@@ -26,7 +26,7 @@ void ContactListener::BeginContact(b2Contact* contact)
 		else
 		{
 			auto square = (SquareNode*)bodyA->GetUserData();
-			//square->addScore(-1);
+			square->addScore(-1);
 		}
 	}
 }

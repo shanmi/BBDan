@@ -23,7 +23,7 @@ bool MarbleModel::haveMarbleMoving()
 {
 	for (auto iter = m_marbles.begin(); iter != m_marbles.end(); ++iter)
 	{
-		if ((*iter)->isMoving())
+		if (!(*iter)->isTrueStop())
 		{
 			return true;
 		}

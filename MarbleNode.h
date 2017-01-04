@@ -28,6 +28,10 @@ public:
 	void setMovingState(bool isMoving){ m_bIsMoving = isMoving; }
 	bool isMoving(){ return m_bIsMoving; }
 
+	void setBodyPosition(cocos2d::CCPoint point);
+
+	bool isTrueStop(){ return m_bTrueStop; }
+
 private:
 	MarbleNode(MarbleAttr attr);
 
@@ -35,5 +39,6 @@ private:
 	MarbleAttr m_attr;
 	b2Body *m_body;
 	bool m_bIsMoving;
+	bool m_bTrueStop;
 };
 #endif

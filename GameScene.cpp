@@ -157,17 +157,17 @@ void GameScene::initSquares()
 
 void GameScene::update(float dt)
 {
-	bool isOneRoundOver = GameController::getInstance()->isRoundOver();
+	/*bool isOneRoundOver = GameController::getInstance()->isRoundOver();
 	if (isOneRoundOver)
 	{
 		return;
-	}
+	}*/
 
-	/*bool haveMarbleMoving = MarbleModel::theModel()->haveMarbleMoving();
+	bool haveMarbleMoving = MarbleModel::theModel()->haveMarbleMoving();
 	if (!haveMarbleMoving)
 	{
 		return;
-	}*/
+	}
 
 	int32 velocityIterations = 10;
 	int32 positionIterations = 10;
@@ -181,14 +181,16 @@ void GameScene::update(float dt)
 		auto &marble = (*iter);
 		auto body = marble->getBody();
 		MarbleNode *ball = (MarbleNode*)(body->GetUserData());
-		b2Vec2 ballPosition = body->GetPosition();
-		ball->setPosition(ccp(ballPosition.x * PTM_RATIO, ballPosition.y * PTM_RATIO));
-		if (!ball->isMoving())
+		if (ball->isMoving())
 		{
-			b2Vec2 post = b2Vec2(m_arrow->getPositionX(), m_arrow->getPositionY());
-			float angle = CC_DEGREES_TO_RADIANS(0);
-			body->SetTransform(post, angle);
+			b2Vec2 ballPosition = body->GetPosition();
+			ball->setPosition(ccp(ballPosition.x * PTM_RATIO, ballPosition.y * PTM_RATIO));
 		}
+		else
+		{
+			marble->setBodyPosition(m_arrow->getPosition());
+		}
+		
 	}
 	
 	//m_arrow->setPosition(ball->getPosition());
@@ -215,8 +217,8 @@ void GameScene::update(float dt)
 
 bool GameScene::ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent)
 {
-	bool isOneRoundOver = GameController::getInstance()->isRoundOver();
-	if (!isOneRoundOver)
+	bool haveMarbleMoving = MarbleModel::theModel()->haveMarbleMoving();
+	if (haveMarbleMoving)
 	{
 		return false;
 	}
