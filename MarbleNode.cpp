@@ -85,10 +85,6 @@ void MarbleNode::moveToTargetPos()
 	auto move = CCMoveTo::create(0.5f, pos);
 	bool isFirst = GameController::getInstance()->getCounter() == 1;
 	bool isCounterFull = GameController::getInstance()->isCounterFull();
-	if (isCounterFull)
-	{
-		//GameController::getInstance()->resetCounter();
-	}
 	auto callback = CCFunctionAction::create([=]()
 	{
 		if (!isFirst)
@@ -103,7 +99,4 @@ void MarbleNode::moveToTargetPos()
 	actions->addAction(move);
 	actions->addAction(callback);
 	actions->runActions();
-	/*b2Vec2 post = b2Vec2((float)(pos.x / PTM_RATIO), (float)(pos.y / PTM_RATIO));
-	float angle = CC_DEGREES_TO_RADIANS(this->getRotation());
-	m_body->SetTransform(post, angle);*/
 }

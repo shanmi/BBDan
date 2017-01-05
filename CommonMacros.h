@@ -1,20 +1,22 @@
 #ifndef __COMMONMACROS_H__
 #define __COMMONMACROS_H__
 
-enum Colors
-{
-	kColorRandom,
-
-	kColorRed,
-	kColorYellow,
-	kColorBlue,
-	kColorGreen,
-	kColorPurple,
-};
 
 enum TouchPriority
 {
 	kPanelTouchPriority = -10,
+};
+
+enum SquareType
+{
+	kType_Empty = 20,
+	kType_Square = 30,
+	kType_Triangle = 14,
+	kType_AddMarble = 10,
+	kType_AddCoin = 6,
+	kType_Rebound = 5,
+	kType_EliminateRow = 7,
+	kType_EliminateCol = 8,
 };
 
 #define NOTIFY_VIEWS(_FUNC_ ,...)						\

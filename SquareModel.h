@@ -13,12 +13,13 @@ public:
 	SquareNode *createSquareNode(int type);
 	void removeSquareNode(SquareNode *node);
 	std::vector<SquareNode*> createSquareList();
-	std::vector<int> getBallListIndex();
 	std::vector<int> getBallListType();
+	int getBallType();
 
 	std::vector<SquareNode*> getSquares(){ return m_squares; }
 
 	void squareMoveDown();
+	void removeBelowSquares();
 
 private:
 	SquareModel(){ m_curScore = 1; }

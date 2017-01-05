@@ -4,12 +4,6 @@
 #include "cocos2d.h"
 #include "Box2D/Box2D.h"
 
-enum SquareType
-{
-	TYPE_SQUARE,
-	TYPE_TRIANGLE
-};
-
 class SquareNode : public cocos2d::CCNode
 {
 public:

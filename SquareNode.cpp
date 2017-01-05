@@ -51,10 +51,10 @@ void SquareNode::setPosition(const cocos2d::CCPoint &position)
 	b2Vec2 post;
 	switch (m_type)
 	{
-	case TYPE_SQUARE:
+	case kType_Square:
 		post = b2Vec2((float)(getPosition().x / PTM_RATIO), (float)((getPosition().y) / PTM_RATIO));
 		break;
-	case TYPE_TRIANGLE:
+	case kType_Triangle:
 		post = b2Vec2((float)((getPosition().x - getContentSize().width / 2) / PTM_RATIO), (float)(((getPosition().y - getContentSize().height / 2)) / PTM_RATIO));
 		break;
 	}
@@ -96,8 +96,7 @@ TriangleNode *TriangleNode::create(int type, int score)
 
 bool TriangleNode::init()
 {
-	srand(time(NULL));
-	int type = 2;// rand() % 4;
+	int type = rand() % 4;
 	char temp[50] = { 0 };
 	sprintf(temp, "half_%d.png", type);
 	auto node = CCSprite::create(temp);

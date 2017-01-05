@@ -26,7 +26,6 @@ public:
 	void startOneRound();
 
 	void addCounter();
-	void resetCounter(){ m_counter = -1000000000000; }
 	int getCounter(){ return m_counter; }
 	void setTargetPos(cocos2d::CCPoint pos){ m_targetPos = pos; }
 	cocos2d::CCPoint getTargetPos(){ return m_targetPos; }

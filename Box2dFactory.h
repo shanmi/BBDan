@@ -28,6 +28,8 @@ public:
 
 	b2Body *createSquareBody(SquareNode *node);
 
+	void removeBody(b2Body *body);
+
 private:
 	Box2dFactory();
 

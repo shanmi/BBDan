@@ -123,7 +123,6 @@ void GameScene::initGameLayout()
 	addChild(m_arrow);
 	m_arrow->setVisible(false);
 	GameController::getInstance()->setTargetPos(m_arrow->getPosition());
-
 }
 
 void GameScene::initPhysicBorder()
@@ -134,13 +133,11 @@ void GameScene::initPhysicBorder()
 
 void GameScene::initMarbles()
 {
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 1; i++)
 	{
 		auto marble = MarbleModel::theModel()->createMarble();
 		marble->setPosition(m_arrow->getPosition());
 		addChild(marble);
-		/*auto body = Box2dFactory::getInstance()->createCircle(marble);
-		marble->setBody(body);*/
 	}
 }
 
@@ -152,8 +149,6 @@ void GameScene::initSquares()
 		auto node = squares[i];
 		node->setPosition(ccp((node->getContentSize().width / 2 + SQUARE_SPACING) + node->getIndex() * (node->getContentSize().width + SQUARE_SPACING), m_bottomLinePos + (node->getContentSize().height + SQUARE_SPACING) * 7.5));
 		addChild(node);
-		/*auto body = Box2dFactory::getInstance()->createSquareBody(node);
-		node->setBody(body);*/
 	}
 }
 
@@ -165,8 +160,6 @@ void GameScene::addSquares()
 		auto node = squares[i];
 		node->setPosition(ccp(node->getContentSize().width / 2 + SQUARE_SPACING + node->getIndex() * (node->getContentSize().width + SQUARE_SPACING), m_bottomLinePos + (node->getContentSize().height + SQUARE_SPACING) * 8.5));
 		addChild(node);
-		/*auto body = Box2dFactory::getInstance()->createSquareBody(node);
-		node->setBody(body);*/
 	}
 }
 
@@ -179,12 +172,6 @@ void GameScene::update(float dt)
 		m_arrow->setPosition(targetPos);
 		return;
 	}
-
-	/*bool haveMarbleMoving = MarbleModel::theModel()->haveMarbleMoving();
-	if (!haveMarbleMoving)
-	{
-	return;
-	}*/
 
 	int32 velocityIterations = 10;
 	int32 positionIterations = 10;
@@ -216,18 +203,10 @@ void GameScene::update(float dt)
 		auto square = *iter;
 		if (square->getScore() <= 0)
 		{
-			m_world->DestroyBody(square->getBody());
 			SquareModel::theModel()->removeSquareNode(square);
 			return;
 		}
 	}
-
-	/*squares = SquareModel::theModel()->getSquares();
-	if (squares.size() == 0)
-	{
-	initSquares();
-	SquareModel::theModel()->squareMoveDown();
-	}*/
 }
 
 bool GameScene::ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent)
@@ -303,4 +282,5 @@ void GameScene::updateSquares()
 void GameScene::showGameOver()
 {
 	CCLog("is game over");
+	SquareModel::theModel()->removeBelowSquares();
 }

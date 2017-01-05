@@ -2,6 +2,7 @@
 #include "cocos2d.h"
 #include "VisibleRect.h"
 #include "SquareNode.h"
+#include "CommonMacros.h"
 
 Box2dFactory::Box2dFactory()
 {
@@ -246,10 +247,15 @@ b2Body *Box2dFactory::createSquareBody(SquareNode *node)
 	int type = node->getType();
 	switch (type)
 	{
-	case TYPE_SQUARE:
+	case kType_Square:
 		return createSquare(node);
-	case TYPE_TRIANGLE:
+	case kType_Triangle:
 		return createTriangle(node);
 	}
 	return createSquare(node);
+}
+
+void Box2dFactory::removeBody(b2Body *body)
+{
+	m_world->DestroyBody(body);
 }
