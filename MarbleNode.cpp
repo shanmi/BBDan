@@ -4,6 +4,7 @@
 #include "Box2dFactory.h"
 #include "CCFunctionAction.h"
 #include "ActionSequence.h"
+#include "GameController.h"
 USING_NS_CC;
 
 MarbleNode::MarbleNode(MarbleAttr attr)
@@ -36,8 +37,20 @@ bool MarbleNode::init()
 	auto size = playerBall->getContentSize();
 
 	setContentSize(size);
+	m_body = Box2dFactory::getInstance()->createCircle(this);
 
 	return true;
+}
+
+void MarbleNode::setPosition(const CCPoint &position)
+{
+	CCNode::setPosition(position);
+	if (!isMoving())
+	{
+		b2Vec2 post = b2Vec2((float)(position.x / PTM_RATIO), (float)(position.y / PTM_RATIO));
+		float angle = CC_DEGREES_TO_RADIANS(this->getRotation());
+		m_body->SetTransform(post, angle);
+	}
 }
 
 void MarbleNode::shoot(float degree)
@@ -59,7 +72,7 @@ void MarbleNode::stop()
 
 }
 
-void MarbleNode::setBodyPosition(cocos2d::CCPoint point)
+void MarbleNode::moveToTargetPos()
 {
 	if (m_bTrueStop)
 	{
@@ -67,16 +80,30 @@ void MarbleNode::setBodyPosition(cocos2d::CCPoint point)
 	}
 	m_bTrueStop = true;
 
+	auto pos = GameController::getInstance()->getTargetPos();
 	auto actions = ActionSequence::create(this);
-	auto move = CCMoveTo::create(0.5f, point);
+	auto move = CCMoveTo::create(0.5f, pos);
+	bool isFirst = GameController::getInstance()->getCounter() == 1;
+	bool isCounterFull = GameController::getInstance()->isCounterFull();
+	if (isCounterFull)
+	{
+		//GameController::getInstance()->resetCounter();
+	}
 	auto callback = CCFunctionAction::create([=]()
 	{
-
+		if (!isFirst)
+		{
+			this->setVisible(false);
+		}
+		if (isCounterFull)
+		{
+			GameController::getInstance()->updateSquares();
+		}
 	});
 	actions->addAction(move);
 	actions->addAction(callback);
 	actions->runActions();
-	b2Vec2 post = b2Vec2((float)(point.x / PTM_RATIO), (float)(point.y / PTM_RATIO));
+	/*b2Vec2 post = b2Vec2((float)(pos.x / PTM_RATIO), (float)(pos.y / PTM_RATIO));
 	float angle = CC_DEGREES_TO_RADIANS(this->getRotation());
-	m_body->SetTransform(post, angle);
+	m_body->SetTransform(post, angle);*/
 }

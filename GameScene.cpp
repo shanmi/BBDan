@@ -6,7 +6,6 @@
 #include "BallHintModel.h"
 #include "Box2dFactory.h"
 #include "MarbleNode.h"
-#include "GameController.h"
 #include "MarbleModel.h"
 #include "ActionSequence.h"
 #include "CCFunctionAction.h"
@@ -17,12 +16,14 @@ void GameScene::onEnter()
 {
 	CCLayer::onEnter();
 	CCDirector::sharedDirector()->getTouchDispatcher()->addTargetedDelegate(this, -1, true);
+	GameController::getInstance()->addView(this);
 }
 
 void GameScene::onExit()
 {
 	CCLayer::onExit();
 	CCDirector::sharedDirector()->getTouchDispatcher()->removeDelegate(this);
+	GameController::getInstance()->removeView(this);
 }
 
 void GameScene::draw()
@@ -121,6 +122,7 @@ void GameScene::initGameLayout()
 	m_arrow->setPosition(ccp(100, m_bottomLinePos + 15));
 	addChild(m_arrow);
 	m_arrow->setVisible(false);
+	GameController::getInstance()->setTargetPos(m_arrow->getPosition());
 
 }
 
@@ -137,8 +139,8 @@ void GameScene::initMarbles()
 		auto marble = MarbleModel::theModel()->createMarble();
 		marble->setPosition(m_arrow->getPosition());
 		addChild(marble);
-		auto body = Box2dFactory::getInstance()->createCircle(marble);
-		marble->setBody(body);
+		/*auto body = Box2dFactory::getInstance()->createCircle(marble);
+		marble->setBody(body);*/
 	}
 }
 
@@ -148,26 +150,41 @@ void GameScene::initSquares()
 	for (int i = 0; i < squares.size(); i++)
 	{
 		auto node = squares[i];
-		node->setPosition(ccp(node->getContentSize().width / 2 + 4 + node->getIndex() * (node->getContentSize().width + 4), m_topLinePos - node->getContentSize().height / 2 - node->getContentSize().height - 4));
+		node->setPosition(ccp((node->getContentSize().width / 2 + SQUARE_SPACING) + node->getIndex() * (node->getContentSize().width + SQUARE_SPACING), m_bottomLinePos + (node->getContentSize().height + SQUARE_SPACING) * 7.5));
 		addChild(node);
-		auto body = Box2dFactory::getInstance()->createSquare(node);
-		node->setBody(body);
+		/*auto body = Box2dFactory::getInstance()->createSquareBody(node);
+		node->setBody(body);*/
+	}
+}
+
+void GameScene::addSquares()
+{
+	auto squares = SquareModel::theModel()->createSquareList();
+	for (int i = 0; i < squares.size(); i++)
+	{
+		auto node = squares[i];
+		node->setPosition(ccp(node->getContentSize().width / 2 + SQUARE_SPACING + node->getIndex() * (node->getContentSize().width + SQUARE_SPACING), m_bottomLinePos + (node->getContentSize().height + SQUARE_SPACING) * 8.5));
+		addChild(node);
+		/*auto body = Box2dFactory::getInstance()->createSquareBody(node);
+		node->setBody(body);*/
 	}
 }
 
 void GameScene::update(float dt)
 {
-	/*bool isOneRoundOver = GameController::getInstance()->isRoundOver();
-	if (isOneRoundOver)
+	bool isRoundOver = GameController::getInstance()->isRoundOver();
+	if (isRoundOver)
 	{
-		return;
-	}*/
-
-	bool haveMarbleMoving = MarbleModel::theModel()->haveMarbleMoving();
-	if (!haveMarbleMoving)
-	{
+		auto targetPos = GameController::getInstance()->getTargetPos();
+		m_arrow->setPosition(targetPos);
 		return;
 	}
+
+	/*bool haveMarbleMoving = MarbleModel::theModel()->haveMarbleMoving();
+	if (!haveMarbleMoving)
+	{
+	return;
+	}*/
 
 	int32 velocityIterations = 10;
 	int32 positionIterations = 10;
@@ -188,13 +205,11 @@ void GameScene::update(float dt)
 		}
 		else
 		{
-			marble->setBodyPosition(m_arrow->getPosition());
+			marble->moveToTargetPos();
 		}
 		
 	}
 	
-	//m_arrow->setPosition(ball->getPosition());
-
 	auto squares = SquareModel::theModel()->getSquares();
 	for (auto iter = squares.begin(); iter!=squares.end(); ++iter)
 	{
@@ -207,18 +222,18 @@ void GameScene::update(float dt)
 		}
 	}
 
-	squares = SquareModel::theModel()->getSquares();
+	/*squares = SquareModel::theModel()->getSquares();
 	if (squares.size() == 0)
 	{
-		initSquares();
-		SquareModel::theModel()->squareMoveDown();
-	}
+	initSquares();
+	SquareModel::theModel()->squareMoveDown();
+	}*/
 }
 
 bool GameScene::ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent)
 {
-	bool haveMarbleMoving = MarbleModel::theModel()->haveMarbleMoving();
-	if (haveMarbleMoving)
+	bool isRoundOver = GameController::getInstance()->isRoundOver();
+	if (!isRoundOver)
 	{
 		return false;
 	}
@@ -260,6 +275,7 @@ void GameScene::ccTouchEnded(CCTouch *pTouch, CCEvent *pEvent)
 	m_arrow->setVisible(false);
 	BallHintModel::theModel()->setHintVisible(false);
 
+	GameController::getInstance()->setRoundState(false);
 	auto actions = ActionSequence::create(this);
 	auto marbles = MarbleModel::theModel()->getMarbles();
 	for (auto iter = marbles.begin(); iter != marbles.end(); ++iter)
@@ -269,10 +285,22 @@ void GameScene::ccTouchEnded(CCTouch *pTouch, CCEvent *pEvent)
 		auto action1 = CCFunctionAction::create([=]()
 		{
 			ball->shoot(m_shootDegree);
+			ball->setVisible(true);
 		});
 		auto action2 = CCDelayTime::create(0.1f);
 		actions->addAction(action1);
 		actions->addAction(action2);
 	}
 	actions->runActions();
+}
+
+void GameScene::updateSquares()
+{
+	addSquares();
+	SquareModel::theModel()->squareMoveDown();
+}
+
+void GameScene::showGameOver()
+{
+	CCLog("is game over");
 }

@@ -7,9 +7,18 @@ SquareModel *SquareModel::theModel()
 	return &model;
 }
 
-SquareNode *SquareModel::createSquareNode()
+SquareNode *SquareModel::createSquareNode(int type)
 {
-	SquareNode *node = SquareNode::create(m_curScore);
+	SquareNode *node;
+	switch (type)
+	{
+	case TYPE_SQUARE:
+		node = SquareNode::create(type, m_curScore);
+		break;
+	case TYPE_TRIANGLE:
+		node = TriangleNode::create(type, m_curScore);
+		break;
+	}
 	m_squares.push_back(node);
 	return node;
 }
@@ -29,11 +38,13 @@ std::vector<SquareNode*> SquareModel::createSquareList()
 	std::vector<SquareNode*> nodes;
 
 	std::vector<int> ballListIndex = getBallListIndex();
+	std::vector<int> ballListType = getBallListType();
+	int index = 0;
 	for (int i = 0; i < BALL_COL_SIZE; i++)
 	{
 		if (find(ballListIndex.begin(), ballListIndex.end(), i) != ballListIndex.end())
 		{
-			auto node = createSquareNode();
+			auto node = createSquareNode(ballListType.at(index++));
 			node->setIndex(i);
 			nodes.push_back(node);
 		}
@@ -45,6 +56,11 @@ std::vector<SquareNode*> SquareModel::createSquareList()
 std::vector<int> SquareModel::getBallListIndex()
 {
 	return{ 0, 2, 4, 6 };
+}
+
+std::vector<int> SquareModel::getBallListType()
+{
+	return{ 0, 1, 0, 1 };
 }
 
 void SquareModel::squareMoveDown()

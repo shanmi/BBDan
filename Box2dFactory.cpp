@@ -1,6 +1,7 @@
 #include "Box2dFactory.h"
 #include "cocos2d.h"
 #include "VisibleRect.h"
+#include "SquareNode.h"
 
 Box2dFactory::Box2dFactory()
 {
@@ -154,7 +155,15 @@ b2Body *Box2dFactory::createCircle(CCNode *node)
 
 b2Body *Box2dFactory::createSquare(CCNode *node)
 {
-	auto worldPos = node->getParent()->convertToWorldSpace(node->getPosition());
+	CCPoint worldPos;
+	if (node->getParent())
+	{
+		worldPos = node->getParent()->convertToWorldSpace(node->getPosition());
+	}
+	else
+	{
+		worldPos = node->getPosition();
+	}
 	b2BodyDef bodyDef;
 	bodyDef.type = b2_staticBody; //dynatic status
 	bodyDef.userData = node;    //save data for finding sprite by body
@@ -178,17 +187,48 @@ b2Body *Box2dFactory::createSquare(CCNode *node)
 
 b2Body *Box2dFactory::createTriangle(cocos2d::CCNode *node)
 {
+	CCPoint worldPos;
+	if (node->getParent())
+	{
+		worldPos = node->getParent()->convertToWorldSpace(node->getPosition());
+	}
+	else
+	{
+		worldPos = node->getPosition();
+	}
 	b2BodyDef bodyDef;
 	bodyDef.userData = node;
 	bodyDef.type = b2_staticBody;
-	bodyDef.position.Set(node->getPositionX() / PTM_RATIO, node->getPositionY() / PTM_RATIO);
+	bodyDef.position.Set((worldPos.x - node->getContentSize().width / 2) / PTM_RATIO, (worldPos.y -node->getContentSize().height / 2) / PTM_RATIO);
 	b2Body *pBody = m_world->CreateBody(&bodyDef);
 
 	b2PolygonShape bodyShape;
 	b2Vec2 vertices[3];
-	vertices[0].Set(0.0f, 0.0f);
-	vertices[1].Set(node->getContentSize().width / PTM_RATIO, 0.0f);
-	vertices[2].Set(0.0f, node->getContentSize().height / PTM_RATIO);
+
+	int type = node->getTag();
+	switch (type)
+	{
+	case 0:
+		vertices[0].Set(0.0f, 0.0f);
+		vertices[1].Set(node->getContentSize().width / PTM_RATIO, 0.0f);
+		vertices[2].Set(0.0f, node->getContentSize().height / PTM_RATIO);
+		break;
+	case 1:
+		vertices[0].Set(0.0f, 0.0f);
+		vertices[1].Set(node->getContentSize().width / PTM_RATIO, node->getContentSize().height / PTM_RATIO);
+		vertices[2].Set(0.0f, node->getContentSize().height / PTM_RATIO);
+		break;
+	case 2:
+		vertices[0].Set(node->getContentSize().width / PTM_RATIO, node->getContentSize().height / PTM_RATIO);
+		vertices[1].Set(0, node->getContentSize().height / PTM_RATIO);
+		vertices[2].Set(node->getContentSize().width / PTM_RATIO, 0);
+		break;
+	case 3:
+		vertices[0].Set(0.0f, 0.0f);
+		vertices[1].Set(node->getContentSize().width / PTM_RATIO, 0.0f);
+		vertices[2].Set(node->getContentSize().width / PTM_RATIO, node->getContentSize().height / PTM_RATIO);
+		break;
+	}
 	bodyShape.Set(vertices, 3);
 
 	b2FixtureDef bodyFixture; //attribute of the node
@@ -199,4 +239,17 @@ b2Body *Box2dFactory::createTriangle(cocos2d::CCNode *node)
 	bodyFixture.restitution = 1.0f;
 	pBody->CreateFixture(&bodyFixture);
 	return pBody;
+}
+
+b2Body *Box2dFactory::createSquareBody(SquareNode *node)
+{
+	int type = node->getType();
+	switch (type)
+	{
+	case TYPE_SQUARE:
+		return createSquare(node);
+	case TYPE_TRIANGLE:
+		return createTriangle(node);
+	}
+	return createSquare(node);
 }

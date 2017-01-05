@@ -9,8 +9,6 @@ USING_NS_CC;
 
 void ContactListener::BeginContact(b2Contact* contact)
 {
-	CCLog("BeginContact");
-
 	b2Body* bodyA = contact->GetFixtureA()->GetBody();
 	b2Body* bodyB = contact->GetFixtureB()->GetBody();
 	auto spriteA = (CCNode*)bodyA->GetUserData();
@@ -20,8 +18,15 @@ void ContactListener::BeginContact(b2Contact* contact)
 	{
 		if (spriteA->getTag() == 100)
 		{
+			if (!GameController::getInstance()->isCounterFull() && spriteB->isMoving())
+			{
+				GameController::getInstance()->addCounter();
+			}
+			if (GameController::getInstance()->getCounter() == 1)
+			{
+				GameController::getInstance()->setTargetPos(spriteB->getPosition());
+			}
 			spriteB->stop();
-			GameController::getInstance()->endOneRound();
 		}
 		else
 		{
@@ -34,9 +39,6 @@ void ContactListener::BeginContact(b2Contact* contact)
 
 void ContactListener::EndContact(b2Contact* contact)
 {
-	CCLog("EndContact");
-
-
 	b2Body* bodyA = contact->GetFixtureA()->GetBody();
 	b2Body* bodyB = contact->GetFixtureB()->GetBody();
 	auto spriteA = (CCSprite*)bodyA->GetUserData();

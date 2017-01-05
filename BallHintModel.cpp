@@ -35,7 +35,7 @@ void BallHintModel::updatePosition(CCPoint pos1, CCPoint pos2, cocos2d::CCPoint 
 {
 	float degree = GameUtil::getDegreeTwoPoints(pos1, pos2);
 	float distance = ccpDistance(pos1, pos2);
-	CCLog("distance=-============%f", distance);
+	//CCLog("distance=-============%f", distance);
 
 	float radian = GameUtil::getRadian(degree);
 	float x = cos(radian);

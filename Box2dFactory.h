@@ -8,6 +8,7 @@
 
 #define PTM_RATIO 32
 
+class SquareNode;
 class Box2dFactory
 {
 public:
@@ -24,6 +25,8 @@ public:
 	b2Body *createCircle(cocos2d::CCNode *node);
 	b2Body *createSquare(cocos2d::CCNode *node);
 	b2Body *createTriangle(cocos2d::CCNode *node);
+
+	b2Body *createSquareBody(SquareNode *node);
 
 private:
 	Box2dFactory();

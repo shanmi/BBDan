@@ -17,6 +17,7 @@ public:
 	~MarbleNode();
 
 	virtual bool init();
+	virtual void setPosition(const cocos2d::CCPoint &position);
 	
 public:
 	void setBody(b2Body *body){ m_body = body; }
@@ -28,7 +29,7 @@ public:
 	void setMovingState(bool isMoving){ m_bIsMoving = isMoving; }
 	bool isMoving(){ return m_bIsMoving; }
 
-	void setBodyPosition(cocos2d::CCPoint point);
+	void moveToTargetPos();
 
 	bool isTrueStop(){ return m_bTrueStop; }
 

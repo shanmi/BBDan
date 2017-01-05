@@ -10,10 +10,11 @@ public:
 	~SquareModel(){}
 
 public:
-	SquareNode *createSquareNode();
+	SquareNode *createSquareNode(int type);
 	void removeSquareNode(SquareNode *node);
 	std::vector<SquareNode*> createSquareList();
 	std::vector<int> getBallListIndex();
+	std::vector<int> getBallListType();
 
 	std::vector<SquareNode*> getSquares(){ return m_squares; }
 

@@ -4,15 +4,23 @@
 #include "cocos2d.h"
 #include "Box2D/Box2D.h"
 
+enum SquareType
+{
+	TYPE_SQUARE,
+	TYPE_TRIANGLE
+};
+
 class SquareNode : public cocos2d::CCNode
 {
 public:
-	static SquareNode *create(int score);
-	SquareNode(int score);
+	static SquareNode *create(int type, int score);
+	SquareNode(int type, int score);
 	~SquareNode(){}
 
 	virtual bool init();
+	virtual void setPosition(const cocos2d::CCPoint &position);
 public:
+	int getType(){ return m_type; }
 	void setIndex(int index){ m_index = index; }
 	int getIndex() { return m_index; }
 	
@@ -27,6 +35,7 @@ public:
 protected:
 	b2Body *m_body;
 	cocos2d::CCLabelTTF *m_scoreLabel;
+	int m_type;
 	int m_score;
 	int m_index;
 
@@ -35,8 +44,8 @@ protected:
 class TriangleNode : public SquareNode
 {
 public:
-	TriangleNode(int score) : SquareNode(score){}
-	static TriangleNode *create(int score);
+	TriangleNode(int type, int score) : SquareNode(type, score){ }
+	static TriangleNode *create(int type, int score);
 	virtual bool init();
 };
 

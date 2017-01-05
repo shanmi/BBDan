@@ -6,6 +6,7 @@ MarbleModel::MarbleModel()
 	m_attr.skin = 1;
 	m_attr.damage = 1;
 }
+
 MarbleModel *MarbleModel::theModel()
 {
 	static MarbleModel model;

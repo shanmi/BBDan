@@ -3,10 +3,14 @@
 
 #include "cocos2d.h"
 #include "Box2D/Box2D.h"
+#include "GameController.h"
 
 class UiLayout;
 class MarbleNode;
-class GameScene : public cocos2d::CCLayer{
+class GameScene 
+	: public cocos2d::CCLayer
+	, public INotifyView
+{
 public:
 	virtual bool init();
 	static cocos2d::CCScene *scene();
@@ -24,12 +28,17 @@ public:
 	virtual void ccTouchEnded(cocos2d::CCTouch *pTouch, cocos2d::CCEvent *pEvent);
 
 public:
+	void updateSquares();
+	void showGameOver();
+
+public:
 	void initTopLayout();
 	void initBottomLayout();
 	void initGameLayout();
+	void initPhysicBorder();
 	void initMarbles();
 	void initSquares();
-	void initPhysicBorder();
+	void addSquares();
 
 private:
 	b2World *m_world;
