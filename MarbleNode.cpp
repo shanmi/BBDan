@@ -36,8 +36,9 @@ bool MarbleNode::init()
 	addChild(playerBall);
 	auto size = playerBall->getContentSize();
 
+	setTag(kTag_Marble);
 	setContentSize(size);
-	m_body = Box2dFactory::getInstance()->createCircle(this);
+	m_body = Box2dFactory::getInstance()->createMarble(this);
 
 	return true;
 }
@@ -93,7 +94,7 @@ void MarbleNode::moveToTargetPos()
 		}
 		if (isCounterFull)
 		{
-			GameController::getInstance()->updateSquares();
+			GameController::getInstance()->oneRoundEnd();
 		}
 	});
 	actions->addAction(move);

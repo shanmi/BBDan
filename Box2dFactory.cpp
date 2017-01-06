@@ -27,7 +27,7 @@ void Box2dFactory::initPhysics()
 	m_world = new b2World(gravity);
 
 	// Do we want to let bodies sleep?
-	m_world->SetAllowSleeping(true);
+	m_world->SetAllowSleeping(false);
 
 	m_world->SetContinuousPhysics(true);
 
@@ -132,7 +132,7 @@ void Box2dFactory::initBorders(float topLine, float bottomLine)
 	groundBody->CreateFixture(&groundBox, 0);
 }
 
-b2Body *Box2dFactory::createCircle(CCNode *node)
+b2Body *Box2dFactory::createMarble(CCNode *node)
 {
 	b2BodyDef bodyDef;
 	bodyDef.type = b2_dynamicBody; //dynatic status
@@ -154,6 +154,38 @@ b2Body *Box2dFactory::createCircle(CCNode *node)
 	return pBody;
 }
 
+b2Body *Box2dFactory::createCircle(CCNode *node, CCSize size, bool isSensor)
+{
+	CCPoint worldPos;
+	if (node->getParent())
+	{
+		worldPos = node->getParent()->convertToWorldSpace(node->getPosition());
+	}
+	else
+	{
+		worldPos = node->getPosition();
+	}
+	b2BodyDef bodyDef;
+	bodyDef.type = b2_staticBody; //static status
+	bodyDef.userData = node;    //save data for finding sprite by body
+	bodyDef.linearDamping = 0.0f; //original speed 0
+	bodyDef.position.Set(worldPos.x / PTM_RATIO, worldPos.y / PTM_RATIO); //mid point
+	b2Body *pBody = m_world->CreateBody(&bodyDef); // create a body in Box2D world
+
+	b2CircleShape bodyShape;
+	bodyShape.m_radius = size.width * 0.5f / PTM_RATIO;
+
+	b2FixtureDef bodyFixture; //attribute of the node
+	bodyFixture.filter.groupIndex = 1; //check collision 
+	bodyFixture.density = 0;
+	bodyFixture.shape = &bodyShape;
+	bodyFixture.friction = 0.0f;
+	bodyFixture.restitution = 1.0f;
+	bodyFixture.isSensor = isSensor; //check collision but not contact when isSensor is true
+	pBody->CreateFixture(&bodyFixture);
+	return pBody;
+}
+
 b2Body *Box2dFactory::createSquare(CCNode *node)
 {
 	CCPoint worldPos;
@@ -166,7 +198,7 @@ b2Body *Box2dFactory::createSquare(CCNode *node)
 		worldPos = node->getPosition();
 	}
 	b2BodyDef bodyDef;
-	bodyDef.type = b2_staticBody; //dynatic status
+	bodyDef.type = b2_staticBody; //static status
 	bodyDef.userData = node;    //save data for finding sprite by body
 	bodyDef.linearDamping = 0.0f; //original speed 0
 	bodyDef.position.Set(worldPos.x / PTM_RATIO, worldPos.y / PTM_RATIO); //mid point
@@ -240,19 +272,6 @@ b2Body *Box2dFactory::createTriangle(cocos2d::CCNode *node)
 	bodyFixture.restitution = 1.0f;
 	pBody->CreateFixture(&bodyFixture);
 	return pBody;
-}
-
-b2Body *Box2dFactory::createSquareBody(SquareNode *node)
-{
-	int type = node->getType();
-	switch (type)
-	{
-	case kType_Square:
-		return createSquare(node);
-	case kType_Triangle:
-		return createTriangle(node);
-	}
-	return createSquare(node);
 }
 
 void Box2dFactory::removeBody(b2Body *body)

@@ -5,19 +5,21 @@
 #include "ActionSequence.h"
 #include "CCFunctionAction.h"
 #include "Config.h"
+#include "MarbleModel.h"
+#include "SquareModel.h"
 
 USING_NS_CC;
 
-SquareNode::SquareNode(int type, int score)
-:m_type(type)
-,m_score(score)
+SquareNode::SquareNode()
+:m_scoreLabel(NULL)
+, m_collisionType(kCollision_Square)
 {
-
+	
 }
 
-SquareNode *SquareNode::create(int type, int score)
+SquareNode *SquareNode::create()
 {
-	SquareNode *node = new SquareNode(type, score);
+	SquareNode *node = new SquareNode();
 	node->autorelease();
 	node->init();
 	return node;
@@ -25,6 +27,8 @@ SquareNode *SquareNode::create(int type, int score)
 
 bool SquareNode::init()
 {
+	m_score = SquareModel::theModel()->getCurrentScore();
+
 	auto node = CCSprite::create("brick.png");
 	auto color = ccc3(255, 255 - (m_score * 13) % 256, (m_score * 7) % 256);
 	node->setColor(color);
@@ -49,15 +53,7 @@ void SquareNode::setPosition(const cocos2d::CCPoint &position)
 {
 	CCNode::setPosition(position);
 	b2Vec2 post;
-	switch (m_type)
-	{
-	case kType_Square:
-		post = b2Vec2((float)(getPosition().x / PTM_RATIO), (float)((getPosition().y) / PTM_RATIO));
-		break;
-	case kType_Triangle:
-		post = b2Vec2((float)((getPosition().x - getContentSize().width / 2) / PTM_RATIO), (float)(((getPosition().y - getContentSize().height / 2)) / PTM_RATIO));
-		break;
-	}
+	post = b2Vec2((float)(getPosition().x / PTM_RATIO), (float)((getPosition().y) / PTM_RATIO));
 	float angle = CC_DEGREES_TO_RADIANS(this->getRotation());
 	m_body->SetTransform(post, angle);
 }
@@ -66,7 +62,10 @@ void SquareNode::addScore(int score)
 {
 	m_score += score;
 	std::string scoreStr = GameUtil::intToString(m_score);
-	m_scoreLabel->setString(scoreStr.c_str());
+	if (m_scoreLabel)
+	{
+		m_scoreLabel->setString(scoreStr.c_str());
+	}
 }
 
 void SquareNode::moveDown()
@@ -85,10 +84,45 @@ void SquareNode::moveDown()
 	actions->runActions();
 }
 
-/////////////////////////////////////////////////////////////////////////////////////
-TriangleNode *TriangleNode::create(int type, int score)
+bool SquareNode::shouldRemoveDirectly()
 {
-	TriangleNode *node = new TriangleNode(type, score);
+	switch (m_collisionType)
+	{
+	case kCollision_Square:
+	case kCollision_Triangle:
+	case kCollision_AddMarble:
+	case kCollision_AddCoin:
+		return true;
+		break;
+	case kCollision_Rebound:
+	case kCollision_EliminateRow:
+	case kCollision_EliminateCol:
+		return false;
+		break;
+	default:
+		break;
+	}
+	return false;
+}
+
+void SquareNode::doScaleAction()
+{
+	auto scaleTo = CCScaleBy::create(0.1f, 1.2f);
+	auto scaleBack = scaleTo->reverse();
+	auto actions = CCSequence::create(scaleTo, scaleBack, NULL);
+	runAction(actions);
+}
+
+void SquareNode::doCollisionAction()
+{
+	int attactRate = GameController::getInstance()->getAttactRate();
+	addScore(-attactRate);
+}
+
+/////////////////////////////////////////////////////////////////////////////////////
+TriangleNode *TriangleNode::create()
+{
+	TriangleNode *node = new TriangleNode();
 	node->autorelease();
 	node->init();
 	return node;
@@ -96,6 +130,8 @@ TriangleNode *TriangleNode::create(int type, int score)
 
 bool TriangleNode::init()
 {
+	m_score = SquareModel::theModel()->getCurrentScore();
+
 	int type = rand() % 4;
 	char temp[50] = { 0 };
 	sprintf(temp, "half_%d.png", type);
@@ -133,4 +169,19 @@ bool TriangleNode::init()
 	m_body = Box2dFactory::getInstance()->createTriangle(this);
 
 	return true;
+}
+
+void TriangleNode::setPosition(const cocos2d::CCPoint &position)
+{
+	CCNode::setPosition(position);
+	b2Vec2 post;
+	post = b2Vec2((float)((getPosition().x - getContentSize().width / 2) / PTM_RATIO), (float)(((getPosition().y - getContentSize().height / 2)) / PTM_RATIO));
+	float angle = CC_DEGREES_TO_RADIANS(this->getRotation());
+	m_body->SetTransform(post, angle);
+}
+
+void TriangleNode::doCollisionAction()
+{
+	int attactRate = GameController::getInstance()->getAttactRate();
+	addScore(-attactRate);
 }

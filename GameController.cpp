@@ -1,11 +1,13 @@
 #include "GameController.h"
 #include "MarbleModel.h"
 #include "SquareModel.h"
+#include "GameData.h"
 GameController::GameController()
+:m_counter(-1)
+, m_bIsRoundOver(true)
+, m_targetPos(ccp(0, 0))
+, m_attactRate(ATTACT_RATE)
 {
-	m_counter = -1;
-	m_bIsRoundOver = true;
-	m_targetPos = ccp(0, 0);
 }
 
 void GameController::addView(INotifyView *view)
@@ -50,17 +52,46 @@ bool GameController::isCounterFull()
 	return false;
 }
 
+void GameController::checkSquares(bool isCheckTool /* = false */)
+{
+	auto squares = SquareModel::theModel()->getSquares();
+	for (auto iter = squares.begin(); iter != squares.end(); ++iter)
+	{
+		auto square = *iter;
+		if (square->getScore() <= 0)
+		{
+			if (square->shouldRemoveDirectly() || isCheckTool)
+			{
+				SquareModel::theModel()->removeSquareNode(square);
+			}
+		}
+	}
+}
 bool GameController::checkGameOver()
 {
 	auto squares = SquareModel::theModel()->getSquares();
 	for (auto iter = squares.begin(); iter != squares.end(); ++iter)
 	{
-		auto sqaure = (*iter);
-		if (sqaure->getPositionY() - sqaure->getContentSize().height < m_targetPos.y)
+		auto &square = (*iter);
+		if (square->getPositionY() - square->getContentSize().height < m_targetPos.y)
 		{
-			showGameOver();
-			return true;
+			if (square->getCollisionType() == kCollision_Square || square->getCollisionType() == kCollision_Triangle)
+			{
+				showGameOver();
+				return true;
+			}
+			SquareModel::theModel()->removeSquareNode(square);
 		}
+	}
+	return false;
+}
+
+bool GameController::checkCoinsEnought()
+{
+	int coinCount = GameData::getInstance()->getCoins();
+	if (coinCount >= DOUBLE_ATTACT_COST_COIN)
+	{
+		return true;
 	}
 	return false;
 }

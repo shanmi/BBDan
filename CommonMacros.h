@@ -19,6 +19,23 @@ enum SquareType
 	kType_EliminateCol = 8,
 };
 
+enum CollisionType
+{
+	kCollision_Square,
+	kCollision_Triangle,
+	kCollision_AddMarble,
+	kCollision_AddCoin,
+	kCollision_Rebound,
+	kCollision_EliminateRow,
+	kCollision_EliminateCol,
+};
+
+enum ViewTag
+{
+	kTag_Wall = 100,
+	kTag_Marble = 200,
+};
+
 #define NOTIFY_VIEWS(_FUNC_ ,...)						\
 for (size_t index = 0; index < m_views.size(); ++index) \
 {														\

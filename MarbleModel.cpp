@@ -5,6 +5,8 @@ MarbleModel::MarbleModel()
 {
 	m_attr.skin = 1;
 	m_attr.damage = 1;
+
+	m_marblesCount = 0;
 }
 MarbleModel *MarbleModel::theModel()
 {
@@ -15,7 +17,9 @@ MarbleModel *MarbleModel::theModel()
 MarbleNode* MarbleModel::createMarble()
 {
 	MarbleNode *marble = MarbleNode::create(m_attr);
+	marble->setVisible(false);
 	m_marbles.push_back(marble);
+	m_marblesCount = m_marbles.size();
 	return marble;
 }
 
@@ -29,4 +33,14 @@ bool MarbleModel::haveMarbleMoving()
 		}
 	}
 	return false;
+}
+
+int MarbleModel::checkMarblesCount()
+{
+	int curCount = m_marbles.size();
+	if (m_marblesCount > curCount)
+	{
+		return m_marblesCount - curCount;
+	}
+	return 0;
 }

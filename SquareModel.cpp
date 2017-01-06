@@ -3,6 +3,7 @@
 #include "CommonMacros.h"
 #include "GameController.h"
 #include "Box2dFactory.h"
+#include "CircleNode.h"
 
 SquareModel *SquareModel::theModel()
 {
@@ -16,13 +17,37 @@ SquareNode *SquareModel::createSquareNode(int type)
 	switch (type)
 	{
 	case kType_Square:
-		node = SquareNode::create(type, m_curScore);
+		node = SquareNode::create();
 		break;
 	case kType_Triangle:
-		node = TriangleNode::create(type, m_curScore);
+		node = TriangleNode::create();
+		break;
+	case kType_AddMarble:
+		node = CircleAddMarbleNode::create();
+		break;
+	case kType_EliminateRow:
+		node = CircleEliRowNode::create();
+		break;
+	case kType_EliminateCol:
+		node = CircleEliRowNode::create();
+		break;
+	case kType_Rebound:
+		node = CircleReboundNode::create();
+		break;
+	case kType_AddCoin:
+		node = CircleAddCoinNode::create();
+		break;
+	case kType_Empty:
+		node = nullptr;
+		break;
+	default:
+		assert(false && "not exit square type!");
 		break;
 	}
-	m_squares.push_back(node);
+	if (node != nullptr)
+	{
+		m_squares.push_back(node);
+	}
 	return node;
 }
 
@@ -45,30 +70,19 @@ std::vector<SquareNode*> SquareModel::createSquareList()
 	std::vector<int> ballListType = getBallListType();
 	for (int i = 0; i < BALL_COL_SIZE; i++)
 	{
-		int type = ballListType.at(i);
-		SquareNode *node;
-		switch (type)
+		int type = kType_AddCoin;// ballListType.at(i);
+		int random = rand() % 2;
+		if (random == 1)
 		{
-		case kType_Empty:
-			break;
-		case kType_Square:
-		case kType_Triangle:
-			node = createSquareNode(type);
+			type = kType_Square;
+		}
+
+		type = ballListType.at(i);
+		SquareNode *node = createSquareNode(type);
+		if (node != nullptr)
+		{
 			node->setIndex(i);
 			nodes.push_back(node);
-			break;
-		case kType_AddMarble:
-			break;
-		case kType_AddCoin:
-			break;
-		case kType_Rebound:
-			break;
-		case kType_EliminateRow:
-			break;
-		case kType_EliminateCol:
-			break;
-		default:
-			break;
 		}
 	}
 	m_curScore++;
@@ -117,7 +131,6 @@ int SquareModel::getBallType()
 			return type;
 		}
 	}
-
 }
 
 void SquareModel::removeBelowSquares()
@@ -126,10 +139,34 @@ void SquareModel::removeBelowSquares()
 	auto squares = m_squares;
 	for (auto iter = squares.begin(); iter != squares.end(); ++iter)
 	{
-		auto &sqaure = (*iter);
-		if (sqaure->getPositionY() - sqaure->getContentSize().height * 3 < bottomPos.y)
+		auto &square = (*iter);
+		if (square->getPositionY() - square->getContentSize().height * 3 < bottomPos.y)
 		{
 			removeSquareNode(*iter);
+		}
+	}
+}
+
+void SquareModel::elimateSameRowSquare(SquareNode *node)
+{
+	for (auto iter = m_squares.begin(); iter != m_squares.end(); ++iter)
+	{
+		auto &square = (*iter);
+		if ((square->getCollisionType() == kCollision_Square || square->getCollisionType() == kCollision_Triangle) && square->getPositionY() == node->getPositionY())
+		{
+			square->addScore(-1);
+		}
+	}
+}
+
+void SquareModel::elimateSameColSquare(SquareNode *node)
+{
+	for (auto iter = m_squares.begin(); iter != m_squares.end(); ++iter)
+	{
+		auto &square = (*iter);
+		if ((square->getCollisionType() == kCollision_Square || square->getCollisionType() == kCollision_Triangle) && square->getPositionX() == node->getPositionX())
+		{
+			square->addScore(-1);
 		}
 	}
 }

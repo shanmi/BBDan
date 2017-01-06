@@ -9,6 +9,7 @@
 #include "MarbleModel.h"
 #include "ActionSequence.h"
 #include "CCFunctionAction.h"
+#include "GameData.h"
 
 USING_NS_CC;
 
@@ -98,11 +99,38 @@ void GameScene::initTopLayout()
 void GameScene::initBottomLayout()
 {
 	CCSprite *line_bottom = dynamic_cast<CCSprite*>(m_bottomLayout->getChildById(2));
-	line_bottom->setTag(100);
+	line_bottom->setTag(kTag_Wall);
 	auto worldPos = line_bottom->convertToWorldSpace(CCPointZero);
 	m_bottomLinePos = worldPos.y;
 
 	Box2dFactory::getInstance()->createSquare(line_bottom);
+
+	updateCoins();
+
+	CCMenuItem *doubleAttactBtn = dynamic_cast<CCMenuItem*>(m_bottomLayout->getChildById(6));
+	doubleAttactBtn->setTarget(this, menu_selector(GameScene::onDoubleAttact));
+
+	CCSprite *character = dynamic_cast<CCSprite*>(m_bottomLayout->getChildById(3));
+	character->setPosition(ccp(100, m_bottomLinePos + 15));
+}
+
+void GameScene::onDoubleAttact(CCObject *pSender)
+{
+	bool ifCoinEnought = GameController::getInstance()->checkCoinsEnought();
+	if (ifCoinEnought)
+	{
+		GameData::getInstance()->addCoins(-DOUBLE_ATTACT_COST_COIN);
+		updateCoins();
+
+		CCMenuItem *item = (CCMenuItem*)(pSender);
+		item->setVisible(false);
+		GameController::getInstance()->setDoubleAttact();
+	}
+	else
+	{
+		// show pay point
+	}
+	
 }
 
 void GameScene::initGameLayout()
@@ -117,9 +145,10 @@ void GameScene::initGameLayout()
 	addChild(m_touchPoint);
 	m_touchPoint->setVisible(false);
 
+	CCSprite *character = dynamic_cast<CCSprite*>(m_bottomLayout->getChildById(3));
 	m_arrow = CCSprite::create("arrow.png");
 	m_arrow->setAnchorPoint(ccp(1.0f, 0.5f));
-	m_arrow->setPosition(ccp(100, m_bottomLinePos + 15));
+	m_arrow->setPosition(character->getPosition());
 	addChild(m_arrow);
 	m_arrow->setVisible(false);
 	GameController::getInstance()->setTargetPos(m_arrow->getPosition());
@@ -194,19 +223,10 @@ void GameScene::update(float dt)
 		{
 			marble->moveToTargetPos();
 		}
-		
 	}
 	
-	auto squares = SquareModel::theModel()->getSquares();
-	for (auto iter = squares.begin(); iter!=squares.end(); ++iter)
-	{
-		auto square = *iter;
-		if (square->getScore() <= 0)
-		{
-			SquareModel::theModel()->removeSquareNode(square);
-			return;
-		}
-	}
+	//check squares by not check tool
+	GameController::getInstance()->checkSquares();
 }
 
 bool GameScene::ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent)
@@ -273,10 +293,47 @@ void GameScene::ccTouchEnded(CCTouch *pTouch, CCEvent *pEvent)
 	actions->runActions();
 }
 
-void GameScene::updateSquares()
+void GameScene::oneRoundEnd()
 {
 	addSquares();
 	SquareModel::theModel()->squareMoveDown();
+
+	//check marbles
+	int addCount = MarbleModel::theModel()->checkMarblesCount();
+	auto pos = GameController::getInstance()->getTargetPos();
+	for (int i = 0; i < addCount; i++)
+	{
+		auto marble = MarbleModel::theModel()->createMarble();
+		marble->setPosition(pos);
+		addChild(marble);
+	}
+
+	//check tools when one round end and delete "0 score" tool
+	GameController::getInstance()->checkSquares(true);
+
+	//reset doubleAttact buttom
+	GameController::getInstance()->resetAttactRate();
+	CCMenuItem *doubleAttactBtn = dynamic_cast<CCMenuItem*>(m_bottomLayout->getChildById(6));
+	doubleAttactBtn->setVisible(true);
+
+	//check character's position
+	auto targetPos = GameController::getInstance()->getTargetPos();
+	CCSprite *character = dynamic_cast<CCSprite*>(m_bottomLayout->getChildById(3));
+	auto moveTo = CCMoveTo::create(0.5f, targetPos);
+	character->runAction(moveTo);
+}
+
+void GameScene::updateMarbles()
+{
+	// just show adding marble action
+}
+
+void GameScene::updateCoins()
+{
+	int coinCount = GameData::getInstance()->getCoins();
+	std::string countStr = GameUtil::intToString(coinCount);
+	CCLabelTTF *coinLabel = dynamic_cast<CCLabelTTF*>(m_bottomLayout->getChildById(5));
+	coinLabel->setString(countStr.c_str());
 }
 
 void GameScene::showGameOver()

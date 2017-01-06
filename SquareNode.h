@@ -3,21 +3,32 @@
 
 #include "cocos2d.h"
 #include "Box2D/Box2D.h"
+#include "CommonMacros.h"
+
+struct CommonAction
+{
+	virtual void doCollisionAction(){}
+};
 
 class SquareNode : public cocos2d::CCNode
+	, public CommonAction
 {
 public:
-	static SquareNode *create(int type, int score);
-	SquareNode(int type, int score);
+	static SquareNode *create();
+	SquareNode();
 	~SquareNode(){}
 
 	virtual bool init();
 	virtual void setPosition(const cocos2d::CCPoint &position);
+
+	virtual void doScaleAction();
+	virtual void doCollisionAction();
 public:
-	int getType(){ return m_type; }
 	void setIndex(int index){ m_index = index; }
 	int getIndex() { return m_index; }
 	
+	int getCollisionType(){ return m_collisionType; }
+
 	void addScore(int score);
 	int getScore() { return m_score; }
 
@@ -26,10 +37,12 @@ public:
 
 	void moveDown();
 
+	bool shouldRemoveDirectly();
+
 protected:
 	b2Body *m_body;
 	cocos2d::CCLabelTTF *m_scoreLabel;
-	int m_type;
+	int m_collisionType;
 	int m_score;
 	int m_index;
 
@@ -38,9 +51,11 @@ protected:
 class TriangleNode : public SquareNode
 {
 public:
-	TriangleNode(int type, int score) : SquareNode(type, score){ }
-	static TriangleNode *create(int type, int score);
+	TriangleNode() : SquareNode(){ m_collisionType = kCollision_Triangle; }
+	static TriangleNode *create();
 	virtual bool init();
+	virtual void setPosition(const cocos2d::CCPoint &position);
+	virtual void doCollisionAction();
 };
 
 #endif

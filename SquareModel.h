@@ -15,11 +15,14 @@ public:
 	std::vector<SquareNode*> createSquareList();
 	std::vector<int> getBallListType();
 	int getBallType();
+	int getCurrentScore(){ return m_curScore; }
 
 	std::vector<SquareNode*> getSquares(){ return m_squares; }
 
 	void squareMoveDown();
 	void removeBelowSquares();
+	void elimateSameRowSquare(SquareNode *node);
+	void elimateSameColSquare(SquareNode *node);
 
 private:
 	SquareModel(){ m_curScore = 1; }

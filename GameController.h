@@ -3,10 +3,13 @@
 
 #include "cocos2d.h"
 #include "CommonMacros.h"
+#include "Config.h"
 
 struct INotifyView
 {
-	virtual void updateSquares(){}
+	virtual void oneRoundEnd(){}
+	virtual void updateMarbles(){}
+	virtual void updateCoins(){}
 	virtual void showGameOver(){}
 };
 
@@ -19,9 +22,10 @@ public:
 public:
 	void addView(INotifyView *view);
 	void removeView(INotifyView *view);
-	void updateSquares(){ NOTIFY_VIEWS(updateSquares); }
+	void oneRoundEnd(){ NOTIFY_VIEWS(oneRoundEnd); }
 	void showGameOver() { NOTIFY_VIEWS(showGameOver); }
-
+	void updateMarbles() { NOTIFY_VIEWS(updateMarbles); }
+	void updateCoins() { NOTIFY_VIEWS(updateCoins); }
 public:
 	void startOneRound();
 
@@ -33,16 +37,23 @@ public:
 	bool isCounterFull();
 	bool isRoundOver(){ return m_bIsRoundOver; }
 	void setRoundState(bool isOver) { m_bIsRoundOver = isOver; }
+	void checkSquares(bool isCheckTool = false);
 	bool checkGameOver();
 
+	void setDoubleAttact(){ m_attactRate = ATTACT_RATE * 2; }
+	void resetAttactRate(){ m_attactRate = ATTACT_RATE; }
+	int getAttactRate(){ return m_attactRate; }
+
+	bool checkCoinsEnought();
 private:
 	GameController();
 
 private:
 	cocos2d::CCPoint m_targetPos;
-	int m_counter;
-	bool m_bIsRoundOver;
 	std::vector<INotifyView*> m_views;
+	int m_counter;
+	int m_attactRate;
+	bool m_bIsRoundOver;
 };
 
 #endif

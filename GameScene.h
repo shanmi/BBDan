@@ -28,10 +28,14 @@ public:
 	virtual void ccTouchEnded(cocos2d::CCTouch *pTouch, cocos2d::CCEvent *pEvent);
 
 public:
-	void updateSquares();
+	void oneRoundEnd();
+	void updateMarbles();
+	void updateCoins();
 	void showGameOver();
 
 public:
+
+	void onDoubleAttact(cocos2d::CCObject *pSender);
 	void initTopLayout();
 	void initBottomLayout();
 	void initGameLayout();

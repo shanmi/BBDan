@@ -15,11 +15,16 @@ public:
 	std::vector<MarbleNode *> getMarbles(){ return m_marbles; }
 	bool haveMarbleMoving();
 
+	void addMarblesCount(){ m_marblesCount++; }
+	int getMarblesCount(){ return m_marblesCount; }
+
+	int checkMarblesCount();
 private:
 	MarbleModel();
 
 private:
 	MarbleAttr m_attr;
 	std::vector<MarbleNode *> m_marbles;
+	int m_marblesCount;
 };
 #endif
