@@ -162,7 +162,7 @@ void GameScene::initPhysicBorder()
 
 void GameScene::initMarbles()
 {
-	for (int i = 0; i < 1; i++)
+	for (int i = 0; i < 10; i++)
 	{
 		auto marble = MarbleModel::theModel()->createMarble();
 		marble->setPosition(m_arrow->getPosition());
@@ -227,6 +227,8 @@ void GameScene::update(float dt)
 	
 	//check squares by not check tool
 	GameController::getInstance()->checkSquares();
+
+
 }
 
 bool GameScene::ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent)
@@ -250,7 +252,7 @@ void GameScene::ccTouchMoved(CCTouch *pTouch, CCEvent *pEvent)
 
 	m_shootDegree = GameUtil::getDegreeTwoPoints(curPos, prePos);
 	m_arrow->setRotation(180 - m_shootDegree);
-	if (m_shootDegree < 0)
+	if (m_shootDegree < 6 || m_shootDegree > 174)
 	{
 		m_arrow->setVisible(false);
 		BallHintModel::theModel()->setHintVisible(false);
@@ -266,10 +268,13 @@ void GameScene::ccTouchMoved(CCTouch *pTouch, CCEvent *pEvent)
 
 void GameScene::ccTouchEnded(CCTouch *pTouch, CCEvent *pEvent)
 {
-	if (m_arrow->isVisible())
+	if (!m_arrow->isVisible())
 	{
-		GameController::getInstance()->startOneRound();
+		m_touchPoint->setVisible(false);
+		return;
 	}
+
+	GameController::getInstance()->startOneRound();
 	m_touchPoint->setVisible(false);
 	m_arrow->setVisible(false);
 	BallHintModel::theModel()->setHintVisible(false);
@@ -334,6 +339,11 @@ void GameScene::updateCoins()
 	std::string countStr = GameUtil::intToString(coinCount);
 	CCLabelTTF *coinLabel = dynamic_cast<CCLabelTTF*>(m_bottomLayout->getChildById(5));
 	coinLabel->setString(countStr.c_str());
+}
+
+void GameScene::addSquareNode(SquareNode *node)
+{
+	addChild(node);
 }
 
 void GameScene::showGameOver()

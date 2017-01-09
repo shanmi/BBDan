@@ -10,13 +10,13 @@ enum TouchPriority
 enum SquareType
 {
 	kType_Empty = 20,
-	kType_Square = 30,
-	kType_Triangle = 14,
-	kType_AddMarble = 10,
-	kType_AddCoin = 6,
-	kType_Rebound = 5,
-	kType_EliminateRow = 7,
-	kType_EliminateCol = 8,
+	kType_Square = 35,
+	kType_Triangle = 19,
+	kType_AddMarble = 12,
+	kType_AddCoin = 5,
+	kType_Rebound = 4,
+	kType_EliminateRow = 2,
+	kType_EliminateCol = 3,
 };
 
 enum CollisionType

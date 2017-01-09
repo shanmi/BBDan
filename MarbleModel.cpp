@@ -1,5 +1,6 @@
 #include "MarbleModel.h"
 #include "MarbleNode.h"
+#include "Config.h"
 
 MarbleModel::MarbleModel()
 {
@@ -43,4 +44,25 @@ int MarbleModel::checkMarblesCount()
 		return m_marblesCount - curCount;
 	}
 	return 0;
+}
+
+bool MarbleModel::isMarblesNerverStop()
+{
+	for (auto iter = m_marbles.begin(); iter != m_marbles.end(); ++iter)
+	{
+		if ((*iter)->getReboundTimes() >= REBOUND_TIMES)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+void MarbleModel::reboundMarbles()
+{
+	for (auto iter = m_marbles.begin(); iter != m_marbles.end(); ++iter)
+	{
+		auto &marble = *iter;
+		marble->addReboundTimes(-marble->getReboundTimes());
+	}
 }

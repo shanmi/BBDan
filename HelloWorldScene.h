@@ -17,6 +17,10 @@ public:
     
     // implement the "static node()" method manually
     CREATE_FUNC(HelloWorld);
+
+	void onEnter();
+	void onExit();
+	bool ccTouchBegan(cocos2d::CCTouch *pTouch, cocos2d::CCEvent *pEvent);
 };
 
 #endif // __HELLOWORLD_SCENE_H__

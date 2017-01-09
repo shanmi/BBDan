@@ -19,6 +19,9 @@ public:
 	int getMarblesCount(){ return m_marblesCount; }
 
 	int checkMarblesCount();
+
+	bool isMarblesNerverStop();
+	void reboundMarbles();
 private:
 	MarbleModel();
 

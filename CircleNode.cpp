@@ -7,6 +7,8 @@
 #include "SquareModel.h"
 #include "GameData.h"
 #include "Config.h"
+#include "ActionSequence.h"
+#include "CCFunctionAction.h"
 USING_NS_CC;
 
 CircleAddMarbleNode *CircleAddMarbleNode::create()
@@ -29,9 +31,18 @@ bool CircleAddMarbleNode::init()
 	auto fanIn = CCFadeIn::create(0.6f);
 	node->runAction(fanIn);
 
-	m_body = Box2dFactory::getInstance()->createCircle(this, node->getContentSize(), true);
-
 	return true;
+}
+
+void CircleAddMarbleNode::setBody()
+{
+	auto node = CCSprite::create("item_0.png");
+	m_body = Box2dFactory::getInstance()->createCircle(this, node->getContentSize(), true);
+}
+
+void CircleAddMarbleNode::runRemoveAction()
+{
+	removeFromParent();
 }
 
 void CircleAddMarbleNode::doCollisionAction()
@@ -65,13 +76,41 @@ bool CircleEliRowNode::init()
 	auto fanIn = CCFadeIn::create(0.6f);
 	node->runAction(fanIn);
 
-	m_body = Box2dFactory::getInstance()->createCircle(this, node->getContentSize(), true);
-
 	return true;
+}
+
+void CircleEliRowNode::setBody()
+{
+	auto node = CCSprite::create("item_1.png");
+	m_body = Box2dFactory::getInstance()->createCircle(this, node->getContentSize(), true);
+}
+
+void CircleEliRowNode::runRemoveAction()
+{
+	removeFromParent();
 }
 
 void CircleEliRowNode::doCollisionAction()
 {
+	int kColorHintSize = 15;
+	auto parent = getParent();
+	auto size = parent->getContentSize();
+	auto colorCol = CCLayerColor::create(ccc4(255, 255, 0, 255));
+	colorCol->setContentSize(ccp(size.width, kColorHintSize));
+	parent->addChild(colorCol);
+	colorCol->setPositionY(getPositionY() - kColorHintSize / 2);
+	colorCol->stopAllActions();
+	auto actions = ActionSequence::create(colorCol);
+	auto marbles = MarbleModel::theModel()->getMarbles();
+	auto action1 = CCBlink::create(0.1f, 1);
+	auto action2 = CCFunctionAction::create([=]()
+	{
+		colorCol->removeFromParent();
+	});
+	actions->addAction(action1);
+	actions->addAction(action2);
+	actions->runActions();
+
 	int attactRate = GameController::getInstance()->getAttactRate();
 	addScore(-attactRate);// delete
 
@@ -101,13 +140,41 @@ bool CircleEliColNode::init()
 	auto fanIn = CCFadeIn::create(0.6f);
 	node->runAction(fanIn);
 
-	m_body = Box2dFactory::getInstance()->createCircle(this, node->getContentSize(), true);
-
 	return true;
+}
+
+void CircleEliColNode::setBody()
+{
+	auto node = CCSprite::create("item_2.png");
+	m_body = Box2dFactory::getInstance()->createCircle(this, node->getContentSize(), true);
+}
+
+void CircleEliColNode::runRemoveAction()
+{
+	removeFromParent();
 }
 
 void CircleEliColNode::doCollisionAction()
 {
+	int kColorHintSize = 15;
+	auto parent = getParent();
+	auto size = parent->getContentSize();
+	auto colorCol = CCLayerColor::create(ccc4(255, 255, 0, 255));
+	colorCol->setContentSize(ccp(kColorHintSize, size.height));
+	parent->addChild(colorCol);
+	colorCol->setPositionX(getPositionX() - kColorHintSize / 2);
+	colorCol->stopAllActions();
+	auto actions = ActionSequence::create(colorCol);
+	auto marbles = MarbleModel::theModel()->getMarbles();
+	auto action1 = CCBlink::create(0.1f, 1);
+	auto action2 = CCFunctionAction::create([=]()
+	{
+		colorCol->removeFromParent();
+	});
+	actions->addAction(action1);
+	actions->addAction(action2);
+	actions->runActions();
+
 	int attactRate = GameController::getInstance()->getAttactRate();
 	addScore(-attactRate);// delete
 
@@ -137,9 +204,18 @@ bool CircleReboundNode::init()
 	auto fanIn = CCFadeIn::create(0.6f);
 	node->runAction(fanIn);
 
-	m_body = Box2dFactory::getInstance()->createCircle(this, node->getContentSize(), false);
-
 	return true;
+}
+
+void CircleReboundNode::setBody()
+{
+	auto node = CCSprite::create("item_3.png");
+	m_body = Box2dFactory::getInstance()->createCircle(this, node->getContentSize(), false);
+}
+
+void CircleReboundNode::runRemoveAction()
+{
+	removeFromParent();
 }
 
 void CircleReboundNode::doCollisionAction()
@@ -172,9 +248,18 @@ bool CircleAddCoinNode::init()
 	auto fanIn = CCFadeIn::create(0.6f);
 	node->runAction(fanIn);
 
-	m_body = Box2dFactory::getInstance()->createCircle(this, node->getContentSize(), true);
-
 	return true;
+}
+
+void CircleAddCoinNode::setBody()
+{
+	auto node = CCSprite::create("coin.png");
+	m_body = Box2dFactory::getInstance()->createCircle(this, node->getContentSize(), true);
+}
+
+void CircleAddCoinNode::runRemoveAction()
+{
+	removeFromParent();
 }
 
 void CircleAddCoinNode::doCollisionAction()

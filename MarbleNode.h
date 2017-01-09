@@ -33,6 +33,9 @@ public:
 
 	bool isTrueStop(){ return m_bTrueStop; }
 
+	void addReboundTimes(int times = 1){ m_reboundTimes += times; }
+	int getReboundTimes(){ return m_reboundTimes; }
+
 private:
 	MarbleNode(MarbleAttr attr);
 
@@ -41,5 +44,6 @@ private:
 	b2Body *m_body;
 	bool m_bIsMoving;
 	bool m_bTrueStop;
+	int m_reboundTimes;
 };
 #endif

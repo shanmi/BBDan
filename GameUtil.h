@@ -8,6 +8,8 @@ namespace GameUtil
 	float getRadian(float fDegree);
 	float getDegree(float fRadian);
 	std::string intToString(int value);
+
+	cocos2d::CCParticleExplosion *getExplodeEffect();
 }
 
 #endif

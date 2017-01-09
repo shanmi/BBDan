@@ -10,6 +10,8 @@ public:
 	CircleAddMarbleNode() : SquareNode(){ m_collisionType = kCollision_AddMarble; }
 	static CircleAddMarbleNode *create();
 	virtual bool init();
+	virtual void setBody();
+	virtual void runRemoveAction();
 	virtual void doCollisionAction();
 };
 
@@ -19,6 +21,8 @@ public:
 	CircleEliRowNode() : SquareNode(){ m_collisionType = kCollision_EliminateRow; }
 	static CircleEliRowNode *create();
 	virtual bool init();
+	virtual void setBody();
+	virtual void runRemoveAction();
 	virtual void doCollisionAction();
 };
 
@@ -28,6 +32,8 @@ public:
 	CircleEliColNode() : SquareNode(){ m_collisionType = kCollision_EliminateCol; }
 	static CircleEliColNode *create();
 	virtual bool init();
+	virtual void setBody();
+	virtual void runRemoveAction();
 	virtual void doCollisionAction();
 };
 
@@ -38,6 +44,8 @@ public:
 	CircleReboundNode() : SquareNode(){ m_collisionType = kCollision_Rebound; }
 	static CircleReboundNode *create();
 	virtual bool init();
+	virtual void setBody();
+	virtual void runRemoveAction();
 	virtual void doCollisionAction();
 };
 
@@ -47,6 +55,8 @@ public:
 	CircleAddCoinNode() : SquareNode(){ m_collisionType = kCollision_AddCoin; }
 	static CircleAddCoinNode *create();
 	virtual bool init();
+	virtual void setBody();
+	virtual void runRemoveAction();
 	virtual void doCollisionAction();
 };
 

@@ -31,6 +31,7 @@ public:
 	void oneRoundEnd();
 	void updateMarbles();
 	void updateCoins();
+	void addSquareNode(SquareNode *node);
 	void showGameOver();
 
 public:

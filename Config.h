@@ -10,4 +10,6 @@
 #define ATTACT_RATE 1
 #define DOUBLE_ATTACT_COST_COIN 30
 
+#define REBOUND_TIMES 10  //create a rebound ball when bigger than this value
+
 #endif

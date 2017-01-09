@@ -64,3 +64,26 @@ std::string GameUtil::intToString(int value)
 	return temp;
 }
 
+CCParticleExplosion *GameUtil::getExplodeEffect(){
+	CCParticleExplosion *pEmitter = CCParticleExplosion::create();
+	pEmitter->setTexture(CCTextureCache::sharedTextureCache()->addImage("particle.png"));
+	pEmitter->setAutoRemoveOnFinish(true);
+
+	ccColor4F c4Start = { 0.3, 0.4, 0.5, 0.6 };
+	ccColor4F c4End = { 1, 1, 1, 1 };
+	pEmitter->setStartColor(c4Start);
+	pEmitter->setEndColor(c4End);
+	pEmitter->setStartColorVar(c4Start);
+	pEmitter->setEndColorVar(c4End);
+
+	pEmitter->setTotalParticles(50);
+
+	pEmitter->setSpeed(80);
+	pEmitter->setSpeedVar(20);
+
+	pEmitter->setLife(2);
+	pEmitter->setLifeVar(0.3f);
+	pEmitter->setScale(0.5f);
+
+	return pEmitter;
+}

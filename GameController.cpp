@@ -2,6 +2,8 @@
 #include "MarbleModel.h"
 #include "SquareModel.h"
 #include "GameData.h"
+USING_NS_CC;
+
 GameController::GameController()
 :m_counter(-1)
 , m_bIsRoundOver(true)
@@ -65,8 +67,14 @@ void GameController::checkSquares(bool isCheckTool /* = false */)
 				SquareModel::theModel()->removeSquareNode(square);
 			}
 		}
+		if (square->getBody() == NULL)
+		{
+			square->setBody();
+			GameController::getInstance()->addSquareNode(square);
+		}
 	}
 }
+
 bool GameController::checkGameOver()
 {
 	auto squares = SquareModel::theModel()->getSquares();
@@ -94,4 +102,38 @@ bool GameController::checkCoinsEnought()
 		return true;
 	}
 	return false;
+}
+
+void GameController::addSquareNode(SquareNode *node)
+{
+	NOTIFY_VIEWS(addSquareNode, node);
+}
+
+void GameController::createPropByMarble(MarbleNode *marble)
+{
+	MarbleModel::theModel()->reboundMarbles();
+	auto targetPos = GameController::getInstance()->getTargetPos();
+	auto node = CCSprite::create("brick.png");
+	float posX = (node->getContentSize().width / 2 + SQUARE_SPACING) + 3 * (node->getContentSize().width + SQUARE_SPACING);
+	float posY = targetPos.y + node->getContentSize().height / 2 - marble->getContentSize().height / 2;
+	while (posY < marble->getPositionY())
+	{
+		posY += (node->getContentSize().height + SQUARE_SPACING);
+	}
+	posY -= (node->getContentSize().height + SQUARE_SPACING);
+	node->setPosition(ccp(posX, posY));
+
+	auto squares = SquareModel::theModel()->getSquares();
+	for (auto iter = squares.begin(); iter != squares.end(); ++iter)
+	{
+		auto square = (*iter);
+		auto rect = square->boundingBox();
+		if (rect.containsPoint(ccp(posX, posY)))
+		{
+			return;
+		}
+	}
+	auto square = SquareModel::theModel()->createSquareNode(kType_Rebound);
+	square->setPosition(ccp(posX, posY));
+	square->addScore(-square->getScore());
 }

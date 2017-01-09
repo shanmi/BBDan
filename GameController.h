@@ -5,12 +5,15 @@
 #include "CommonMacros.h"
 #include "Config.h"
 
+class SquareNode;
+class MarbleNode;
 struct INotifyView
 {
 	virtual void oneRoundEnd(){}
 	virtual void updateMarbles(){}
 	virtual void updateCoins(){}
 	virtual void showGameOver(){}
+	virtual void addSquareNode(SquareNode *node){}
 };
 
 class GameController
@@ -26,6 +29,7 @@ public:
 	void showGameOver() { NOTIFY_VIEWS(showGameOver); }
 	void updateMarbles() { NOTIFY_VIEWS(updateMarbles); }
 	void updateCoins() { NOTIFY_VIEWS(updateCoins); }
+	void addSquareNode(SquareNode *node);
 public:
 	void startOneRound();
 
@@ -45,6 +49,7 @@ public:
 	int getAttactRate(){ return m_attactRate; }
 
 	bool checkCoinsEnought();
+	void createPropByMarble(MarbleNode *marble);
 private:
 	GameController();
 

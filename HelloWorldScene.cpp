@@ -2,6 +2,7 @@
 #include "SquareNode.h"
 #include "SquareModel.h"
 #include "Config.h"
+#include "GameUtil.h"
 
 USING_NS_CC;
 
@@ -67,15 +68,6 @@ bool HelloWorld::init()
     // add the label as a child to this layer
     this->addChild(pLabel, 1);
 
-    // add "HelloWorld" splash screen"
-    CCSprite* pSprite = CCSprite::create("HelloWorld.png");
-
-    // position the sprite on the center of the screen
-    pSprite->setPosition(ccp(visibleSize.width/2 + origin.x, visibleSize.height/2 + origin.y));
-
-    // add the sprite as a child to this layer
-    this->addChild(pSprite, 0);
-
 	for (int n = 0; n < 1; n++)
 	{
 		auto squares = SquareModel::theModel()->createSquareList();
@@ -87,7 +79,6 @@ bool HelloWorld::init()
 		}
 	}
 
-    
     return true;
 }
 
@@ -102,4 +93,26 @@ void HelloWorld::menuCloseCallback(CCObject* pSender)
     exit(0);
 #endif
 #endif
+}
+
+bool HelloWorld::ccTouchBegan(cocos2d::CCTouch *pTouch, cocos2d::CCEvent *pEvent)
+{
+	CCPoint position = pTouch->getLocation();
+	auto pEmitter = GameUtil::getExplodeEffect();
+	pEmitter->setPosition(position);
+	addChild(pEmitter);
+
+	return true;
+}
+
+void HelloWorld::onEnter()
+{
+	CCLayer::onEnter();
+	CCDirector::sharedDirector()->getTouchDispatcher()->addTargetedDelegate(this, -1, true);
+}
+
+void HelloWorld::onExit()
+{
+	CCLayer::onExit();
+	CCDirector::sharedDirector()->getTouchDispatcher()->removeDelegate(this);
 }

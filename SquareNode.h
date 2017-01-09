@@ -22,6 +22,8 @@ public:
 	virtual void setPosition(const cocos2d::CCPoint &position);
 
 	virtual void doScaleAction();
+	virtual void setBody();
+	virtual void runRemoveAction();
 	virtual void doCollisionAction();
 public:
 	void setIndex(int index){ m_index = index; }
@@ -32,11 +34,9 @@ public:
 	void addScore(int score);
 	int getScore() { return m_score; }
 
-	void setBody(b2Body *body){ m_body = body; }
 	b2Body *getBody(){ return m_body; }
 
 	void moveDown();
-
 	bool shouldRemoveDirectly();
 
 protected:
@@ -55,6 +55,7 @@ public:
 	static TriangleNode *create();
 	virtual bool init();
 	virtual void setPosition(const cocos2d::CCPoint &position);
+	virtual void setBody();
 	virtual void doCollisionAction();
 };
 

@@ -1,5 +1,5 @@
 #include "ActionSequence.h"
-
+#include <algorithm>
 USING_NS_CC;
 
 ActionSequence::ActionSequence(CCNode *target)

@@ -12,9 +12,10 @@ USING_NS_CC;
 
 SquareNode::SquareNode()
 :m_scoreLabel(NULL)
+, m_body(NULL)
 , m_collisionType(kCollision_Square)
 {
-	
+
 }
 
 SquareNode *SquareNode::create()
@@ -44,18 +45,19 @@ bool SquareNode::init()
 	m_scoreLabel->setColor(color);
 	addChild(m_scoreLabel);
 
-	m_body = Box2dFactory::getInstance()->createSquare(this);
-
 	return true;
 }
 
 void SquareNode::setPosition(const cocos2d::CCPoint &position)
 {
 	CCNode::setPosition(position);
-	b2Vec2 post;
-	post = b2Vec2((float)(getPosition().x / PTM_RATIO), (float)((getPosition().y) / PTM_RATIO));
-	float angle = CC_DEGREES_TO_RADIANS(this->getRotation());
-	m_body->SetTransform(post, angle);
+	if (m_body)
+	{
+		b2Vec2 post;
+		post = b2Vec2((float)(getPosition().x / PTM_RATIO), (float)((getPosition().y) / PTM_RATIO));
+		float angle = CC_DEGREES_TO_RADIANS(this->getRotation());
+		m_body->SetTransform(post, angle);
+	}
 }
 
 void SquareNode::addScore(int score)
@@ -72,7 +74,7 @@ void SquareNode::moveDown()
 {
 	auto actions = ActionSequence::create(this);
 	auto delay = CCFadeIn::create(0.6f);
-	auto move = CCMoveBy::create(1.0f, ccp(0, -getContentSize().height-SQUARE_SPACING));
+	auto move = CCMoveBy::create(1.0f, ccp(0, -getContentSize().height - SQUARE_SPACING));
 	auto callback = CCFunctionAction::create([=]()
 	{
 		GameController::getInstance()->setRoundState(true);
@@ -105,12 +107,26 @@ bool SquareNode::shouldRemoveDirectly()
 	return false;
 }
 
+void SquareNode::runRemoveAction()
+{
+	auto explore = GameUtil::getExplodeEffect();
+	explore->setPosition(getPosition());
+	getParent()->addChild(explore);
+	removeFromParent();
+}
+
 void SquareNode::doScaleAction()
 {
-	auto scaleTo = CCScaleBy::create(0.1f, 1.2f);
-	auto scaleBack = scaleTo->reverse();
+	setScale(1.0f);
+	auto scaleTo = CCScaleTo::create(0.1f, 1.2f);
+	auto scaleBack = CCScaleTo::create(0.1f, 1.0f);
 	auto actions = CCSequence::create(scaleTo, scaleBack, NULL);
 	runAction(actions);
+}
+
+void SquareNode::setBody()
+{
+	m_body = Box2dFactory::getInstance()->createSquare(this);
 }
 
 void SquareNode::doCollisionAction()
@@ -166,18 +182,24 @@ bool TriangleNode::init()
 	addChild(m_scoreLabel);
 	this->setTag(type);
 
-	m_body = Box2dFactory::getInstance()->createTriangle(this);
-
 	return true;
 }
 
 void TriangleNode::setPosition(const cocos2d::CCPoint &position)
 {
 	CCNode::setPosition(position);
-	b2Vec2 post;
-	post = b2Vec2((float)((getPosition().x - getContentSize().width / 2) / PTM_RATIO), (float)(((getPosition().y - getContentSize().height / 2)) / PTM_RATIO));
-	float angle = CC_DEGREES_TO_RADIANS(this->getRotation());
-	m_body->SetTransform(post, angle);
+	if (m_body)
+	{
+		b2Vec2 post;
+		post = b2Vec2((float)((getPosition().x - getContentSize().width / 2) / PTM_RATIO), (float)(((getPosition().y - getContentSize().height / 2)) / PTM_RATIO));
+		float angle = CC_DEGREES_TO_RADIANS(this->getRotation());
+		m_body->SetTransform(post, angle);
+	}
+}
+
+void TriangleNode::setBody()
+{
+	m_body = Box2dFactory::getInstance()->createTriangle(this);
 }
 
 void TriangleNode::doCollisionAction()

@@ -59,7 +59,7 @@ void SquareModel::removeSquareNode(SquareNode *node)
 		m_squares.erase(iter);
 	}
 	Box2dFactory::getInstance()->removeBody(node->getBody());
-	node->removeFromParent();
+	node->runRemoveAction();
 }
 
 std::vector<SquareNode*> SquareModel::createSquareList()
@@ -81,6 +81,7 @@ std::vector<SquareNode*> SquareModel::createSquareList()
 		SquareNode *node = createSquareNode(type);
 		if (node != nullptr)
 		{
+			node->setBody();
 			node->setIndex(i);
 			nodes.push_back(node);
 		}

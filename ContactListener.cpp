@@ -1,3 +1,4 @@
+#include "SquareModel.h"
 #include "ContactListener.h"  
 #include "Box2dFactory.h"
 #include "SquareNode.h"
@@ -5,6 +6,7 @@
 #include "GameController.h"
 #include "ccMacros.h"
 #include "CircleNode.h"
+#include "MarbleModel.h"
 
 USING_NS_CC;
 
@@ -41,12 +43,35 @@ void ContactListener::BeginContact(b2Contact* contact)
 				GameController::getInstance()->setTargetPos(spriteB->getPosition());
 			}
 			marble->stop();
+			MarbleModel::theModel()->reboundMarbles();
 		}
 		else
 		{
 			auto square = dynamic_cast<SquareNode*>(node);
 			square->doCollisionAction();
-			//square->setVisible(false);
+			if (square->getCollisionType() != kCollision_EliminateRow && square->getCollisionType() != kCollision_EliminateCol)
+			{
+				MarbleModel::theModel()->reboundMarbles();
+			}
+		}
+	}
+	else
+	{
+		MarbleNode *marble;
+		if (spriteA != nullptr)
+		{
+			marble = dynamic_cast<MarbleNode*>(spriteA);
+		}
+		else
+		{
+			marble = dynamic_cast<MarbleNode*>(spriteB);
+		}
+		marble->addReboundTimes();
+
+		bool isMarbleNeverStop = MarbleModel::theModel()->isMarblesNerverStop();
+		if (isMarbleNeverStop)
+		{
+			GameController::getInstance()->createPropByMarble(marble);
 		}
 	}
 }
@@ -54,26 +79,17 @@ void ContactListener::BeginContact(b2Contact* contact)
 
 void ContactListener::EndContact(b2Contact* contact)
 {
-	b2Body* bodyA = contact->GetFixtureA()->GetBody();
-	b2Body* bodyB = contact->GetFixtureB()->GetBody();
-	auto spriteA = (CCSprite*)bodyA->GetUserData();
-	auto spriteB = (CCSprite*)bodyB->GetUserData();
-
-	if (spriteA != nullptr && spriteB != nullptr)
-	{
-		/*spriteA->setColor(Color3B::WHITE);
-		spriteB->setColor(Color3B::WHITE);*/
-	}
+	
 }
 
 
 void ContactListener::PreSolve(b2Contact* contact, const b2Manifold* oldManifold)
 {
-	CCLog("PreSolve.....................");
+
 }
 
 
 void ContactListener::PostSolve(b2Contact* contact, const b2ContactImpulse* impulse)
 {
-	CCLog("PostSolve.....................");
+
 }

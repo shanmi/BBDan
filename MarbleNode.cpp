@@ -11,6 +11,7 @@ MarbleNode::MarbleNode(MarbleAttr attr)
 : m_attr(attr)
 , m_bIsMoving(false)
 , m_bTrueStop(false)
+, m_reboundTimes(0)
 {
 
 }
@@ -70,7 +71,6 @@ void MarbleNode::stop()
 	v_t.y = 0;
 	m_body->SetLinearVelocity(v_t);
 	m_bIsMoving = false;
-
 }
 
 void MarbleNode::moveToTargetPos()
