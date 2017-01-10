@@ -26,18 +26,17 @@ bool CircleAddMarbleNode::init()
 	auto size = sizeSprite->getContentSize();
 	setContentSize(size);
 
-	auto node = CCSprite::create("item_0.png");
-	addChild(node);
+	m_image = CCSprite::create("item_0.png");
+	addChild(m_image);
 	auto fanIn = CCFadeIn::create(0.6f);
-	node->runAction(fanIn);
+	m_image->runAction(fanIn);
 
 	return true;
 }
 
 void CircleAddMarbleNode::setBody()
 {
-	auto node = CCSprite::create("item_0.png");
-	m_body = Box2dFactory::getInstance()->createCircle(this, node->getContentSize(), true);
+	m_body = Box2dFactory::getInstance()->createCircle(this, m_image->getContentSize(), true);
 }
 
 void CircleAddMarbleNode::runRemoveAction()
@@ -71,18 +70,17 @@ bool CircleEliRowNode::init()
 	auto size = sizeSprite->getContentSize();
 	setContentSize(size);
 
-	auto node = CCSprite::create("item_1.png");
-	addChild(node);
+	m_image = CCSprite::create("item_1.png");
+	addChild(m_image);
 	auto fanIn = CCFadeIn::create(0.6f);
-	node->runAction(fanIn);
+	m_image->runAction(fanIn);
 
 	return true;
 }
 
 void CircleEliRowNode::setBody()
 {
-	auto node = CCSprite::create("item_1.png");
-	m_body = Box2dFactory::getInstance()->createCircle(this, node->getContentSize(), true);
+	m_body = Box2dFactory::getInstance()->createCircle(this, m_image->getContentSize(), true);
 }
 
 void CircleEliRowNode::runRemoveAction()
@@ -135,18 +133,17 @@ bool CircleEliColNode::init()
 	auto size = sizeSprite->getContentSize();
 	setContentSize(size);
 
-	auto node = CCSprite::create("item_2.png");
-	addChild(node);
+	m_image = CCSprite::create("item_2.png");
+	addChild(m_image);
 	auto fanIn = CCFadeIn::create(0.6f);
-	node->runAction(fanIn);
+	m_image->runAction(fanIn);
 
 	return true;
 }
 
 void CircleEliColNode::setBody()
 {
-	auto node = CCSprite::create("item_2.png");
-	m_body = Box2dFactory::getInstance()->createCircle(this, node->getContentSize(), true);
+	m_body = Box2dFactory::getInstance()->createCircle(this, m_image->getContentSize(), true);
 }
 
 void CircleEliColNode::runRemoveAction()
@@ -199,18 +196,17 @@ bool CircleReboundNode::init()
 	auto size = sizeSprite->getContentSize();
 	setContentSize(size);
 
-	auto node = CCSprite::create("item_3.png");
-	addChild(node);
+	m_image = CCSprite::create("item_3.png");
+	addChild(m_image);
 	auto fanIn = CCFadeIn::create(0.6f);
-	node->runAction(fanIn);
+	m_image->runAction(fanIn);
 
 	return true;
 }
 
 void CircleReboundNode::setBody()
 {
-	auto node = CCSprite::create("item_3.png");
-	m_body = Box2dFactory::getInstance()->createCircle(this, node->getContentSize(), false);
+	m_body = Box2dFactory::getInstance()->createCircle(this, m_image->getContentSize(), false);
 }
 
 void CircleReboundNode::runRemoveAction()
@@ -243,18 +239,21 @@ bool CircleAddCoinNode::init()
 	auto size = sizeSprite->getContentSize();
 	setContentSize(size);
 
-	auto node = CCSprite::create("coin.png");
-	addChild(node);
+	m_image = CCSprite::create("coin.png");
+	addChild(m_image);
 	auto fanIn = CCFadeIn::create(0.6f);
-	node->runAction(fanIn);
+	m_image->runAction(fanIn);
+
+	auto *flip3d = CCOrbitCamera::create(2, -45, 0, 90, 180, 0, 0);
+	auto repeat = CCRepeatForever::create(flip3d);
+	m_image->runAction(repeat);
 
 	return true;
 }
 
 void CircleAddCoinNode::setBody()
 {
-	auto node = CCSprite::create("coin.png");
-	m_body = Box2dFactory::getInstance()->createCircle(this, node->getContentSize(), true);
+	m_body = Box2dFactory::getInstance()->createCircle(this, m_image->getContentSize(), true);
 }
 
 void CircleAddCoinNode::runRemoveAction()

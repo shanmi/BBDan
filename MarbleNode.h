@@ -3,12 +3,7 @@
 
 #include "cocos2d.h"
 #include "Box2D/Box2D.h"
-
-struct MarbleAttr
-{
-	int skin;
-	int damage;
-};
+#include "MarbleAttr.h"
 
 class MarbleNode : public cocos2d::CCNode
 {

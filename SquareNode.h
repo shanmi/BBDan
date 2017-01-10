@@ -38,9 +38,11 @@ public:
 
 	void moveDown();
 	bool shouldRemoveDirectly();
+	void showBombAction();
 
 protected:
 	b2Body *m_body;
+	cocos2d::CCSprite *m_image;
 	cocos2d::CCLabelTTF *m_scoreLabel;
 	int m_collisionType;
 	int m_score;

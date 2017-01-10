@@ -5,6 +5,7 @@
 #include "CCFunctionAction.h"
 #include "ActionSequence.h"
 #include "GameController.h"
+#include "GameUtil.h"
 USING_NS_CC;
 
 MarbleNode::MarbleNode(MarbleAttr attr)
@@ -57,10 +58,14 @@ void MarbleNode::setPosition(const CCPoint &position)
 
 void MarbleNode::shoot(float degree)
 {
+	if (m_attr.skin == kMarble_Dispersed)
+	{
+		degree = rand() % 60 - 30 + degree;
+	}
 	m_bTrueStop = false;
 	b2Vec2 v_t;
-	v_t.x = BALL_MOVE_PACE * cos(CC_DEGREES_TO_RADIANS(degree));
-	v_t.y = BALL_MOVE_PACE * sin(CC_DEGREES_TO_RADIANS(degree));
+	v_t.x = BALL_MOVE_PACE * cos(CC_DEGREES_TO_RADIANS(degree)) * m_attr.speed;
+	v_t.y = BALL_MOVE_PACE * sin(CC_DEGREES_TO_RADIANS(degree)) * m_attr.speed;
 	m_body->SetLinearVelocity(v_t);
 }
 

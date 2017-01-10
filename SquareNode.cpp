@@ -30,14 +30,14 @@ bool SquareNode::init()
 {
 	m_score = SquareModel::theModel()->getCurrentScore();
 
-	auto node = CCSprite::create("brick.png");
+	m_image = CCSprite::create("brick.png");
 	auto color = ccc3(255, 255 - (m_score * 13) % 256, (m_score * 7) % 256);
-	node->setColor(color);
-	addChild(node);
+	m_image->setColor(color);
+	addChild(m_image);
 	auto fanIn = CCFadeIn::create(0.6f);
-	node->runAction(fanIn);
+	m_image->runAction(fanIn);
 
-	auto size = node->getContentSize();
+	auto size = m_image->getContentSize();
 	setContentSize(size);
 
 	std::string scoreStr = GameUtil::intToString(m_score);
@@ -67,6 +67,8 @@ void SquareNode::addScore(int score)
 	if (m_scoreLabel)
 	{
 		m_scoreLabel->setString(scoreStr.c_str());
+		auto color = ccc3(255, 255 - (m_score * 13) % 256, (m_score * 7) % 256);
+		m_image->setColor(color);
 	}
 }
 
@@ -109,10 +111,28 @@ bool SquareNode::shouldRemoveDirectly()
 
 void SquareNode::runRemoveAction()
 {
-	auto explore = GameUtil::getExplodeEffect();
-	explore->setPosition(getPosition());
-	getParent()->addChild(explore);
-	removeFromParent();
+	auto actions = ActionSequence::create(m_image);
+	auto size = CCDirector::sharedDirector()->getWinSize();
+	int posX = 0;
+	if (getPositionX() > size.width / 2)
+	{
+		posX = 100;
+	}
+	else
+	{
+		posX = -100;
+	}
+	auto action1 = CCJumpBy::create(0.5f, ccp(posX, 60), 60, 1);
+	auto action2 = CCFunctionAction::create([=]
+	{
+		auto explore = GameUtil::getExplodeEffect();
+		explore->setPosition(ccp(getPositionX() + posX, getPositionY() + 60));
+		getParent()->addChild(explore);
+		removeFromParent();
+	});
+	actions->addAction(action1);
+	actions->addAction(action2);
+	actions->runActions();
 }
 
 void SquareNode::doScaleAction()
@@ -131,8 +151,22 @@ void SquareNode::setBody()
 
 void SquareNode::doCollisionAction()
 {
+	showBombAction();
+
+	int damage = MarbleModel::theModel()->getMarbleAttr().damage;
 	int attactRate = GameController::getInstance()->getAttactRate();
-	addScore(-attactRate);
+	addScore(-attactRate*damage);
+}
+
+void SquareNode::showBombAction()
+{
+	int skin = MarbleModel::theModel()->getMarbleAttr().skin;
+	if (skin == kMarble_Bomb)
+	{
+		auto explore = GameUtil::getExplodeEffect();
+		explore->setPosition(getPosition());
+		getParent()->addChild(explore);
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -151,14 +185,14 @@ bool TriangleNode::init()
 	int type = rand() % 4;
 	char temp[50] = { 0 };
 	sprintf(temp, "half_%d.png", type);
-	auto node = CCSprite::create(temp);
+	m_image = CCSprite::create(temp);
 	auto color = ccc3(255, 255 - (m_score * 13) % 256, (m_score * 7) % 256);
-	node->setColor(color);
-	addChild(node);
+	m_image->setColor(color);
+	addChild(m_image);
 	auto fanIn = CCFadeIn::create(0.6f);
-	node->runAction(fanIn);
+	m_image->runAction(fanIn);
 
-	auto size = node->getContentSize();
+	auto size = m_image->getContentSize();
 	setContentSize(size);
 
 	std::string scoreStr = GameUtil::intToString(m_score);
@@ -204,6 +238,9 @@ void TriangleNode::setBody()
 
 void TriangleNode::doCollisionAction()
 {
+	showBombAction();
+
+	int damage = MarbleModel::theModel()->getMarbleAttr().damage;
 	int attactRate = GameController::getInstance()->getAttactRate();
-	addScore(-attactRate);
+	addScore(-attactRate*damage);
 }

@@ -10,6 +10,7 @@ namespace GameUtil
 	std::string intToString(int value);
 
 	cocos2d::CCParticleExplosion *getExplodeEffect();
+	cocos2d::CCMotionStreak *getMotionStreak();
 }
 
 #endif

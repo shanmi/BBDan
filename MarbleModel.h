@@ -12,6 +12,7 @@ public:
 public:
 	MarbleNode* createMarble();
 	void setMarbleAttr(MarbleAttr attr){ m_attr = attr; }
+	MarbleAttr getMarbleAttr(){ return m_attr; }
 	std::vector<MarbleNode *> getMarbles(){ return m_marbles; }
 	bool haveMarbleMoving();
 

@@ -78,10 +78,59 @@ bool HelloWorld::init()
 			addChild(node);
 		}
 	}
+	/*auto m_emitter = new CCParticleSystemQuad();
+	std::string filename = "SpookyPeas.plist";
+	m_emitter->initWithFile(filename.c_str());
+	addChild(m_emitter, 10);*/
+
+
+	/*auto m_emitter = CCParticleGalaxy::create();
+	addChild(m_emitter, 10);
+	m_emitter->setTexture(CCTextureCache::sharedTextureCache()->addImage("particle.png"));
+	m_emitter->setScale(0.3f);
+	auto moveTo = CCMoveBy::create(2.0f, ccp(0,500));
+	auto moveBack = moveTo->reverse();
+	auto sequence = CCSequence::create(moveTo, moveBack, NULL);
+	auto actions = CCRepeatForever::create(sequence);
+	runAction(actions);*/
+
+	CCSize s = CCDirector::sharedDirector()->getWinSize();
+
+	// the root object just rotates around
+	m_root = CCSprite::create("item_4.png");
+	addChild(m_root, 1);
+	m_root->setPosition(ccp(s.width / 2, s.height / 2));
+	auto moveTo = CCMoveBy::create(2.0f, ccp(200, 500));
+	auto moveBack = moveTo->reverse();
+	auto sequence = CCSequence::create(moveTo, moveBack, NULL);
+	auto actions = CCRepeatForever::create(sequence);
+	m_root->runAction(actions);
+
+	// create the streak object and add it to the scene
+	m_streak = CCMotionStreak::create(2, 3, 32, ccGREEN, "streak.png");
+	addChild(m_streak);
+	// schedule an update on each frame so we can syncronize the streak with the target
+	schedule(schedule_selector(HelloWorld::onUpdate));
+
+	CCActionInterval *colorAction = CCRepeatForever::create(CCSequence::create(
+		CCTintTo::create(0.2f, 255, 0, 0),
+		CCTintTo::create(0.2f, 0, 255, 0),
+		CCTintTo::create(0.2f, 0, 0, 255),
+		CCTintTo::create(0.2f, 0, 255, 255),
+		CCTintTo::create(0.2f, 255, 255, 0),
+		CCTintTo::create(0.2f, 255, 0, 255),
+		CCTintTo::create(0.2f, 255, 255, 255),
+		NULL));
+
+	m_streak->runAction(colorAction);
 
     return true;
 }
 
+void HelloWorld::onUpdate(float delta)
+{
+	m_streak->setPosition(m_root->convertToWorldSpace(CCPointZero));
+}
 
 void HelloWorld::menuCloseCallback(CCObject* pSender)
 {

@@ -14,7 +14,7 @@ std::vector<cocos2d::CCSprite*> BallHintModel::createBallHints()
 {
 	for (int i = 0; i < HINT_BALL_SIZE; i++)
 	{
-		auto hint = CCSprite::create("play_ball_1.png");
+		auto hint = CCSprite::create("hint.png");
 		hint->setScale(0.2f);
 		hint->setContentSize(hint->getContentSize()*0.6f);
 		hint->setVisible(false);
@@ -46,11 +46,21 @@ void BallHintModel::updatePosition(CCPoint pos1, CCPoint pos2, cocos2d::CCPoint 
 	{
 		scale = 2;
 	}
+	auto winSize = CCDirector::sharedDirector()->getWinSize();
 	for (int i = 0; i < m_ballHints.size(); i++)
 	{
 		auto hint = m_ballHints[i];
 		float newX = startPos.x + (hint->getContentSize().width * i * scale + arrowWidth) * x;
 		float newY = startPos.y + (hint->getContentSize().height * i * scale + arrowWidth) * y;
+		if (newX < 0)
+		{
+			newX = -newX;
+		}
+		else if (newX > winSize.width)
+		{
+			radian = GameUtil::getRadian(degree + 10);
+			newX = winSize.width - (newX - winSize.width);
+		}
 		hint->setPosition(ccp(newX, newY));
 	}
 }

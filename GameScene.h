@@ -44,6 +44,7 @@ public:
 	void initMarbles();
 	void initSquares();
 	void addSquares();
+	void updateStreak(float dt);
 
 private:
 	b2World *m_world;

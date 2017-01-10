@@ -87,3 +87,21 @@ CCParticleExplosion *GameUtil::getExplodeEffect(){
 
 	return pEmitter;
 }
+
+CCMotionStreak *GameUtil::getMotionStreak()
+{
+	auto streak = CCMotionStreak::create(0.1f, 3, 32, ccGREEN, "streak.png");
+
+	CCActionInterval *colorAction = CCRepeatForever::create(CCSequence::create(
+		CCTintTo::create(0.2f, 255, 0, 0),
+		CCTintTo::create(0.2f, 0, 255, 0),
+		CCTintTo::create(0.2f, 0, 0, 255),
+		CCTintTo::create(0.2f, 0, 255, 255),
+		CCTintTo::create(0.2f, 255, 255, 0),
+		CCTintTo::create(0.2f, 255, 0, 255),
+		CCTintTo::create(0.2f, 255, 255, 255),
+		NULL));
+
+	streak->runAction(colorAction);
+	return streak;
+}

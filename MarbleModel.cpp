@@ -1,11 +1,11 @@
 #include "MarbleModel.h"
 #include "MarbleNode.h"
 #include "Config.h"
+#include "CommonMacros.h"
 
 MarbleModel::MarbleModel()
 {
-	m_attr.skin = 1;
-	m_attr.damage = 1;
+	m_attr = FasterMarle();
 
 	m_marblesCount = 0;
 }

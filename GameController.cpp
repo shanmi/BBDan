@@ -120,7 +120,7 @@ void GameController::createPropByMarble(MarbleNode *marble)
 	{
 		posY += (node->getContentSize().height + SQUARE_SPACING);
 	}
-	posY -= (node->getContentSize().height + SQUARE_SPACING);
+	posY = posY - node->getContentSize().height / 2 - SQUARE_SPACING;
 	node->setPosition(ccp(posX, posY));
 
 	auto squares = SquareModel::theModel()->getSquares();

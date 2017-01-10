@@ -165,8 +165,30 @@ void GameScene::initMarbles()
 	for (int i = 0; i < 10; i++)
 	{
 		auto marble = MarbleModel::theModel()->createMarble();
-		marble->setPosition(m_arrow->getPosition());
+		marble->setPosition(ccp(100, m_bottomLinePos + marble->getContentSize().height));
 		addChild(marble);
+		if (i == 0)
+		{
+			marble->setVisible(true);
+		}
+		else
+		{
+			marble->setVisible(false);
+		}
+		auto streak = GameUtil::getMotionStreak();
+		streak->setTag(100 + i);
+		addChild(streak);
+	}
+	schedule(schedule_selector(GameScene::updateStreak));
+}
+
+void GameScene::updateStreak(float dt)
+{
+	auto marbles = MarbleModel::theModel()->getMarbles();
+	for (int i = 0; i < marbles.size(); i++)
+	{
+		auto node = getChildByTag(100 + i);
+		node->setPosition(marbles[i]->convertToWorldSpace(CCPointZero));
 	}
 }
 
@@ -227,7 +249,6 @@ void GameScene::update(float dt)
 	
 	//check squares by not check tool
 	GameController::getInstance()->checkSquares();
-
 
 }
 
@@ -304,6 +325,7 @@ void GameScene::oneRoundEnd()
 	SquareModel::theModel()->squareMoveDown();
 
 	//check marbles
+	auto marbles = MarbleModel::theModel()->getMarbles();
 	int addCount = MarbleModel::theModel()->checkMarblesCount();
 	auto pos = GameController::getInstance()->getTargetPos();
 	for (int i = 0; i < addCount; i++)
@@ -311,6 +333,9 @@ void GameScene::oneRoundEnd()
 		auto marble = MarbleModel::theModel()->createMarble();
 		marble->setPosition(pos);
 		addChild(marble);
+		auto streak = GameUtil::getMotionStreak();
+		streak->setTag(100 + marbles.size() + i);
+		addChild(streak);
 	}
 
 	//check tools when one round end and delete "0 score" tool

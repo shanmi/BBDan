@@ -30,6 +30,15 @@ enum CollisionType
 	kCollision_EliminateCol,
 };
 
+enum MarbleType
+{
+	kMarble_Normal,
+	kMarble_Faster,
+	kMarble_Biger,
+	kMarble_Dispersed,
+	kMarble_Across,
+	kMarble_Bomb,
+};
 enum ViewTag
 {
 	kTag_Wall = 100,
