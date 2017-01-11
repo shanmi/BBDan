@@ -37,6 +37,8 @@ public:
 public:
 
 	void onDoubleAttact(cocos2d::CCObject *pSender);
+	void onClearScreen(cocos2d::CCObject *pSender);
+	void onFreezing(cocos2d::CCObject *pSender);
 	void initTopLayout();
 	void initBottomLayout();
 	void initGameLayout();

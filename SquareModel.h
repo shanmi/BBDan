@@ -18,6 +18,9 @@ public:
 	int getCurrentScore(){ return m_curScore; }
 
 	std::vector<SquareNode*> getSquares(){ return m_squares; }
+	void clearSquares();
+	void setSquareFreezing(bool isFreezing);
+	bool isFreezing(){ return m_bIsFreezing; }
 
 	void squareMoveDown();
 	void removeBelowSquares();
@@ -25,10 +28,11 @@ public:
 	void elimateSameColSquare(SquareNode *node);
 
 private:
-	SquareModel(){ m_curScore = 1; }
+	SquareModel();
 
 private:
 	int m_curScore;
 	std::vector<SquareNode*> m_squares;
+	bool m_bIsFreezing;
 };
 #endif

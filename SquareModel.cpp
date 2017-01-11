@@ -5,6 +5,13 @@
 #include "Box2dFactory.h"
 #include "CircleNode.h"
 
+SquareModel::SquareModel()
+:m_curScore(1)
+, m_bIsFreezing(false)
+{
+
+}
+
 SquareModel *SquareModel::theModel()
 {
 	static SquareModel model;
@@ -26,10 +33,12 @@ SquareNode *SquareModel::createSquareNode(int type)
 		node = CircleAddMarbleNode::create();
 		break;
 	case kType_EliminateRow:
-		node = CircleEliRowNode::create();
+		//node = CircleEliRowNode::create();
+		node = BossEatMarbleNode::create();
 		break;
 	case kType_EliminateCol:
-		node = CircleEliRowNode::create();
+		//node = CircleEliRowNode::create();
+		node = BossEatMarbleNode::create();
 		break;
 	case kType_Rebound:
 		node = CircleReboundNode::create();
@@ -60,6 +69,17 @@ void SquareModel::removeSquareNode(SquareNode *node)
 	}
 	Box2dFactory::getInstance()->removeBody(node->getBody());
 	node->runRemoveAction();
+}
+
+void SquareModel::clearSquares()
+{
+	for (auto iter = m_squares.begin(); iter != m_squares.end(); ++iter)
+	{
+		auto &square = *iter;
+		//Box2dFactory::getInstance()->removeBody(square->getBody());
+		square->addScore(-square->getScore());
+	}
+	//m_squares.clear();
 }
 
 std::vector<SquareNode*> SquareModel::createSquareList()
@@ -101,14 +121,6 @@ std::vector<int> SquareModel::getBallListType()
 	return types;
 }
 
-void SquareModel::squareMoveDown()
-{
-	for (auto iter = m_squares.begin(); iter != m_squares.end(); ++iter)
-	{
-		(*iter)->moveDown();
-	}
-}
-
 int SquareModel::getBallType()
 {
 	std::vector<int> types;
@@ -134,6 +146,19 @@ int SquareModel::getBallType()
 	}
 }
 
+void SquareModel::squareMoveDown()
+{
+	for (auto iter = m_squares.begin(); iter != m_squares.end(); ++iter)
+	{
+		bool isLastOne = false;
+		if (iter == m_squares.end() - 1)
+		{
+			isLastOne = true;
+		}
+		(*iter)->moveDown(isLastOne);
+	}
+}
+
 void SquareModel::removeBelowSquares()
 {
 	auto bottomPos = GameController::getInstance()->getTargetPos();
@@ -143,7 +168,7 @@ void SquareModel::removeBelowSquares()
 		auto &square = (*iter);
 		if (square->getPositionY() - square->getContentSize().height * 3 < bottomPos.y)
 		{
-			removeSquareNode(*iter);
+			removeSquareNode(square);
 		}
 	}
 }
@@ -169,5 +194,15 @@ void SquareModel::elimateSameColSquare(SquareNode *node)
 		{
 			square->addScore(-1);
 		}
+	}
+}
+
+void SquareModel::setSquareFreezing(bool isFreezing)
+{
+	m_bIsFreezing = isFreezing;
+	for (auto iter = m_squares.begin(); iter != m_squares.end(); ++iter)
+	{
+		auto &square = (*iter);
+		square->setFreezing(isFreezing);
 	}
 }

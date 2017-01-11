@@ -49,6 +49,13 @@ void ContactListener::BeginContact(b2Contact* contact)
 		{
 			auto square = dynamic_cast<SquareNode*>(node);
 			square->doCollisionAction();
+			if (square->getCollisionType() == kCollision_BossEatMarble)
+			{
+				marble->stop();
+				/*auto pos = GameController::getInstance()->getTargetPos();
+				marble->setPosition(pos);*/
+				GameController::getInstance()->addCounter();
+			}
 			if (square->getCollisionType() != kCollision_EliminateRow && square->getCollisionType() != kCollision_EliminateCol)
 			{
 				MarbleModel::theModel()->reboundMarbles();

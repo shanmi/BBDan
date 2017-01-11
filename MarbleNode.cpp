@@ -60,7 +60,7 @@ void MarbleNode::shoot(float degree)
 {
 	if (m_attr.skin == kMarble_Dispersed)
 	{
-		degree = rand() % 60 - 30 + degree;
+		degree = rand() % 40 - 20 + degree;
 	}
 	m_bTrueStop = false;
 	b2Vec2 v_t;
@@ -102,7 +102,8 @@ void MarbleNode::moveToTargetPos()
 			GameController::getInstance()->oneRoundEnd();
 		}
 	});
-	actions->addAction(move);
+	setPosition(pos);
+	//actions->addAction(move);
 	actions->addAction(callback);
 	actions->runActions();
 }

@@ -5,7 +5,7 @@
 
 MarbleModel::MarbleModel()
 {
-	m_attr = FasterMarle();
+	m_attr = DispersedMarle();
 
 	m_marblesCount = 0;
 }

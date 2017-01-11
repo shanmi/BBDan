@@ -28,6 +28,7 @@ enum CollisionType
 	kCollision_Rebound,
 	kCollision_EliminateRow,
 	kCollision_EliminateCol,
+	kCollision_BossEatMarble
 };
 
 enum MarbleType

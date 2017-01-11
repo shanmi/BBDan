@@ -72,7 +72,7 @@ void SquareNode::addScore(int score)
 	}
 }
 
-void SquareNode::moveDown()
+void SquareNode::moveDown(bool isLastOne /* = false */)
 {
 	auto actions = ActionSequence::create(this);
 	auto delay = CCFadeIn::create(0.6f);
@@ -84,7 +84,10 @@ void SquareNode::moveDown()
 	});
 	actions->addAction(delay);
 	actions->addAction(move);
-	actions->addAction(callback);
+	if (isLastOne)
+	{
+		actions->addAction(callback);
+	}
 	actions->runActions();
 }
 
@@ -111,28 +114,10 @@ bool SquareNode::shouldRemoveDirectly()
 
 void SquareNode::runRemoveAction()
 {
-	auto actions = ActionSequence::create(m_image);
-	auto size = CCDirector::sharedDirector()->getWinSize();
-	int posX = 0;
-	if (getPositionX() > size.width / 2)
-	{
-		posX = 100;
-	}
-	else
-	{
-		posX = -100;
-	}
-	auto action1 = CCJumpBy::create(0.5f, ccp(posX, 60), 60, 1);
-	auto action2 = CCFunctionAction::create([=]
-	{
-		auto explore = GameUtil::getExplodeEffect();
-		explore->setPosition(ccp(getPositionX() + posX, getPositionY() + 60));
-		getParent()->addChild(explore);
-		removeFromParent();
-	});
-	actions->addAction(action1);
-	actions->addAction(action2);
-	actions->runActions();
+	auto explore = GameUtil::getExplodeEffect();
+	explore->setPosition(getPosition());
+	getParent()->addChild(explore);
+	removeFromParent();
 }
 
 void SquareNode::doScaleAction()
@@ -166,6 +151,19 @@ void SquareNode::showBombAction()
 		auto explore = GameUtil::getExplodeEffect();
 		explore->setPosition(getPosition());
 		getParent()->addChild(explore);
+	}
+}
+
+void SquareNode::setFreezing(bool isFreezing)
+{
+	if (isFreezing)
+	{
+		auto freezing = CCSprite::create("freezing.png");
+		addChild(freezing, 100, 100);
+	}
+	else
+	{
+		removeChildByTag(100);
 	}
 }
 
@@ -243,4 +241,39 @@ void TriangleNode::doCollisionAction()
 	int damage = MarbleModel::theModel()->getMarbleAttr().damage;
 	int attactRate = GameController::getInstance()->getAttactRate();
 	addScore(-attactRate*damage);
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////////
+BossEatMarbleNode *BossEatMarbleNode::create()
+{
+	BossEatMarbleNode *node = new BossEatMarbleNode();
+	node->autorelease();
+	node->init();
+	return node;
+}
+
+bool BossEatMarbleNode::init()
+{
+	m_score = SquareModel::theModel()->getCurrentScore();
+
+	m_image = CCSprite::create("boss_0.png");
+	addChild(m_image);
+	auto fanIn = CCFadeIn::create(0.6f);
+	m_image->runAction(fanIn);
+
+	auto size = m_image->getContentSize();
+	setContentSize(size);
+
+	return true;
+}
+
+void BossEatMarbleNode::setBody()
+{
+	m_body = Box2dFactory::getInstance()->createSquare(this);
+}
+
+void BossEatMarbleNode::doCollisionAction()
+{
+	
 }

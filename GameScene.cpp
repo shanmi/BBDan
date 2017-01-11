@@ -35,6 +35,7 @@ void GameScene::draw()
 
 GameScene::GameScene()
 : m_shootDegree(0)
+, m_bIsShoot(false)
 {
 
 }
@@ -112,6 +113,13 @@ void GameScene::initBottomLayout()
 
 	CCSprite *character = dynamic_cast<CCSprite*>(m_bottomLayout->getChildById(3));
 	character->setPosition(ccp(100, m_bottomLinePos + 15));
+
+	CCMenuItem *clearScreenBtn = dynamic_cast<CCMenuItem*>(m_bottomLayout->getChildById(8));
+	clearScreenBtn->setTarget(this, menu_selector(GameScene::onClearScreen));
+
+	CCMenuItem *freezingBtn = dynamic_cast<CCMenuItem*>(m_bottomLayout->getChildById(9));
+	freezingBtn->setTarget(this, menu_selector(GameScene::onFreezing));
+
 }
 
 void GameScene::onDoubleAttact(CCObject *pSender)
@@ -130,7 +138,26 @@ void GameScene::onDoubleAttact(CCObject *pSender)
 	{
 		// show pay point
 	}
-	
+}
+
+void GameScene::onClearScreen(CCObject *pSender)
+{
+	bool isRoundOver = GameController::getInstance()->isRoundOver();
+	if (isRoundOver)
+	{
+		GameController::getInstance()->setRoundState(false);
+		SquareModel::theModel()->clearSquares();
+		oneRoundEnd();
+	}
+}
+
+void GameScene::onFreezing(CCObject *pSender)
+{
+	bool isFreezing = SquareModel::theModel()->isFreezing();
+	if (!isFreezing)
+	{
+		SquareModel::theModel()->setSquareFreezing(true);
+	}
 }
 
 void GameScene::initGameLayout()
@@ -321,8 +348,17 @@ void GameScene::ccTouchEnded(CCTouch *pTouch, CCEvent *pEvent)
 
 void GameScene::oneRoundEnd()
 {
-	addSquares();
-	SquareModel::theModel()->squareMoveDown();
+	bool isFreezing = SquareModel::theModel()->isFreezing();
+	if (isFreezing)
+	{
+		SquareModel::theModel()->setSquareFreezing(false);
+		GameController::getInstance()->setRoundState(true);
+	}
+	else
+	{
+		addSquares();
+		SquareModel::theModel()->squareMoveDown();
+	}
 
 	//check marbles
 	auto marbles = MarbleModel::theModel()->getMarbles();
@@ -375,4 +411,5 @@ void GameScene::showGameOver()
 {
 	CCLog("is game over");
 	SquareModel::theModel()->removeBelowSquares();
+	//GameController::getInstance()->setRoundState(false);
 }

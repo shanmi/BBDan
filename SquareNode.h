@@ -7,7 +7,9 @@
 
 struct CommonAction
 {
+	virtual void setBody(){}
 	virtual void doCollisionAction(){}
+	virtual void runRemoveAction(){}
 };
 
 class SquareNode : public cocos2d::CCNode
@@ -21,22 +23,23 @@ public:
 	virtual bool init();
 	virtual void setPosition(const cocos2d::CCPoint &position);
 
-	virtual void doScaleAction();
 	virtual void setBody();
-	virtual void runRemoveAction();
 	virtual void doCollisionAction();
+	virtual void runRemoveAction();
 public:
 	void setIndex(int index){ m_index = index; }
 	int getIndex() { return m_index; }
-	
-	int getCollisionType(){ return m_collisionType; }
 
 	void addScore(int score);
 	int getScore() { return m_score; }
 
+	int getCollisionType(){ return m_collisionType; }
 	b2Body *getBody(){ return m_body; }
 
-	void moveDown();
+	void setFreezing(bool isFreezing);
+
+	void moveDown(bool isLastOne = false);
+	void doScaleAction();
 	bool shouldRemoveDirectly();
 	void showBombAction();
 
@@ -57,6 +60,16 @@ public:
 	static TriangleNode *create();
 	virtual bool init();
 	virtual void setPosition(const cocos2d::CCPoint &position);
+	virtual void setBody();
+	virtual void doCollisionAction();
+};
+
+class BossEatMarbleNode : public SquareNode
+{
+public:
+	BossEatMarbleNode() : SquareNode(){ m_collisionType = kCollision_BossEatMarble; }
+	static BossEatMarbleNode *create();
+	virtual bool init();
 	virtual void setBody();
 	virtual void doCollisionAction();
 };
