@@ -6,6 +6,7 @@
 #include "ActionSequence.h"
 #include "GameController.h"
 #include "GameUtil.h"
+#include "MarbleModel.h"
 USING_NS_CC;
 
 MarbleNode::MarbleNode(MarbleAttr attr)
@@ -60,7 +61,12 @@ void MarbleNode::shoot(float degree)
 {
 	if (m_attr.skin == kMarble_Dispersed)
 	{
-		degree = rand() % 40 - 20 + degree;
+		auto marbles = MarbleModel::theModel()->getMarbles();
+		auto iter = find(marbles.begin(), marbles.end(), this);
+		if (iter != marbles.begin())
+		{
+			degree = rand() % 40 - 20 + degree;
+		}
 	}
 	m_bTrueStop = false;
 	b2Vec2 v_t;
@@ -93,10 +99,10 @@ void MarbleNode::moveToTargetPos()
 	bool isCounterFull = GameController::getInstance()->isCounterFull();
 	auto callback = CCFunctionAction::create([=]()
 	{
-		if (!isFirst)
+		/*if (!isFirst)
 		{
 			this->setVisible(false);
-		}
+		}*/
 		if (isCounterFull)
 		{
 			GameController::getInstance()->oneRoundEnd();

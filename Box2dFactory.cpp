@@ -186,7 +186,7 @@ b2Body *Box2dFactory::createCircle(CCNode *node, CCSize size, bool isSensor)
 	return pBody;
 }
 
-b2Body *Box2dFactory::createSquare(CCNode *node)
+b2Body *Box2dFactory::createSquare(CCNode *node, bool isSensor /* = false */)
 {
 	CCPoint worldPos;
 	if (node->getParent())
@@ -213,6 +213,7 @@ b2Body *Box2dFactory::createSquare(CCNode *node)
 	bodyFixture.shape = &bodyShape;
 	bodyFixture.friction = 0.0f;
 	bodyFixture.restitution = 1.0f;
+	bodyFixture.isSensor = isSensor; //check collision but not contact when isSensor is true
 	pBody->CreateFixture(&bodyFixture);
 
 	return pBody;

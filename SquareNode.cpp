@@ -99,6 +99,7 @@ bool SquareNode::shouldRemoveDirectly()
 	case kCollision_Triangle:
 	case kCollision_AddMarble:
 	case kCollision_AddCoin:
+	case kCollision_BossEatMarble:
 		return true;
 		break;
 	case kCollision_Rebound:
@@ -265,6 +266,12 @@ bool BossEatMarbleNode::init()
 	auto size = m_image->getContentSize();
 	setContentSize(size);
 
+	auto color = ccc3(255, 255 - (m_score * 13) % 256, (m_score * 7) % 256);
+	std::string scoreStr = GameUtil::intToString(m_score);
+	m_scoreLabel = CCLabelTTF::create(scoreStr.c_str(), "fonts/SF Square Root.ttf", 34);
+	m_scoreLabel->setColor(color);
+	addChild(m_scoreLabel);
+
 	return true;
 }
 
@@ -275,5 +282,9 @@ void BossEatMarbleNode::setBody()
 
 void BossEatMarbleNode::doCollisionAction()
 {
-	
+	showBombAction();
+
+	int damage = MarbleModel::theModel()->getMarbleAttr().damage;
+	int attactRate = GameController::getInstance()->getAttactRate();
+	addScore(-attactRate*damage);
 }

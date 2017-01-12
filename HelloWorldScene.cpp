@@ -35,25 +35,6 @@ bool HelloWorld::init()
     CCPoint origin = CCDirector::sharedDirector()->getVisibleOrigin();
 
     /////////////////////////////
-    // 2. add a menu item with "X" image, which is clicked to quit the program
-    //    you may modify it.
-
-    // add a "close" icon to exit the progress. it's an autorelease object
-    CCMenuItemImage *pCloseItem = CCMenuItemImage::create(
-                                        "CloseNormal.png",
-                                        "CloseSelected.png",
-                                        this,
-                                        menu_selector(HelloWorld::menuCloseCallback));
-    
-	pCloseItem->setPosition(ccp(origin.x + visibleSize.width - pCloseItem->getContentSize().width/2 ,
-                                origin.y + pCloseItem->getContentSize().height/2));
-
-    // create menu, it's an autorelease object
-    CCMenu* pMenu = CCMenu::create(pCloseItem, NULL);
-    pMenu->setPosition(CCPointZero);
-    this->addChild(pMenu, 1);
-
-    /////////////////////////////
     // 3. add your codes below...
 
     // add a label shows "Hello World"
@@ -94,42 +75,29 @@ bool HelloWorld::init()
 	auto actions = CCRepeatForever::create(sequence);
 	runAction(actions);*/
 
-	CCSize s = CCDirector::sharedDirector()->getWinSize();
+	CCParticleSun* par = CCParticleSun::create();
+	par->setStartSize(60);
+	par->setEmissionRate(100);
+	par->setAnchorPoint(ccp(0.5f, 0.5f));
+	par->setPosition(230, 600);
+	par->setTexture(CCTextureCache::sharedTextureCache()->addImage("fire.png"));
+	addChild(par, 10);
 
-	// the root object just rotates around
-	m_root = CCSprite::create("item_4.png");
-	addChild(m_root, 1);
-	m_root->setPosition(ccp(s.width / 2, s.height / 2));
-	auto moveTo = CCMoveBy::create(2.0f, ccp(200, 500));
+	//auto fire = CCParticleMeteor::create();
+	//par->setStartSize(60);
+	//fire->setTexture(CCTextureCache::sharedTextureCache()->addImage("fire.png"));
+	////fire->setRotation(30);
+	//fire->setPosition(230, 600);
+	//addChild(fire);
+
+	auto delay = CCDelayTime::create(1.0f);
+	auto moveTo = CCMoveBy::create(1.0f, ccp(0, -500));
 	auto moveBack = moveTo->reverse();
-	auto sequence = CCSequence::create(moveTo, moveBack, NULL);
+	auto sequence = CCSequence::create(delay, moveTo, moveBack, NULL);
 	auto actions = CCRepeatForever::create(sequence);
-	m_root->runAction(actions);
-
-	// create the streak object and add it to the scene
-	m_streak = CCMotionStreak::create(2, 3, 32, ccGREEN, "streak.png");
-	addChild(m_streak);
-	// schedule an update on each frame so we can syncronize the streak with the target
-	schedule(schedule_selector(HelloWorld::onUpdate));
-
-	CCActionInterval *colorAction = CCRepeatForever::create(CCSequence::create(
-		CCTintTo::create(0.2f, 255, 0, 0),
-		CCTintTo::create(0.2f, 0, 255, 0),
-		CCTintTo::create(0.2f, 0, 0, 255),
-		CCTintTo::create(0.2f, 0, 255, 255),
-		CCTintTo::create(0.2f, 255, 255, 0),
-		CCTintTo::create(0.2f, 255, 0, 255),
-		CCTintTo::create(0.2f, 255, 255, 255),
-		NULL));
-
-	m_streak->runAction(colorAction);
+	par->runAction(actions);
 
     return true;
-}
-
-void HelloWorld::onUpdate(float delta)
-{
-	m_streak->setPosition(m_root->convertToWorldSpace(CCPointZero));
 }
 
 void HelloWorld::menuCloseCallback(CCObject* pSender)

@@ -23,7 +23,7 @@ public:
 	void debugDraw();
 
 	b2Body *createCircle(cocos2d::CCNode *node, cocos2d::CCSize size, bool isSensor = false);
-	b2Body *createSquare(cocos2d::CCNode *node);
+	b2Body *createSquare(cocos2d::CCNode *node, bool isSensor = false);
 	b2Body *createTriangle(cocos2d::CCNode *node);
 	b2Body *createMarble(cocos2d::CCNode *node);
 

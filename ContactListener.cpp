@@ -40,7 +40,13 @@ void ContactListener::BeginContact(b2Contact* contact)
 			}
 			if (GameController::getInstance()->getCounter() == 1)
 			{
-				GameController::getInstance()->setTargetPos(spriteB->getPosition());
+				auto targetPos = GameController::getInstance()->getTargetPos();
+				GameController::getInstance()->setTargetPos(ccp(spriteB->getPositionX(), targetPos.y));
+				marble->setVisible(true);
+			}
+			else
+			{
+				marble->setVisible(false);
 			}
 			marble->stop();
 			MarbleModel::theModel()->reboundMarbles();
@@ -52,9 +58,15 @@ void ContactListener::BeginContact(b2Contact* contact)
 			if (square->getCollisionType() == kCollision_BossEatMarble)
 			{
 				marble->stop();
-				/*auto pos = GameController::getInstance()->getTargetPos();
-				marble->setPosition(pos);*/
 				GameController::getInstance()->addCounter();
+				if (GameController::getInstance()->getCounter() == 1)
+				{
+					marble->setVisible(true);
+				}
+				else
+				{
+					marble->setVisible(false);
+				}
 			}
 			if (square->getCollisionType() != kCollision_EliminateRow && square->getCollisionType() != kCollision_EliminateCol)
 			{

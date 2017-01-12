@@ -37,12 +37,7 @@ GameController *GameController::getInstance()
 
 void GameController::startOneRound()
 {
-	m_counter = 0;
-}
-
-void GameController::addCounter()
-{
-	m_counter++;
+	m_counter = 0;// MarbleModel::theModel()->getMarbles().size();
 }
 
 bool GameController::isCounterFull()

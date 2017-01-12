@@ -5,7 +5,7 @@
 
 MarbleModel::MarbleModel()
 {
-	m_attr = DispersedMarle();
+	m_attr = NormalMarle();
 
 	m_marblesCount = 0;
 }
@@ -17,6 +17,7 @@ MarbleModel *MarbleModel::theModel()
 
 MarbleNode* MarbleModel::createMarble()
 {
+	m_attr = FasterMarle();
 	MarbleNode *marble = MarbleNode::create(m_attr);
 	marble->setVisible(false);
 	m_marbles.push_back(marble);

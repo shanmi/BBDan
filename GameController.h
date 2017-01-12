@@ -33,7 +33,8 @@ public:
 public:
 	void startOneRound();
 
-	void addCounter();
+	void addCounter(){ ++m_counter; }
+	void reduceCounter(){ --m_counter; }
 	int getCounter(){ return m_counter; }
 	void setTargetPos(cocos2d::CCPoint pos){ m_targetPos = pos; }
 	cocos2d::CCPoint getTargetPos(){ return m_targetPos; }

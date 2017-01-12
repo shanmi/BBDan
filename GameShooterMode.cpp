@@ -1,4 +1,4 @@
-#include "GameScene.h"
+#include "GameShooterMode.h"
 #include "UiLayout.h"
 #include "GameUtil.h"
 #include "Config.h"
@@ -13,27 +13,27 @@
 
 USING_NS_CC;
 
-void GameScene::onEnter()
+void GameShooterMode::onEnter()
 {
 	CCLayer::onEnter();
 	CCDirector::sharedDirector()->getTouchDispatcher()->addTargetedDelegate(this, -1, true);
 	GameController::getInstance()->addView(this);
 }
 
-void GameScene::onExit()
+void GameShooterMode::onExit()
 {
 	CCLayer::onExit();
 	CCDirector::sharedDirector()->getTouchDispatcher()->removeDelegate(this);
 	GameController::getInstance()->removeView(this);
 }
 
-void GameScene::draw()
+void GameShooterMode::draw()
 {
 	CCLayer::draw();
 	Box2dFactory::getInstance()->debugDraw();
 }
 
-GameScene::GameScene()
+GameShooterMode::GameShooterMode()
 : m_shootDegree(0)
 , m_addMarbleCount(0)
 , m_bIsShoot(false)
@@ -41,28 +41,28 @@ GameScene::GameScene()
 
 }
 
-GameScene::~GameScene()
+GameShooterMode::~GameShooterMode()
 {
 
 }
 
-GameScene *GameScene::create()
+GameShooterMode *GameShooterMode::create()
 {
-	GameScene *layer = new GameScene;
+	GameShooterMode *layer = new GameShooterMode;
 	layer->init();
 	layer->autorelease();
 	return layer;
 }
 
-CCScene *GameScene::scene()
+CCScene *GameShooterMode::scene()
 {
 	CCScene *scene = CCScene::create();
-	GameScene *layer = GameScene::create();
+	GameShooterMode *layer = GameShooterMode::create();
 	scene->addChild(layer);
 	return scene;
 }
 
-bool GameScene::init()
+bool GameShooterMode::init()
 {
 	if (!CCLayer::init())
 	{
@@ -91,14 +91,14 @@ bool GameScene::init()
 	return true;
 }
 
-void GameScene::initTopLayout()
+void GameShooterMode::initTopLayout()
 {
 	CCSprite *line_top = dynamic_cast<CCSprite*>(m_topLayout->getChildById(2));
 	auto worldPos = m_topLayout->convertToWorldSpace(line_top->getPosition());
 	m_topLinePos = worldPos.y;
 }
 
-void GameScene::initBottomLayout()
+void GameShooterMode::initBottomLayout()
 {
 	CCSprite *line_bottom = dynamic_cast<CCSprite*>(m_bottomLayout->getChildById(2));
 	line_bottom->setTag(kTag_Wall);
@@ -109,20 +109,20 @@ void GameScene::initBottomLayout()
 	updateCoins();
 
 	CCMenuItem *doubleAttactBtn = dynamic_cast<CCMenuItem*>(m_bottomLayout->getChildById(6));
-	doubleAttactBtn->setTarget(this, menu_selector(GameScene::onDoubleAttact));
+	doubleAttactBtn->setTarget(this, menu_selector(GameShooterMode::onDoubleAttact));
 
 	CCSprite *character = dynamic_cast<CCSprite*>(m_bottomLayout->getChildById(3));
 	character->setPosition(ccp(100, m_bottomLinePos + 15));
 
 	CCMenuItem *clearScreenBtn = dynamic_cast<CCMenuItem*>(m_bottomLayout->getChildById(8));
-	clearScreenBtn->setTarget(this, menu_selector(GameScene::onClearScreen));
+	clearScreenBtn->setTarget(this, menu_selector(GameShooterMode::onClearScreen));
 
 	CCMenuItem *freezingBtn = dynamic_cast<CCMenuItem*>(m_bottomLayout->getChildById(9));
-	freezingBtn->setTarget(this, menu_selector(GameScene::onFreezing));
+	freezingBtn->setTarget(this, menu_selector(GameShooterMode::onFreezing));
 
 }
 
-void GameScene::onDoubleAttact(CCObject *pSender)
+void GameShooterMode::onDoubleAttact(CCObject *pSender)
 {
 	bool ifCoinEnought = GameController::getInstance()->checkCoinsEnought();
 	if (ifCoinEnought)
@@ -140,7 +140,7 @@ void GameScene::onDoubleAttact(CCObject *pSender)
 	}
 }
 
-void GameScene::onClearScreen(CCObject *pSender)
+void GameShooterMode::onClearScreen(CCObject *pSender)
 {
 	bool isRoundOver = GameController::getInstance()->isRoundOver();
 	if (isRoundOver)
@@ -151,7 +151,7 @@ void GameScene::onClearScreen(CCObject *pSender)
 	}
 }
 
-void GameScene::onFreezing(CCObject *pSender)
+void GameShooterMode::onFreezing(CCObject *pSender)
 {
 	bool isFreezing = SquareModel::theModel()->isFreezing();
 	if (!isFreezing)
@@ -160,7 +160,7 @@ void GameScene::onFreezing(CCObject *pSender)
 	}
 }
 
-void GameScene::initGameLayout()
+void GameShooterMode::initGameLayout()
 {
 	auto ballHints = BallHintModel::theModel()->createBallHints();
 	for (auto iter = ballHints.begin(); iter != ballHints.end(); ++iter)
@@ -186,13 +186,13 @@ void GameScene::initGameLayout()
 	character->addChild(m_marbleCount);
 }
 
-void GameScene::initPhysicBorder()
+void GameShooterMode::initPhysicBorder()
 {
 	m_world = Box2dFactory::getInstance()->getWorld();
 	Box2dFactory::getInstance()->initBorders(m_topLinePos, m_bottomLinePos);
 }
 
-void GameScene::initMarbles()
+void GameShooterMode::initMarbles()
 {
 	for (int i = 0; i < 10; i++)
 	{
@@ -212,10 +212,10 @@ void GameScene::initMarbles()
 		streak->setTag(100 + i);
 		addChild(streak);
 	}
-	schedule(schedule_selector(GameScene::updateStreak));
+	schedule(schedule_selector(GameShooterMode::updateStreak));
 }
 
-void GameScene::updateStreak(float dt)
+void GameShooterMode::updateStreak(float dt)
 {
 	auto marbles = MarbleModel::theModel()->getMarbles();
 	for (int i = 0; i < marbles.size(); i++)
@@ -225,7 +225,7 @@ void GameScene::updateStreak(float dt)
 	}
 }
 
-void GameScene::initSquares()
+void GameShooterMode::initSquares()
 {
 	auto squares = SquareModel::theModel()->createSquareList();
 	for (int i = 0; i < squares.size(); i++)
@@ -236,7 +236,7 @@ void GameScene::initSquares()
 	}
 }
 
-void GameScene::addSquares()
+void GameShooterMode::addSquares()
 {
 	auto squares = SquareModel::theModel()->createSquareList();
 	for (int i = 0; i < squares.size(); i++)
@@ -247,7 +247,7 @@ void GameScene::addSquares()
 	}
 }
 
-void GameScene::update(float dt)
+void GameShooterMode::update(float dt)
 {
 	bool isRoundOver = GameController::getInstance()->isRoundOver();
 	if (isRoundOver)
@@ -291,7 +291,7 @@ void GameScene::update(float dt)
 
 }
 
-bool GameScene::ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent)
+bool GameShooterMode::ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent)
 {
 	bool isRoundOver = GameController::getInstance()->isRoundOver();
 	if (!isRoundOver)
@@ -305,7 +305,7 @@ bool GameScene::ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent)
 	return true;
 }
 
-void GameScene::ccTouchMoved(CCTouch *pTouch, CCEvent *pEvent)
+void GameShooterMode::ccTouchMoved(CCTouch *pTouch, CCEvent *pEvent)
 {
 	auto curPos = pTouch->getLocation();
 	auto prePos = m_touchPoint->getPosition();
@@ -326,7 +326,7 @@ void GameScene::ccTouchMoved(CCTouch *pTouch, CCEvent *pEvent)
 	BallHintModel::theModel()->updatePosition(curPos, prePos, m_arrow->getPosition(), m_arrow->getContentSize().width);
 }
 
-void GameScene::ccTouchEnded(CCTouch *pTouch, CCEvent *pEvent)
+void GameShooterMode::ccTouchEnded(CCTouch *pTouch, CCEvent *pEvent)
 {
 	if (!m_arrow->isVisible())
 	{
@@ -360,7 +360,7 @@ void GameScene::ccTouchEnded(CCTouch *pTouch, CCEvent *pEvent)
 	actions->runActions();
 }
 
-void GameScene::oneRoundEnd()
+void GameShooterMode::oneRoundEnd()
 {
 	bool isFreezing = SquareModel::theModel()->isFreezing();
 	if (isFreezing)
@@ -403,13 +403,13 @@ void GameScene::oneRoundEnd()
 	character->runAction(moveTo);
 }
 
-void GameScene::updateMarbles()
+void GameShooterMode::updateMarbles()
 {
 	// just show adding marble action
 	m_addMarbleCount++;
 }
 
-void GameScene::updateCoins()
+void GameShooterMode::updateCoins()
 {
 	int coinCount = GameData::getInstance()->getCoins();
 	std::string countStr = GameUtil::intToString(coinCount);
@@ -417,7 +417,7 @@ void GameScene::updateCoins()
 	coinLabel->setString(countStr.c_str());
 }
 
-void GameScene::updateMarbleCount()
+void GameShooterMode::updateMarbleCount()
 {
 	char temp[50] = { 0 };
 	if (m_addMarbleCount > MarbleModel::theModel()->getMarblesCount())
@@ -428,12 +428,12 @@ void GameScene::updateMarbleCount()
 	m_marbleCount->setString(temp);
 }
 
-void GameScene::addSquareNode(SquareNode *node)
+void GameShooterMode::addSquareNode(SquareNode *node)
 {
 	addChild(node);
 }
 
-void GameScene::showGameOver()
+void GameShooterMode::showGameOver()
 {
 	CCLog("is game over");
 	SquareModel::theModel()->removeBelowSquares();

@@ -1,7 +1,7 @@
 #ifndef __COMMONMACROS_H__
 #define __COMMONMACROS_H__
 
-
+#define LABEL_FONT "fonts/SF Square Head Bold.ttf"
 enum TouchPriority
 {
 	kPanelTouchPriority = -10,

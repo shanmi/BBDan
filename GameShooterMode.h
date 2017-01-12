@@ -1,5 +1,5 @@
-#ifndef _GAME_SCENE_H_
-#define _GAME_SCENE_H_
+#ifndef _GAME_SHOOTER_MODE_H_
+#define _GAME_SHOOTER_MODE_H_
 
 #include "cocos2d.h"
 #include "Box2D/Box2D.h"
@@ -7,16 +7,16 @@
 
 class UiLayout;
 class MarbleNode;
-class GameScene 
+class GameShooterMode 
 	: public cocos2d::CCLayer
 	, public INotifyView
 {
 public:
 	virtual bool init();
 	static cocos2d::CCScene *scene();
-	static GameScene *create();
-	GameScene();
-	~GameScene();
+	static GameShooterMode *create();
+	GameShooterMode();
+	~GameShooterMode();
 
 	virtual void onEnter();
 	virtual void onExit();

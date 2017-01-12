@@ -23,7 +23,6 @@ public:
 	bool ccTouchBegan(cocos2d::CCTouch *pTouch, cocos2d::CCEvent *pEvent);
 
 public:
-	void onUpdate(float delta);
 	cocos2d::CCMotionStreak *m_streak;
 	cocos2d::CCSprite *m_root;
 };
