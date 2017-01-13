@@ -10,6 +10,7 @@
 #include "ActionSequence.h"
 #include "CCFunctionAction.h"
 #include "GameData.h"
+#include "MainMenu.h"
 
 USING_NS_CC;
 
@@ -33,10 +34,14 @@ void GameShooterMode::draw()
 	Box2dFactory::getInstance()->debugDraw();
 }
 
+void GameShooterMode::keyBackClicked()
+{
+	GameController::getInstance()->backToMainMenu();
+}
+
 GameShooterMode::GameShooterMode()
-: m_shootDegree(0)
-, m_addMarbleCount(0)
-, m_bIsShoot(false)
+: m_moveCounter(0)
+, m_freezingTime(0)
 {
 
 }
@@ -69,6 +74,9 @@ bool GameShooterMode::init()
 		return false;
 	}
 
+	setKeypadEnabled(true);
+	Box2dFactory::getInstance()->initPhysics(true);
+
 	auto winSize = CCDirector::sharedDirector()->getWinSize();
 	m_topLayout = UiLayout::create("layout/common_top.xml");
 	m_topLayout->setPosition(ccp(0, winSize.height - m_topLayout->getContentSize().height));
@@ -85,7 +93,7 @@ bool GameShooterMode::init()
 
 	initMarbles();
 	initSquares();
-	
+
 
 	scheduleUpdate();
 	return true;
@@ -111,8 +119,8 @@ void GameShooterMode::initBottomLayout()
 	CCMenuItem *doubleAttactBtn = dynamic_cast<CCMenuItem*>(m_bottomLayout->getChildById(6));
 	doubleAttactBtn->setTarget(this, menu_selector(GameShooterMode::onDoubleAttact));
 
-	CCSprite *character = dynamic_cast<CCSprite*>(m_bottomLayout->getChildById(3));
-	character->setPosition(ccp(100, m_bottomLinePos + 15));
+	m_character = dynamic_cast<CCSprite*>(m_bottomLayout->getChildById(3));
+	m_character->setPosition(ccp(100, m_bottomLinePos + 15));
 
 	CCMenuItem *clearScreenBtn = dynamic_cast<CCMenuItem*>(m_bottomLayout->getChildById(8));
 	clearScreenBtn->setTarget(this, menu_selector(GameShooterMode::onClearScreen));
@@ -146,7 +154,7 @@ void GameShooterMode::onClearScreen(CCObject *pSender)
 	if (isRoundOver)
 	{
 		GameController::getInstance()->setRoundState(false);
-		SquareModel::theModel()->clearSquares();
+		SquareModel::theModel()->removeAllSquares();
 		oneRoundEnd();
 	}
 }
@@ -162,28 +170,7 @@ void GameShooterMode::onFreezing(CCObject *pSender)
 
 void GameShooterMode::initGameLayout()
 {
-	auto ballHints = BallHintModel::theModel()->createBallHints();
-	for (auto iter = ballHints.begin(); iter != ballHints.end(); ++iter)
-	{
-		addChild(*iter);
-	}
 
-	m_touchPoint = CCSprite::create("start_touch_point.png");
-	addChild(m_touchPoint);
-	m_touchPoint->setVisible(false);
-
-	CCSprite *character = dynamic_cast<CCSprite*>(m_bottomLayout->getChildById(3));
-	m_arrow = CCSprite::create("arrow.png");
-	m_arrow->setAnchorPoint(ccp(1.0f, 0.5f));
-	m_arrow->setPosition(character->getPosition());
-	addChild(m_arrow);
-	m_arrow->setVisible(false);
-
-	char temp[50] = { 0 };
-	sprintf(temp, "X%d", 10);
-	m_marbleCount = CCLabelTTF::create(temp, LABEL_FONT, 23);
-	m_marbleCount->setPosition(ccp(character->getContentSize().width / 2, character->getContentSize().height + m_marbleCount->getContentSize().height));
-	character->addChild(m_marbleCount);
 }
 
 void GameShooterMode::initPhysicBorder()
@@ -194,73 +181,79 @@ void GameShooterMode::initPhysicBorder()
 
 void GameShooterMode::initMarbles()
 {
-	for (int i = 0; i < 10; i++)
-	{
-		auto marble = MarbleModel::theModel()->createMarble();
-		marble->setPosition(ccp(m_arrow->getPositionX(), m_bottomLinePos + marble->getContentSize().height / 2 + 4));
-		addChild(marble);
-		if (i == 0)
-		{
-			marble->setVisible(true);
-			GameController::getInstance()->setTargetPos(marble->getPosition());
-		}
-		else
-		{
-			marble->setVisible(false);
-		}
-		auto streak = GameUtil::getMotionStreak();
-		streak->setTag(100 + i);
-		addChild(streak);
-	}
 	schedule(schedule_selector(GameShooterMode::updateStreak));
+
+	addMarble(0);
 }
 
 void GameShooterMode::updateStreak(float dt)
 {
-	auto marbles = MarbleModel::theModel()->getMarbles();
+	/*auto marbles = MarbleModel::theModel()->getMarbles();
 	for (int i = 0; i < marbles.size(); i++)
 	{
-		auto node = getChildByTag(100 + i);
-		node->setPosition(marbles[i]->convertToWorldSpace(CCPointZero));
-	}
+	auto node = getChildByTag(100 + i);
+	node->setPosition(marbles[i]->convertToWorldSpace(CCPointZero));
+	}*/
 }
 
 void GameShooterMode::initSquares()
 {
-	auto squares = SquareModel::theModel()->createSquareList();
-	for (int i = 0; i < squares.size(); i++)
+	for (int i = 0; i < 3; i++)
 	{
-		auto node = squares[i];
-		node->setPosition(ccp((node->getContentSize().width / 2 + SQUARE_SPACING) + node->getIndex() * (node->getContentSize().width + SQUARE_SPACING), m_bottomLinePos + (node->getContentSize().height + SQUARE_SPACING) * 7.5));
-		addChild(node);
+		auto squares = SquareModel::theModel()->createSquareList(false);
+		for (int j = 0; j < squares.size(); j++)
+		{
+			auto node = squares[j];
+			node->setPosition(ccp((node->getContentSize().width / 2 + SQUARE_SPACING) + node->getIndex() * (node->getContentSize().width + SQUARE_SPACING), 
+				m_bottomLinePos + (node->getContentSize().height + SQUARE_SPACING) * (i + 6.5)));
+			addChild(node);
+		}
 	}
+}
+
+void GameShooterMode::addMarble(float dt)
+{
+	auto marbles = MarbleModel::theModel()->getMarbles();
+	auto actions = ActionSequence::create(this);
+	MarbleAttr m_attr = FasterMarle();
+	auto ball = MarbleModel::theModel()->createMarble();
+	ball->setPosition(ccp(m_character->getPositionX(), m_bottomLinePos + ball->getContentSize().height / 2 + 4));
+	addChild(ball);
+	ball->setMovingState(true);
+	ball->shooterShoot();
+	ball->setVisible(true);
+	auto attr = MarbleModel::theModel()->getMarbleAttr();
+	auto action1 = CCDelayTime::create(0.2f / attr.speed);
+	auto action2 = CCFunctionAction::create([=]()
+	{
+		addMarble(0);
+	});
+	actions->addAction(action1);
+	actions->addAction(action2);
+	actions->runActions();
+
+	auto streak = GameUtil::getMotionStreak();
+	streak->setTag(100 + marbles.size());
+	addChild(streak);
 }
 
 void GameShooterMode::addSquares()
 {
-	auto squares = SquareModel::theModel()->createSquareList();
+	auto squares = SquareModel::theModel()->createSquareList(false);
 	for (int i = 0; i < squares.size(); i++)
 	{
 		auto node = squares[i];
-		node->setPosition(ccp(node->getContentSize().width / 2 + SQUARE_SPACING + node->getIndex() * (node->getContentSize().width + SQUARE_SPACING), m_bottomLinePos + (node->getContentSize().height + SQUARE_SPACING) * 8.5));
+		node->setPosition(ccp(node->getContentSize().width / 2 + SQUARE_SPACING + node->getIndex() * (node->getContentSize().width + SQUARE_SPACING), 
+			m_bottomLinePos + (node->getContentSize().height + SQUARE_SPACING) * 8.5));
 		addChild(node);
 	}
 }
 
 void GameShooterMode::update(float dt)
 {
-	bool isRoundOver = GameController::getInstance()->isRoundOver();
-	if (isRoundOver)
-	{
-		auto targetPos = GameController::getInstance()->getTargetPos();
-		m_arrow->setPosition(targetPos);
-		return;
-	}
 
-	updateMarbleCount();
-
-	int32 velocityIterations = 10;
-	int32 positionIterations = 10;
+	int32 velocityIterations = 8;
+	int32 positionIterations = 1;
 
 	m_world->Step(dt, velocityIterations, positionIterations);
 	m_world->ClearForces();
@@ -278,117 +271,65 @@ void GameShooterMode::update(float dt)
 		}
 		else
 		{
-			if (!marble->isTrueStop())
+			MarbleModel::theModel()->removeMarble(marble);
+		}
+	}
+
+	bool isFreezing = SquareModel::theModel()->isFreezing();
+	if (isFreezing)
+	{
+		m_freezingTime += dt;
+		if (m_freezingTime > FREEZING_TIME)
+		{
+			m_freezingTime = 0;
+			SquareModel::theModel()->setSquareFreezing(false);
+		}
+	}
+	else
+	{
+		auto squares = SquareModel::theModel()->getSquares();
+		for (auto iter = squares.begin(); iter != squares.end(); ++iter)
+		{
+			auto square = *iter;
+			square->setPosition(ccp(square->getPositionX(), square->getPositionY() - (square->getContentSize().height + SQUARE_SPACING) / BALL_MOVE_SPEED));
+			if (square->getPositionY() < m_bottomLinePos)
 			{
-				m_addMarbleCount++;
-				marble->moveToTargetPos();
+				SquareModel::theModel()->removeSquareNode(square);
 			}
+		}
+		m_moveCounter++;
+		if (m_moveCounter > BALL_MOVE_SPEED)
+		{
+			m_moveCounter = 0;
+			addSquares();
 		}
 	}
 	
 	//check squares by not check tool
-	GameController::getInstance()->checkSquares();
+	GameController::getInstance()->checkSquares(true);
 
 }
 
 bool GameShooterMode::ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent)
 {
-	bool isRoundOver = GameController::getInstance()->isRoundOver();
-	if (!isRoundOver)
-	{
-		return false;
-	}
 	auto location = pTouch->getLocation();
-	m_touchPoint->setPosition(location);
-	m_touchPoint->setVisible(true);
-
+	m_character->setPositionX(location.x - m_character->getContentSize().width/2);
 	return true;
 }
 
 void GameShooterMode::ccTouchMoved(CCTouch *pTouch, CCEvent *pEvent)
 {
-	auto curPos = pTouch->getLocation();
-	auto prePos = m_touchPoint->getPosition();
-
-	m_shootDegree = GameUtil::getDegreeTwoPoints(curPos, prePos);
-	m_arrow->setRotation(180 - m_shootDegree);
-	if (m_shootDegree < 6 || m_shootDegree > 174)
-	{
-		m_arrow->setVisible(false);
-		BallHintModel::theModel()->setHintVisible(false);
-	}
-	else
-	{
-		m_arrow->setVisible(true);
-		BallHintModel::theModel()->setHintVisible(true);
-	}
-
-	BallHintModel::theModel()->updatePosition(curPos, prePos, m_arrow->getPosition(), m_arrow->getContentSize().width);
+	auto location = pTouch->getLocation();
+	m_character->setPositionX(location.x - m_character->getContentSize().width / 2);
 }
 
 void GameShooterMode::ccTouchEnded(CCTouch *pTouch, CCEvent *pEvent)
 {
-	if (!m_arrow->isVisible())
-	{
-		m_touchPoint->setVisible(false);
-		return;
-	}
-	
-	GameController::getInstance()->startOneRound();
-	m_touchPoint->setVisible(false);
-	m_arrow->setVisible(false);
-	BallHintModel::theModel()->setHintVisible(false);
 
-	GameController::getInstance()->setRoundState(false);
-	auto actions = ActionSequence::create(this);
-	auto marbles = MarbleModel::theModel()->getMarbles();
-	m_addMarbleCount = marbles.size();
-	for (auto iter = marbles.begin(); iter != marbles.end(); ++iter)
-	{
-		auto &ball = (*iter);
-		ball->setMovingState(true);
-		auto action1 = CCFunctionAction::create([=]()
-		{
-			m_addMarbleCount--;
-			ball->shoot(m_shootDegree);
-			ball->setVisible(true);
-		});
-		auto action2 = CCDelayTime::create(0.1f);
-		actions->addAction(action1);
-		actions->addAction(action2);
-	}
-	actions->runActions();
 }
 
 void GameShooterMode::oneRoundEnd()
 {
-	bool isFreezing = SquareModel::theModel()->isFreezing();
-	if (isFreezing)
-	{
-		SquareModel::theModel()->setSquareFreezing(false);
-		GameController::getInstance()->setRoundState(true);
-	}
-	else
-	{
-		addSquares();
-		SquareModel::theModel()->squareMoveDown();
-	}
-
-	//check marbles
-	auto marbles = MarbleModel::theModel()->getMarbles();
-	int addCount = MarbleModel::theModel()->checkMarblesCount();
-	auto pos = GameController::getInstance()->getTargetPos();
-	for (int i = 0; i < addCount; i++)
-	{
-		auto marble = MarbleModel::theModel()->createMarble();
-		marble->setPosition(pos);
-		addChild(marble);
-		auto streak = GameUtil::getMotionStreak();
-		streak->setTag(100 + marbles.size() + i);
-		addChild(streak);
-	}
-	updateMarbleCount();
-
 	//check tools when one round end and delete "0 score" tool
 	GameController::getInstance()->checkSquares(true);
 
@@ -396,17 +337,11 @@ void GameShooterMode::oneRoundEnd()
 	GameController::getInstance()->resetAttactRate();
 	CCMenuItem *doubleAttactBtn = dynamic_cast<CCMenuItem*>(m_bottomLayout->getChildById(6));
 
-	//check character's position
-	auto targetPos = GameController::getInstance()->getTargetPos();
-	CCSprite *character = dynamic_cast<CCSprite*>(m_bottomLayout->getChildById(3));
-	auto moveTo = CCMoveTo::create(0.5f, targetPos);
-	character->runAction(moveTo);
 }
 
 void GameShooterMode::updateMarbles()
 {
 	// just show adding marble action
-	m_addMarbleCount++;
 }
 
 void GameShooterMode::updateCoins()
@@ -415,17 +350,6 @@ void GameShooterMode::updateCoins()
 	std::string countStr = GameUtil::intToString(coinCount);
 	CCLabelTTF *coinLabel = dynamic_cast<CCLabelTTF*>(m_bottomLayout->getChildById(5));
 	coinLabel->setString(countStr.c_str());
-}
-
-void GameShooterMode::updateMarbleCount()
-{
-	char temp[50] = { 0 };
-	if (m_addMarbleCount > MarbleModel::theModel()->getMarblesCount())
-	{
-		m_addMarbleCount = MarbleModel::theModel()->getMarblesCount();
-	}
-	sprintf(temp, "X%d", m_addMarbleCount);
-	m_marbleCount->setString(temp);
 }
 
 void GameShooterMode::addSquareNode(SquareNode *node)

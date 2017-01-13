@@ -64,3 +64,8 @@ void BallHintModel::updatePosition(CCPoint pos1, CCPoint pos2, cocos2d::CCPoint 
 		hint->setPosition(ccp(newX, newY));
 	}
 }
+
+void BallHintModel::clearHints()
+{
+	m_ballHints.clear();
+}

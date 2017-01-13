@@ -3,6 +3,7 @@
 #include "SquareModel.h"
 #include "Config.h"
 #include "GameUtil.h"
+#include "Box2dFactory.h"
 
 USING_NS_CC;
 
@@ -31,6 +32,8 @@ bool HelloWorld::init()
         return false;
     }
     
+	Box2dFactory::getInstance()->initPhysics(false);
+
     CCSize visibleSize = CCDirector::sharedDirector()->getVisibleSize();
     CCPoint origin = CCDirector::sharedDirector()->getVisibleOrigin();
 
@@ -56,7 +59,7 @@ bool HelloWorld::init()
 		{
 			auto node = squares[i];
 			node->setPosition(ccp(node->getContentSize().width / 2 + 4 + node->getIndex() * (node->getContentSize().width + 4), node->getContentSize().height / 2 + n*(node->getContentSize().height+4)));
-			addChild(node);
+			//addChild(node);
 		}
 	}
 	/*auto m_emitter = new CCParticleSystemQuad();
@@ -79,7 +82,7 @@ bool HelloWorld::init()
 	par->setStartSize(60);
 	par->setEmissionRate(100);
 	par->setAnchorPoint(ccp(0.5f, 0.5f));
-	par->setPosition(230, 600);
+	par->setPosition(0, 0);
 	par->setTexture(CCTextureCache::sharedTextureCache()->addImage("fire.png"));
 	addChild(par, 10);
 
@@ -95,7 +98,7 @@ bool HelloWorld::init()
 	auto moveBack = moveTo->reverse();
 	auto sequence = CCSequence::create(delay, moveTo, moveBack, NULL);
 	auto actions = CCRepeatForever::create(sequence);
-	par->runAction(actions);
+	//par->runAction(actions);
 
     return true;
 }

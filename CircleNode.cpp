@@ -206,7 +206,7 @@ bool CircleReboundNode::init()
 
 void CircleReboundNode::setBody()
 {
-	m_body = Box2dFactory::getInstance()->createCircle(this, m_image->getContentSize(), false);
+	m_body = Box2dFactory::getInstance()->createCircle(this, m_image->getContentSize(), true);
 }
 
 void CircleReboundNode::runRemoveAction()

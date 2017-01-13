@@ -12,13 +12,13 @@ public:
 public:
 	SquareNode *createSquareNode(int type);
 	void removeSquareNode(SquareNode *node);
-	std::vector<SquareNode*> createSquareList();
+	std::vector<SquareNode*> createSquareList(bool autoAddScore = true);
 	std::vector<int> getBallListType();
 	int getBallType();
 	int getCurrentScore(){ return m_curScore; }
 
 	std::vector<SquareNode*> getSquares(){ return m_squares; }
-	void clearSquares();
+	void removeAllSquares();
 	void setSquareFreezing(bool isFreezing);
 	bool isFreezing(){ return m_bIsFreezing; }
 
@@ -26,6 +26,8 @@ public:
 	void removeBelowSquares();
 	void elimateSameRowSquare(SquareNode *node);
 	void elimateSameColSquare(SquareNode *node);
+
+	void clearSquares();
 
 private:
 	SquareModel();

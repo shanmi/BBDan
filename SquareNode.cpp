@@ -29,6 +29,14 @@ SquareNode *SquareNode::create()
 bool SquareNode::init()
 {
 	m_score = SquareModel::theModel()->getCurrentScore();
+	if (m_score % 10 == 0)
+	{
+		int random = rand() % 100;
+		if (random < 50)
+		{
+			m_score = m_score * 2;
+		}
+	}
 
 	m_image = CCSprite::create("brick.png");
 	auto color = ccc3(255, 255 - (m_score * 13) % 256, (m_score * 7) % 256);
@@ -66,9 +74,10 @@ void SquareNode::addScore(int score)
 	std::string scoreStr = GameUtil::intToString(m_score);
 	if (m_scoreLabel)
 	{
-		m_scoreLabel->setString(scoreStr.c_str());
 		auto color = ccc3(255, 255 - (m_score * 13) % 256, (m_score * 7) % 256);
+		m_scoreLabel->setString(scoreStr.c_str());
 		m_image->setColor(color);
+		m_scoreLabel->setColor(color);
 	}
 }
 
@@ -99,13 +108,7 @@ bool SquareNode::shouldRemoveDirectly()
 	case kCollision_Triangle:
 	case kCollision_AddMarble:
 	case kCollision_AddCoin:
-	case kCollision_BossEatMarble:
 		return true;
-		break;
-	case kCollision_Rebound:
-	case kCollision_EliminateRow:
-	case kCollision_EliminateCol:
-		return false;
 		break;
 	default:
 		break;
@@ -113,6 +116,20 @@ bool SquareNode::shouldRemoveDirectly()
 	return false;
 }
 
+bool SquareNode::canRemoveByProps()
+{
+	switch (m_collisionType)
+	{
+	case kCollision_Square:
+	case kCollision_Triangle:
+	case kCollision_BossEatMarble:
+		return true;
+		break;
+	default:
+		break;
+	}
+	return false;
+}
 void SquareNode::runRemoveAction()
 {
 	auto explore = GameUtil::getExplodeEffect();
@@ -180,6 +197,14 @@ TriangleNode *TriangleNode::create()
 bool TriangleNode::init()
 {
 	m_score = SquareModel::theModel()->getCurrentScore();
+	if (m_score % 10 == 0)
+	{
+		int random = rand() % 100;
+		if (random < 50)
+		{
+			m_score = m_score * 2;
+		}
+	}
 
 	int type = rand() % 4;
 	char temp[50] = { 0 };
@@ -256,28 +281,37 @@ BossEatMarbleNode *BossEatMarbleNode::create()
 
 bool BossEatMarbleNode::init()
 {
-	m_score = SquareModel::theModel()->getCurrentScore();
+	m_score = 1;// SquareModel::theModel()->getCurrentScore();
 
-	m_image = CCSprite::create("boss_0.png");
+	/*m_image = CCSprite::create("boss_0.png");
 	addChild(m_image);
 	auto fanIn = CCFadeIn::create(0.6f);
-	m_image->runAction(fanIn);
+	m_image->runAction(fanIn);*/
 
+	CCParticleSun* sun = CCParticleSun::create();
+	sun->setStartSize(60);
+	sun->setEmissionRate(100);
+	sun->setAnchorPoint(ccp(0.5f, 0.5f));
+	sun->setPosition(0, 0);
+	sun->setTexture(CCTextureCache::sharedTextureCache()->addImage("fire.png"));
+	addChild(sun);
+
+	m_image = CCSprite::create("boss_0.png");
 	auto size = m_image->getContentSize();
 	setContentSize(size);
 
-	auto color = ccc3(255, 255 - (m_score * 13) % 256, (m_score * 7) % 256);
+	/*auto color = ccc3(255, 255 - (m_score * 13) % 256, (m_score * 7) % 256);
 	std::string scoreStr = GameUtil::intToString(m_score);
 	m_scoreLabel = CCLabelTTF::create(scoreStr.c_str(), "fonts/SF Square Root.ttf", 34);
 	m_scoreLabel->setColor(color);
-	addChild(m_scoreLabel);
+	addChild(m_scoreLabel);*/
 
 	return true;
 }
 
 void BossEatMarbleNode::setBody()
 {
-	m_body = Box2dFactory::getInstance()->createSquare(this);
+	m_body = Box2dFactory::getInstance()->createCircle(this, m_image->getContentSize(), false);
 }
 
 void BossEatMarbleNode::doCollisionAction()

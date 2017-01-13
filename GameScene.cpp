@@ -10,6 +10,7 @@
 #include "ActionSequence.h"
 #include "CCFunctionAction.h"
 #include "GameData.h"
+#include "MainMenu.h"
 
 USING_NS_CC;
 
@@ -31,6 +32,11 @@ void GameScene::draw()
 {
 	CCLayer::draw();
 	Box2dFactory::getInstance()->debugDraw();
+}
+
+void GameScene::keyBackClicked()
+{
+	GameController::getInstance()->backToMainMenu();
 }
 
 GameScene::GameScene()
@@ -68,6 +74,9 @@ bool GameScene::init()
 	{
 		return false;
 	}
+
+	setKeypadEnabled(true);
+	Box2dFactory::getInstance()->initPhysics(false);
 
 	auto winSize = CCDirector::sharedDirector()->getWinSize();
 	m_topLayout = UiLayout::create("layout/common_top.xml");
@@ -146,7 +155,7 @@ void GameScene::onClearScreen(CCObject *pSender)
 	if (isRoundOver)
 	{
 		GameController::getInstance()->setRoundState(false);
-		SquareModel::theModel()->clearSquares();
+		SquareModel::theModel()->removeAllSquares();
 		oneRoundEnd();
 	}
 }
@@ -194,7 +203,7 @@ void GameScene::initPhysicBorder()
 
 void GameScene::initMarbles()
 {
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 1; i++)
 	{
 		auto marble = MarbleModel::theModel()->createMarble();
 		marble->setPosition(ccp(m_arrow->getPositionX(), m_bottomLinePos + marble->getContentSize().height / 2 + 4));
@@ -231,7 +240,8 @@ void GameScene::initSquares()
 	for (int i = 0; i < squares.size(); i++)
 	{
 		auto node = squares[i];
-		node->setPosition(ccp((node->getContentSize().width / 2 + SQUARE_SPACING) + node->getIndex() * (node->getContentSize().width + SQUARE_SPACING), m_bottomLinePos + (node->getContentSize().height + SQUARE_SPACING) * 7.5));
+		node->setPosition(ccp((node->getContentSize().width / 2 + SQUARE_SPACING) + node->getIndex() * (node->getContentSize().width + SQUARE_SPACING), 
+			m_bottomLinePos + (node->getContentSize().height + SQUARE_SPACING) * 7.5));
 		addChild(node);
 	}
 }
@@ -242,7 +252,8 @@ void GameScene::addSquares()
 	for (int i = 0; i < squares.size(); i++)
 	{
 		auto node = squares[i];
-		node->setPosition(ccp(node->getContentSize().width / 2 + SQUARE_SPACING + node->getIndex() * (node->getContentSize().width + SQUARE_SPACING), m_bottomLinePos + (node->getContentSize().height + SQUARE_SPACING) * 8.5));
+		node->setPosition(ccp(node->getContentSize().width / 2 + SQUARE_SPACING + node->getIndex() * (node->getContentSize().width + SQUARE_SPACING), 
+			m_bottomLinePos + (node->getContentSize().height + SQUARE_SPACING) * 8.5));
 		addChild(node);
 	}
 }

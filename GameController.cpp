@@ -2,6 +2,8 @@
 #include "MarbleModel.h"
 #include "SquareModel.h"
 #include "GameData.h"
+#include "BallHintModel.h"
+#include "MainMenu.h"
 USING_NS_CC;
 
 GameController::GameController()
@@ -131,4 +133,14 @@ void GameController::createPropByMarble(MarbleNode *marble)
 	auto square = SquareModel::theModel()->createSquareNode(kType_Rebound);
 	square->setPosition(ccp(posX, posY));
 	square->addScore(-square->getScore());
+}
+
+void GameController::backToMainMenu()
+{
+	MarbleModel::theModel()->clearMarbles();
+	BallHintModel::theModel()->clearHints();
+	SquareModel::theModel()->clearSquares();
+	CCDirector* pDirector = CCDirector::sharedDirector();
+	CCScene *pScene = MainMenu::scene();
+	pDirector->replaceScene(pScene);
 }

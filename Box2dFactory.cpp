@@ -20,7 +20,7 @@ Box2dFactory *Box2dFactory::getInstance()
 	return &instance;
 }
 
-void Box2dFactory::initPhysics()
+void Box2dFactory::initPhysics(bool isShooterMode)
 {
 	b2Vec2 gravity;
 	gravity.Set(0.0f, 0.0f);
@@ -34,10 +34,17 @@ void Box2dFactory::initPhysics()
 	m_debugDraw = new GLESDebugDraw(PTM_RATIO);
 	m_world->SetDebugDraw(m_debugDraw);
 
-	m_contactListener = new ContactListener();
-	m_world->SetContactListener(m_contactListener);
-
-
+	if (isShooterMode)
+	{
+		auto contactListener = new ContactShooterListener();
+		m_world->SetContactListener(contactListener);
+	}
+	else
+	{
+		auto contactListener = new ContactListener();
+		m_world->SetContactListener(contactListener);
+	}
+	
 	uint32 flags = 0;
 	flags += b2Draw::e_shapeBit;
 	/* flags += b2Draw::e_jointBit;
@@ -278,4 +285,10 @@ b2Body *Box2dFactory::createTriangle(cocos2d::CCNode *node)
 void Box2dFactory::removeBody(b2Body *body)
 {
 	m_world->DestroyBody(body);
+}
+
+void Box2dFactory::deleteWorld()
+{
+	delete m_world;
+	m_world = NULL;
 }

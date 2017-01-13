@@ -11,6 +11,7 @@ public:
 
 public:
 	MarbleNode* createMarble();
+	void removeMarble(MarbleNode *node);
 	void setMarbleAttr(MarbleAttr attr){ m_attr = attr; }
 	MarbleAttr getMarbleAttr(){ return m_attr; }
 	std::vector<MarbleNode *> getMarbles(){ return m_marbles; }
@@ -23,6 +24,7 @@ public:
 
 	bool isMarblesNerverStop();
 	void reboundMarbles();
+	void clearMarbles();
 private:
 	MarbleModel();
 

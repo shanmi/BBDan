@@ -22,6 +22,7 @@ public:
 	virtual void onExit();
 	virtual void update(float dt);
 	virtual void draw(); //for debug
+	virtual void keyBackClicked();
 
 	virtual bool ccTouchBegan(cocos2d::CCTouch *pTouch, cocos2d::CCEvent *pEvent);
 	virtual void ccTouchMoved(cocos2d::CCTouch *pTouch, cocos2d::CCEvent *pEvent);

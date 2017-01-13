@@ -5,6 +5,7 @@
 #include "GLES-Render.h"
 #include "ContactListener.h"
 #include "cocos2d.h"
+#include "ContactShooterListener.h"
 
 #define PTM_RATIO 32
 
@@ -16,7 +17,7 @@ public:
 	~Box2dFactory();
 
 public:
-	void initPhysics();
+	void initPhysics(bool isShooterMode);
 	void initBorders();
 	void initBorders(float topLine, float bottomLine);
 	b2World *getWorld(){ return m_world; }
@@ -28,6 +29,7 @@ public:
 	b2Body *createMarble(cocos2d::CCNode *node);
 
 	void removeBody(b2Body *body);
+	void deleteWorld();
 
 private:
 	Box2dFactory();
@@ -35,7 +37,6 @@ private:
 private:
 	b2World *m_world;
 	GLESDebugDraw *m_debugDraw;
-	ContactListener *m_contactListener;
 };
 
 #endif

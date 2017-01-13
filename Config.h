@@ -12,4 +12,8 @@
 
 #define REBOUND_TIMES 3  //create a rebound ball when bigger than this value
 
+
+#define BALL_MOVE_SPEED 300
+#define FREEZING_TIME 3
+
 #endif

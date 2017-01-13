@@ -2,6 +2,7 @@
 #define __COMMONMACROS_H__
 
 #define LABEL_FONT "fonts/SF Square Head Bold.ttf"
+
 enum TouchPriority
 {
 	kPanelTouchPriority = -10,
@@ -9,14 +10,15 @@ enum TouchPriority
 
 enum SquareType
 {
-	kType_Empty = 20,
-	kType_Square = 35,
-	kType_Triangle = 19,
+	kType_Empty = 25,
+	kType_Square = 30,
+	kType_Triangle = 18,
 	kType_AddMarble = 12,
 	kType_AddCoin = 5,
 	kType_Rebound = 4,
 	kType_EliminateRow = 2,
 	kType_EliminateCol = 3,
+	kType_BossEatMarble = 1,
 };
 
 enum CollisionType

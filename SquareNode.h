@@ -41,6 +41,7 @@ public:
 	void moveDown(bool isLastOne = false);
 	void doScaleAction();
 	bool shouldRemoveDirectly();
+	bool canRemoveByProps();
 	void showBombAction();
 
 protected:

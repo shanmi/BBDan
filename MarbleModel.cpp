@@ -2,6 +2,7 @@
 #include "MarbleNode.h"
 #include "Config.h"
 #include "CommonMacros.h"
+#include "Box2dFactory.h"
 
 MarbleModel::MarbleModel()
 {
@@ -17,12 +18,23 @@ MarbleModel *MarbleModel::theModel()
 
 MarbleNode* MarbleModel::createMarble()
 {
-	m_attr = FasterMarle();
+	//m_attr = FasterMarle();
 	MarbleNode *marble = MarbleNode::create(m_attr);
 	marble->setVisible(false);
 	m_marbles.push_back(marble);
 	m_marblesCount = m_marbles.size();
 	return marble;
+}
+
+void MarbleModel::removeMarble(MarbleNode *node)
+{
+	auto iter = find(m_marbles.begin(), m_marbles.end(), node);
+	if (iter != m_marbles.end())
+	{
+		m_marbles.erase(iter);
+	}
+	Box2dFactory::getInstance()->removeBody(node->getBody());
+	node->removeFromParent();
 }
 
 bool MarbleModel::haveMarbleMoving()
@@ -66,4 +78,9 @@ void MarbleModel::reboundMarbles()
 		auto &marble = *iter;
 		marble->addReboundTimes(-marble->getReboundTimes());
 	}
+}
+
+void MarbleModel::clearMarbles()
+{
+	m_marbles.clear();
 }

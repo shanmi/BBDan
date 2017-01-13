@@ -1,7 +1,8 @@
 #include "AppDelegate.h"
 #include "HelloWorldScene.h"
 #include "GameScene.h"
-#include "Box2dFactory.h"
+#include "GameShooterMode.h"
+#include "MainMenu.h"
 
 USING_NS_CC;
 
@@ -38,11 +39,8 @@ bool AppDelegate::applicationDidFinishLaunching() {
     // set FPS. the default value is 1.0/60 if you don't call this
     pDirector->setAnimationInterval(1.0 / 60);
 
-
-	Box2dFactory::getInstance()->initPhysics();
-
     // create a scene. it's an autorelease object
-    CCScene *pScene = GameScene::scene();
+	CCScene *pScene = MainMenu::scene();
 
     // run
     pDirector->runWithScene(pScene);

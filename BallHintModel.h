@@ -14,6 +14,7 @@ public:
 	void setHintVisible(bool visible);
 	void updatePosition(cocos2d::CCPoint pos1, cocos2d::CCPoint pos2, cocos2d::CCPoint startPos, float arrowWidth);
 
+	void clearHints();
 private:
 	BallHintModel(){}
 

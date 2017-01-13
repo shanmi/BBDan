@@ -22,6 +22,7 @@ public:
 	virtual void onExit();
 	virtual void update(float dt);
 	virtual void draw(); //for debug
+	virtual void keyBackClicked();
 
 	virtual bool ccTouchBegan(cocos2d::CCTouch *pTouch, cocos2d::CCEvent *pEvent);
 	virtual void ccTouchMoved(cocos2d::CCTouch *pTouch, cocos2d::CCEvent *pEvent);
@@ -31,7 +32,7 @@ public:
 	void oneRoundEnd();
 	void updateMarbles();
 	void updateCoins();
-	void updateMarbleCount();
+	void addMarble(float dt);
 	void addSquareNode(SquareNode *node);
 	void showGameOver();
 
@@ -53,14 +54,11 @@ private:
 	b2World *m_world;
 	UiLayout *m_topLayout;
 	UiLayout *m_bottomLayout;
-	cocos2d::CCSprite *m_touchPoint;
-	cocos2d::CCSprite *m_arrow;
-	cocos2d::CCLabelTTF *m_marbleCount;
+	cocos2d::CCSprite *m_character;
 	float m_topLinePos;
 	float m_bottomLinePos;
-	float m_shootDegree;
+	int m_moveCounter;
 
-	bool m_bIsShoot;
-	int m_addMarbleCount;
+	float m_freezingTime;
 };
 #endif

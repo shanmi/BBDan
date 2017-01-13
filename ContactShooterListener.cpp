@@ -1,5 +1,5 @@
 #include "SquareModel.h"
-#include "ContactListener.h"  
+#include "ContactShooterListener.h"  
 #include "Box2dFactory.h"
 #include "SquareNode.h"
 #include "MarbleNode.h"
@@ -10,7 +10,7 @@
 
 USING_NS_CC;
 
-void ContactListener::BeginContact(b2Contact* contact)
+void ContactShooterListener::BeginContact(b2Contact* contact)
 {
 	b2Body* bodyA = contact->GetFixtureA()->GetBody();
 	b2Body* bodyB = contact->GetFixtureB()->GetBody();
@@ -34,49 +34,20 @@ void ContactListener::BeginContact(b2Contact* contact)
 
 		if (node->getTag() == kTag_Wall)
 		{
-			if (!GameController::getInstance()->isCounterFull() && marble->isMoving())
-			{
-				GameController::getInstance()->addCounter();
-			}
-			if (GameController::getInstance()->getCounter() == 1)
-			{
-				auto targetPos = GameController::getInstance()->getTargetPos();
-				GameController::getInstance()->setTargetPos(ccp(spriteB->getPositionX(), targetPos.y));
-				marble->setVisible(true);
-			}
-			else
-			{
-				marble->setVisible(false);
-			}
+			marble->setVisible(false);
 			marble->stop();
-			MarbleModel::theModel()->reboundMarbles();
 		}
 		else
 		{
 			auto square = dynamic_cast<SquareNode*>(node);
 			square->doCollisionAction();
-			if (square->getCollisionType() == kCollision_BossEatMarble)
-			{
-				marble->stop();
-				GameController::getInstance()->addCounter();
-				if (GameController::getInstance()->getCounter() == 1)
-				{
-					marble->setVisible(true);
-				}
-				else
-				{
-					marble->setVisible(false);
-				}
-			}
-			else if (square->getCollisionType() == kCollision_Rebound)
+			if (square->getCollisionType() == kCollision_Rebound)
 			{
 				float degree = rand() % 60 + 60;
 				marble->shoot(degree);
 			}
-			if (square->getCollisionType() != kCollision_EliminateRow && square->getCollisionType() != kCollision_EliminateCol)
-			{
-				MarbleModel::theModel()->reboundMarbles();
-			}
+			marble->stop();
+			marble->setVisible(false);
 		}
 	}
 	else
@@ -90,6 +61,7 @@ void ContactListener::BeginContact(b2Contact* contact)
 		{
 			marble = dynamic_cast<MarbleNode*>(spriteB);
 		}
+		marble->stop();
 		marble->addReboundTimes();
 
 		bool isMarbleNeverStop = MarbleModel::theModel()->isMarblesNerverStop();
@@ -101,19 +73,19 @@ void ContactListener::BeginContact(b2Contact* contact)
 }
 
 
-void ContactListener::EndContact(b2Contact* contact)
-{
-	
-}
-
-
-void ContactListener::PreSolve(b2Contact* contact, const b2Manifold* oldManifold)
+void ContactShooterListener::EndContact(b2Contact* contact)
 {
 
 }
 
 
-void ContactListener::PostSolve(b2Contact* contact, const b2ContactImpulse* impulse)
+void ContactShooterListener::PreSolve(b2Contact* contact, const b2Manifold* oldManifold)
+{
+
+}
+
+
+void ContactShooterListener::PostSolve(b2Contact* contact, const b2ContactImpulse* impulse)
 {
 
 }

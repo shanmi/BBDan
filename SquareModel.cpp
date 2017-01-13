@@ -33,12 +33,10 @@ SquareNode *SquareModel::createSquareNode(int type)
 		node = CircleAddMarbleNode::create();
 		break;
 	case kType_EliminateRow:
-		//node = CircleEliRowNode::create();
-		node = BossEatMarbleNode::create();
+		node = CircleEliRowNode::create();
 		break;
 	case kType_EliminateCol:
-		//node = CircleEliRowNode::create();
-		node = BossEatMarbleNode::create();
+		node = CircleEliColNode::create();
 		break;
 	case kType_Rebound:
 		node = CircleReboundNode::create();
@@ -46,11 +44,14 @@ SquareNode *SquareModel::createSquareNode(int type)
 	case kType_AddCoin:
 		node = CircleAddCoinNode::create();
 		break;
+	case kType_BossEatMarble:
+		node = BossEatMarbleNode::create();
+		break;
 	case kType_Empty:
 		node = nullptr;
 		break;
 	default:
-		assert(false && "not exit square type!");
+		assert(false && type && "not exit square type!");
 		break;
 	}
 	if (node != nullptr)
@@ -71,18 +72,16 @@ void SquareModel::removeSquareNode(SquareNode *node)
 	node->runRemoveAction();
 }
 
-void SquareModel::clearSquares()
+void SquareModel::removeAllSquares()
 {
 	for (auto iter = m_squares.begin(); iter != m_squares.end(); ++iter)
 	{
 		auto &square = *iter;
-		//Box2dFactory::getInstance()->removeBody(square->getBody());
 		square->addScore(-square->getScore());
 	}
-	//m_squares.clear();
 }
 
-std::vector<SquareNode*> SquareModel::createSquareList()
+std::vector<SquareNode*> SquareModel::createSquareList(bool autoAddScore /* = true */)
 {
 	srand(time(NULL));
 	std::vector<SquareNode*> nodes;
@@ -106,7 +105,10 @@ std::vector<SquareNode*> SquareModel::createSquareList()
 			nodes.push_back(node);
 		}
 	}
-	m_curScore++;
+	if (autoAddScore)
+	{
+		m_curScore++;
+	}
 	return nodes;
 }
 
@@ -132,6 +134,7 @@ int SquareModel::getBallType()
 	types.push_back(kType_Rebound);
 	types.push_back(kType_EliminateRow);
 	types.push_back(kType_EliminateCol);
+	types.push_back(kType_BossEatMarble);
 
 	int random = rand() % 100;
 	int total = 0;
@@ -178,7 +181,7 @@ void SquareModel::elimateSameRowSquare(SquareNode *node)
 	for (auto iter = m_squares.begin(); iter != m_squares.end(); ++iter)
 	{
 		auto &square = (*iter);
-		if ((square->getCollisionType() == kCollision_Square || square->getCollisionType() == kCollision_Triangle) && square->getPositionY() == node->getPositionY())
+		if (square->canRemoveByProps() && square->getPositionY() == node->getPositionY())
 		{
 			square->addScore(-1);
 		}
@@ -190,7 +193,7 @@ void SquareModel::elimateSameColSquare(SquareNode *node)
 	for (auto iter = m_squares.begin(); iter != m_squares.end(); ++iter)
 	{
 		auto &square = (*iter);
-		if ((square->getCollisionType() == kCollision_Square || square->getCollisionType() == kCollision_Triangle) && square->getPositionX() == node->getPositionX())
+		if (square->canRemoveByProps() && square->getPositionX() == node->getPositionX())
 		{
 			square->addScore(-1);
 		}
@@ -205,4 +208,9 @@ void SquareModel::setSquareFreezing(bool isFreezing)
 		auto &square = (*iter);
 		square->setFreezing(isFreezing);
 	}
+}
+void SquareModel::clearSquares()
+{
+	m_squares.clear();
+	m_curScore = 1;
 }

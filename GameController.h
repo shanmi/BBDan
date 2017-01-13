@@ -51,6 +51,8 @@ public:
 
 	bool checkCoinsEnought();
 	void createPropByMarble(MarbleNode *marble);
+
+	void backToMainMenu();
 private:
 	GameController();
 
