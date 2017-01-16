@@ -7,6 +7,7 @@
 #include "ccMacros.h"
 #include "CircleNode.h"
 #include "MarbleModel.h"
+#include "SoundMgr.h"
 
 USING_NS_CC;
 
@@ -76,6 +77,31 @@ void ContactListener::BeginContact(b2Contact* contact)
 			if (square->getCollisionType() != kCollision_EliminateRow && square->getCollisionType() != kCollision_EliminateCol)
 			{
 				MarbleModel::theModel()->reboundMarbles();
+			}
+
+			if (square->canRemoveByProps())
+			{
+				SoundMgr::theMgr()->playEffect(Effect_Pop);
+			}
+			else if (square->getCollisionType() == kCollision_AddMarble)
+			{
+				SoundMgr::theMgr()->playEffect(Effect_Pop1);
+			}
+			else if (square->getCollisionType() == kCollision_AddCoin)
+			{
+				SoundMgr::theMgr()->playEffect(Effect_Coin);
+			}
+			else if (square->getCollisionType() == kCollision_Rebound)
+			{
+				SoundMgr::theMgr()->playEffect(Effect_Pop2);
+			}
+			else if (square->getCollisionType() == kCollision_EliminateRow || square->getCollisionType() == kCollision_EliminateCol)
+			{
+				SoundMgr::theMgr()->playEffect(Effect_Lazer);
+			}
+			else
+			{
+				SoundMgr::theMgr()->playEffect(Effect_Pop3);
 			}
 		}
 	}

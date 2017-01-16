@@ -3,6 +3,9 @@
 #include "GameScene.h"
 #include "GameShooterMode.h"
 #include "MainMenu.h"
+#include "SoundMgr.h"
+#include "GameConfig.h"
+#include "MyPurchase.h"
 
 USING_NS_CC;
 
@@ -32,12 +35,15 @@ bool AppDelegate::applicationDidFinishLaunching() {
 	pEGLView->setDesignResolutionSize(designSize.width, designSize.height, kResolutionFixedWidth);
 #endif
 
-
     // turn on display FPS
     pDirector->setDisplayStats(true);
 
     // set FPS. the default value is 1.0/60 if you don't call this
     pDirector->setAnimationInterval(1.0 / 60);
+
+	GameConfig::getInstance()->preloadData();
+	SoundMgr::theMgr()->init();
+	MyPurchase::sharedPurchase()->loadIAPPlugin();
 
     // create a scene. it's an autorelease object
 	CCScene *pScene = MainMenu::scene();

@@ -231,12 +231,20 @@ bool TriangleNode::init()
 		m_scoreLabel->setPosition(ccp(-size.width*0.2f, size.height*0.3f));
 		break;
 	case 2:
-		m_scoreLabel->setPosition(ccp(size.width*0.3f, size.height*0.3f));
+		m_scoreLabel->setPosition(ccp(size.width*0.24f, size.height*0.3f));
 		break;
 	case 3:
-		m_scoreLabel->setPosition(ccp(size.width*0.3f, -size.height*0.2f));
+		m_scoreLabel->setPosition(ccp(size.width*0.26f, -size.height*0.2f));
 		break;
 	}
+	float scale = 1.0f;
+	int tempScore = m_score / 100;
+	while (tempScore > 0)
+	{
+		scale -= 0.2f;
+		tempScore = tempScore / 10;
+	}
+	m_scoreLabel->setScale(scale);
 	addChild(m_scoreLabel);
 	this->setTag(type);
 

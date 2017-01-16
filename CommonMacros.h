@@ -5,7 +5,16 @@
 
 enum TouchPriority
 {
-	kPanelTouchPriority = -10,
+	kPriority_Main = -1,
+	kPriority_Panel = -10,
+	kPriority_Shop = -20,
+};
+
+enum GameZOrder
+{
+	kZOrder_Square,
+	kZOrder_Marble,
+	kZOrder_Layout,
 };
 
 enum SquareType

@@ -1,7 +1,7 @@
 #include "GameController.h"
 #include "MarbleModel.h"
 #include "SquareModel.h"
-#include "GameData.h"
+#include "UserInfo.h"
 #include "BallHintModel.h"
 #include "MainMenu.h"
 USING_NS_CC;
@@ -93,7 +93,7 @@ bool GameController::checkGameOver()
 
 bool GameController::checkCoinsEnought()
 {
-	int coinCount = GameData::getInstance()->getCoins();
+	int coinCount = UserInfo::getInstance()->getCoins();
 	if (coinCount >= DOUBLE_ATTACT_COST_COIN)
 	{
 		return true;

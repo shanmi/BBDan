@@ -9,7 +9,7 @@
 #include "MarbleModel.h"
 #include "ActionSequence.h"
 #include "CCFunctionAction.h"
-#include "GameData.h"
+#include "UserInfo.h"
 #include "MainMenu.h"
 
 USING_NS_CC;
@@ -135,7 +135,7 @@ void GameShooterMode::onDoubleAttact(CCObject *pSender)
 	bool ifCoinEnought = GameController::getInstance()->checkCoinsEnought();
 	if (ifCoinEnought)
 	{
-		GameData::getInstance()->addCoins(-DOUBLE_ATTACT_COST_COIN);
+		UserInfo::getInstance()->addCoins(-DOUBLE_ATTACT_COST_COIN);
 		updateCoins();
 
 		CCMenuItem *item = (CCMenuItem*)(pSender);
@@ -346,7 +346,7 @@ void GameShooterMode::updateMarbles()
 
 void GameShooterMode::updateCoins()
 {
-	int coinCount = GameData::getInstance()->getCoins();
+	int coinCount = UserInfo::getInstance()->getCoins();
 	std::string countStr = GameUtil::intToString(coinCount);
 	CCLabelTTF *coinLabel = dynamic_cast<CCLabelTTF*>(m_bottomLayout->getChildById(5));
 	coinLabel->setString(countStr.c_str());

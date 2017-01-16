@@ -2,13 +2,14 @@
 #include "UiLayout.h"
 #include "GameScene.h"
 #include "GameShooterMode.h"
+#include "ShopLayer.h"
 
 USING_NS_CC;
 
 void MainMenu::onEnter()
 {
 	CCLayer::onEnter();
-	CCDirector::sharedDirector()->getTouchDispatcher()->addTargetedDelegate(this, -1, true);
+	CCDirector::sharedDirector()->getTouchDispatcher()->addTargetedDelegate(this, kPriority_Main, true);
 }
 
 void MainMenu::onExit()
@@ -47,6 +48,7 @@ bool MainMenu::init()
 	m_mainLayout = UiLayout::create("layout/main_menu.xml");
 	m_mainLayout->setAnchorPoint(ccp(0.5f, 0.5f));
 	m_mainLayout->setPosition(ccpMult(winSize, 0.5f));
+	m_mainLayout->setMenuTouchPriority(kPriority_Main - 1);
 	addChild(m_mainLayout);
 
 	initLayout();
@@ -61,6 +63,9 @@ void MainMenu::initLayout()
 
 	CCMenuItem *startGameTwo = dynamic_cast<CCMenuItem*>(m_mainLayout->getChildById(3));
 	startGameTwo->setTarget(this, menu_selector(MainMenu::onStartGameTwo));
+
+	CCMenuItem *toBallShop = dynamic_cast<CCMenuItem*>(m_mainLayout->getChildById(6));
+	toBallShop->setTarget(this, menu_selector(MainMenu::onBallShop));
 }
 
 
@@ -77,4 +82,10 @@ void MainMenu::onStartGameTwo(CCObject* pSender)
 	CCDirector* pDirector = CCDirector::sharedDirector();
 	CCScene *pScene = GameShooterMode::scene();
 	pDirector->replaceScene(pScene);
+}
+
+void MainMenu::onBallShop(CCObject *pSender)
+{
+	ShopLayer *shopLayer = ShopLayer::create();
+	addChild(shopLayer);
 }

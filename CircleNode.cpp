@@ -5,7 +5,7 @@
 #include "MarbleModel.h"
 #include "GameController.h"
 #include "SquareModel.h"
-#include "GameData.h"
+#include "UserInfo.h"
 #include "Config.h"
 #include "ActionSequence.h"
 #include "CCFunctionAction.h"
@@ -266,6 +266,6 @@ void CircleAddCoinNode::doCollisionAction()
 	int attactRate = GameController::getInstance()->getAttactRate();
 	addScore(-attactRate); //delete
 
-	GameData::getInstance()->addCoins(ADD_COINS);
+	UserInfo::getInstance()->addCoins(ADD_COINS);
 	GameController::getInstance()->updateCoins();
 }

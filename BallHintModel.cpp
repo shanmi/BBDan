@@ -51,16 +51,16 @@ void BallHintModel::updatePosition(CCPoint pos1, CCPoint pos2, cocos2d::CCPoint 
 	{
 		auto hint = m_ballHints[i];
 		float newX = startPos.x + (hint->getContentSize().width * i * scale + arrowWidth) * x;
-		float newY = startPos.y + (hint->getContentSize().height * i * scale + arrowWidth) * y;
-		if (newX < 0)
+		float newY = startPos.y + (hint->getContentSize().height * i * scale + arrowWidth) * y + 20;
+		/*if (newX < 0)
 		{
-			newX = -newX;
+		newX = -newX;
 		}
 		else if (newX > winSize.width)
 		{
-			radian = GameUtil::getRadian(degree + 10);
-			newX = winSize.width - (newX - winSize.width);
-		}
+		radian = GameUtil::getRadian(degree + 10);
+		newX = winSize.width - (newX - winSize.width);
+		}*/
 		hint->setPosition(ccp(newX, newY));
 	}
 }

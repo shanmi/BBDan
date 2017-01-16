@@ -12,6 +12,7 @@ public:
 
 	void onStartGameOne(CCObject* pSender);
 	void onStartGameTwo(CCObject* pSender);
+	void onBallShop(cocos2d::CCObject *pSender);
 
 	CREATE_FUNC(MainMenu);
 
