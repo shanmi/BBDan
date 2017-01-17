@@ -35,7 +35,7 @@ void ContactListener::BeginContact(b2Contact* contact)
 
 		if (node->getTag() == kTag_Wall)
 		{
-			if (!GameController::getInstance()->isCounterFull() && marble->isMoving())
+			if (marble->isMoving())
 			{
 				GameController::getInstance()->addCounter();
 			}

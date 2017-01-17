@@ -105,3 +105,63 @@ CCMotionStreak *GameUtil::getMotionStreak()
 	streak->runAction(colorAction);
 	return streak;
 }
+
+std::string GameUtil::getBlockImage(int type, int score)
+{
+	char temp[50] = { 0 };
+	std::string image;
+	score = rand() % 500;
+	if (score > 360)
+	{
+		image = "squares/fangkuai_shitou%d.png";
+	}
+	else if (score > 260)
+	{
+		image = "squares/fangkuai_huang%d.png";
+	}
+	else if (score > 200)
+	{
+		image = "squares/fangkuai_zhi%d.png";
+	}
+	else if (score > 150)
+	{
+		image = "squares/fangkuai_lv%d.png";
+	}
+	else if (score > 100)
+	{
+		image = "squares/fangkuai_tuhuang%d.png";
+	}
+	else if (score > 50)
+	{
+		image = "squares/fangkuai_hong%d.png";
+	}
+	else if (score > 10)
+	{
+		image = "squares/fangkuai_qing%d.png";
+	}
+	else
+	{
+		image = "squares/fangkuai_lan%d.png";
+	}
+	sprintf(temp, image.c_str(), type);
+	return temp;
+}
+
+CCAction *GameUtil::getScaleAction()
+{
+	auto scaleby = CCScaleBy::create(0.6f, 1.1f);
+	auto reverse = scaleby->reverse();
+	auto sequence = CCSequence::create(scaleby, reverse, NULL);
+	auto action = CCRepeatForever::create(sequence);
+	return action;
+}
+
+CCLabelAtlas *GameUtil::getImageNum(std::string fontPath, int num)
+{
+	int kLength = 11;
+	std::string text = intToString(num);
+	auto size = CCSprite::create(fontPath.c_str())->getContentSize();
+	auto numLabel = CCLabelAtlas::create(text.c_str(), fontPath.c_str(), size.width / kLength, size.height, '0');
+	numLabel->setAnchorPoint(ccp(0.5f, 0.5f));
+	return numLabel;
+}

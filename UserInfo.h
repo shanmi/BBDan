@@ -3,6 +3,10 @@
 
 #define GAME_MUTE			"game-mute"
 #define GAME_COINS_COUNT	"game-coins-count"
+#define GAME_BEST_SCORE		"game-best-score"
+#define GAME_UNLOCK_MARBLE  "game-unlock-marble"
+#define GAME_FISH_GUIDE		"game-fish-guide"
+#define GAME_PROP_COUNT     "game-prop-count"
 
 class UserInfo
 {
@@ -11,11 +15,24 @@ public:
 	~UserInfo(){}
 
 public:
+	void setMute(bool isMute);
+	bool isMute();
+
 	void addCoins(int count);
 	int getCoins();
 
-	void setMute(bool isMute);
-	bool isMute();
+	void setBestScore(int score);
+	int getBestScore();
+
+	void unlockMarble(int type);
+	void unlockAllMarble();
+	bool isUnlock(int type);
+
+	void setFishGuide(bool finish);
+	bool isFishGuideFinish();
+
+	void addPropsCount(int type, int count);
+	int getPropsCount(int type);
 private:
 	UserInfo(){}
 };

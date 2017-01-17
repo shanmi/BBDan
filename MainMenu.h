@@ -10,10 +10,6 @@ public:
 	virtual bool init();
 	static cocos2d::CCScene* scene();
 
-	void onStartGameOne(CCObject* pSender);
-	void onStartGameTwo(CCObject* pSender);
-	void onBallShop(cocos2d::CCObject *pSender);
-
 	CREATE_FUNC(MainMenu);
 
 	void onEnter();
@@ -23,6 +19,16 @@ public:
 
 public:
 	void initLayout();
+	void toStartGameOne(CCObject* pSender);
+	void toStartGameTwo(CCObject* pSender);
+	void toShopLayer(cocos2d::CCObject *pSender);
+	void toSettingLayer(cocos2d::CCObject *pSender);
+	void toSkinLayer(cocos2d::CCObject *pSender);
+	void toMoreGame(cocos2d::CCObject *pSender);
+	void toLibao1(cocos2d::CCObject *pSender);
+	void toLibao2(cocos2d::CCObject *pSender);
+	void toSoundSwitch(cocos2d::CCObject *pSender);
+	cocos2d::CCAction *getAnimation(float duration, float rotation);
 
 private:
 	UiLayout *m_mainLayout;

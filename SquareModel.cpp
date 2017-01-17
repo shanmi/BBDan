@@ -118,6 +118,15 @@ std::vector<int> SquareModel::getBallListType()
 	for (int i = 0; i < BALL_COL_SIZE; i++)
 	{
 		int type = getBallType();
+		if (type == kType_AddMarble || type == kType_AddCoin || type == kType_Rebound || type == kType_EliminateRow || type == kType_EliminateCol || type == kType_BossEatMarble)
+		{
+			auto iter = find(types.begin(), types.end(), type);
+			while (iter != types.end())
+			{
+				type = getBallType();
+				iter = find(types.begin(), types.end(), type);
+			}
+		}
 		types.push_back(type);
 	}
 	return types;
@@ -136,7 +145,7 @@ int SquareModel::getBallType()
 	types.push_back(kType_EliminateCol);
 	types.push_back(kType_BossEatMarble);
 
-	int random = rand() % 100;
+	int random = rand() % (kType_Empty + kType_Square + kType_Triangle + kType_AddMarble + kType_AddCoin + kType_Rebound + kType_EliminateRow + kType_EliminateCol + kType_BossEatMarble);
 	int total = 0;
 	for (auto iter = types.begin(); iter != types.end(); ++iter)
 	{
@@ -169,7 +178,7 @@ void SquareModel::removeBelowSquares()
 	for (auto iter = squares.begin(); iter != squares.end(); ++iter)
 	{
 		auto &square = (*iter);
-		if (square->getPositionY() - square->getContentSize().height * 3 < bottomPos.y)
+		if (square->getPositionY() - square->getContentSize().height * 5 < bottomPos.y)
 		{
 			removeSquareNode(square);
 		}

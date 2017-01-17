@@ -124,10 +124,13 @@ void GameController::createPropByMarble(MarbleNode *marble)
 	for (auto iter = squares.begin(); iter != squares.end(); ++iter)
 	{
 		auto square = (*iter);
-		auto rect = square->boundingBox();
-		if (rect.containsPoint(ccp(posX, posY)))
+		if (square->getCollisionType() != kCollision_EliminateRow && square->getCollisionType() != kCollision_EliminateCol)
 		{
-			return;
+			auto rect = square->boundingBox();
+			if (rect.containsPoint(ccp(posX, posY)))
+			{
+				return;
+			}
 		}
 	}
 	auto square = SquareModel::theModel()->createSquareNode(kType_Rebound);

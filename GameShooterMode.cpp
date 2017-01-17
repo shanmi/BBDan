@@ -217,6 +217,7 @@ void GameShooterMode::addMarble(float dt)
 	auto actions = ActionSequence::create(this);
 	MarbleAttr m_attr = FasterMarle();
 	auto ball = MarbleModel::theModel()->createMarble();
+	ball->setBody();
 	ball->setPosition(ccp(m_character->getPositionX(), m_bottomLinePos + ball->getContentSize().height / 2 + 4));
 	addChild(ball);
 	ball->setMovingState(true);

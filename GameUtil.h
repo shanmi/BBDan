@@ -2,6 +2,13 @@
 #define _GAME_UTIL_H_
 
 #include "cocos2d.h"
+
+enum BlockType
+{
+	kBlock_Square = 1,
+	kBlock_Triangle
+};
+
 namespace GameUtil
 {
 	float getDegreeTwoPoints(cocos2d::CCPoint p1, cocos2d::CCPoint p2);
@@ -11,6 +18,11 @@ namespace GameUtil
 
 	cocos2d::CCParticleExplosion *getExplodeEffect();
 	cocos2d::CCMotionStreak *getMotionStreak();
+
+	std::string getBlockImage(int type, int score);
+
+	cocos2d::CCAction *getScaleAction();
+	cocos2d::CCLabelAtlas *getImageNum(std::string fontPath, int num);
 }
 
 #endif

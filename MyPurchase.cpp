@@ -213,6 +213,15 @@ void MyPurchaseResult::onPayResult(int ret, const char* msg){
 			buyCount = GameConfig::getInstance()->m_nDiamond[m_nCurrentPayType-1][2];
 			presentCount = GameConfig::getInstance()->m_nDiamond[m_nCurrentPayType - 1][3];
 			break;
+		case PAY_TYPE_TIME_LIBAO:
+			UserInfo::getInstance()->addPropsCount(kProp_Clear, 5);
+			UserInfo::getInstance()->addPropsCount(kProp_DoubleAttact, 5);
+			UserInfo::getInstance()->addPropsCount(kProp_Freezing, 5);
+			break;
+		case PAY_TYPE_MARBLE_LIBAO:
+			UserInfo::getInstance()->unlockAllMarble();
+			break;
+
 		}
 		orderCoins = buyCount + presentCount;
 		CCLOG("Buy success, orderCoins=======================%d", orderCoins);
@@ -324,7 +333,7 @@ int MyPurchase::getIsboolShangyong(){
 	{
 		jobj = minfo.env->CallStaticObjectMethod(minfo.classID, minfo.methodID);
 	}
-	jint carrietType = CARRIET_TYPE_UNKNOWN;
+	jint carrietType;
 	isHave = JniHelper::getMethodInfo(minfo,
 		funstr,
 		"isboolShangyong",

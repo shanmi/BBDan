@@ -37,21 +37,18 @@ bool SquareNode::init()
 			m_score = m_score * 2;
 		}
 	}
-
-	m_image = CCSprite::create("brick.png");
-	auto color = ccc3(255, 255 - (m_score * 13) % 256, (m_score * 7) % 256);
-	m_image->setColor(color);
+	auto image = GameUtil::getBlockImage(kBlock_Square, m_score);
+	m_image = CCSprite::create(image.c_str());
 	addChild(m_image);
 	auto fanIn = CCFadeIn::create(0.6f);
 	m_image->runAction(fanIn);
 
 	auto size = m_image->getContentSize();
-	setContentSize(size);
+	setContentSize(ccp(64, 64));
 
-	std::string scoreStr = GameUtil::intToString(m_score);
-	m_scoreLabel = CCLabelTTF::create(scoreStr.c_str(), "fonts/SF Square Root.ttf", 34);
-	m_scoreLabel->setColor(color);
+	m_scoreLabel = GameUtil::getImageNum(FONT_WHITE, m_score);
 	addChild(m_scoreLabel);
+	setPerfectScale();
 
 	return true;
 }
@@ -74,10 +71,25 @@ void SquareNode::addScore(int score)
 	std::string scoreStr = GameUtil::intToString(m_score);
 	if (m_scoreLabel)
 	{
-		auto color = ccc3(255, 255 - (m_score * 13) % 256, (m_score * 7) % 256);
 		m_scoreLabel->setString(scoreStr.c_str());
-		m_image->setColor(color);
-		m_scoreLabel->setColor(color);
+		auto image = GameUtil::getBlockImage(kBlock_Square, m_score);
+		m_image->initWithFile(image.c_str());
+		setPerfectScale();
+	}
+}
+
+void SquareNode::setPerfectScale()
+{
+	if (m_scoreLabel)
+	{
+		float scale = 1.0f;
+		int tempScore = m_score / 100;
+		while (tempScore > 0)
+		{
+			scale -= 0.2f;
+			tempScore = tempScore / 10;
+		}
+		m_scoreLabel->setScale(scale);
 	}
 }
 
@@ -209,46 +221,55 @@ bool TriangleNode::init()
 	int type = rand() % 4;
 	char temp[50] = { 0 };
 	sprintf(temp, "half_%d.png", type);
-	m_image = CCSprite::create(temp);
-	auto color = ccc3(255, 255 - (m_score * 13) % 256, (m_score * 7) % 256);
-	m_image->setColor(color);
+	auto image = GameUtil::getBlockImage(kBlock_Triangle, m_score);
+	m_image = CCSprite::create(image.c_str());
 	addChild(m_image);
 	auto fanIn = CCFadeIn::create(0.6f);
 	m_image->runAction(fanIn);
 
 	auto size = m_image->getContentSize();
-	setContentSize(size);
+	setContentSize(ccp(64, 64));
 
-	std::string scoreStr = GameUtil::intToString(m_score);
-	m_scoreLabel = CCLabelTTF::create(scoreStr.c_str(), "fonts/SF Square Root.ttf", 34);
-	m_scoreLabel->setColor(color);
+	m_scoreLabel = GameUtil::getImageNum(FONT_WHITE, m_score);
 	switch (type)
 	{
 	case 0:
-		m_scoreLabel->setPosition(ccp(-size.width*0.2f, -size.height*0.2f));
+		m_scoreLabel->setPosition(ccp(-size.width*0.15f, -size.height*0.2f));
+		m_image->setRotation(-90);
 		break;
 	case 1:
-		m_scoreLabel->setPosition(ccp(-size.width*0.2f, size.height*0.3f));
+		m_scoreLabel->setPosition(ccp(-size.width*0.15f, size.height*0.15f));
+		m_image->setRotation(0);
 		break;
 	case 2:
-		m_scoreLabel->setPosition(ccp(size.width*0.24f, size.height*0.3f));
+		m_scoreLabel->setPosition(ccp(size.width*0.15f, size.height*0.15f));
+		m_image->setRotation(90);
 		break;
 	case 3:
-		m_scoreLabel->setPosition(ccp(size.width*0.26f, -size.height*0.2f));
+		m_scoreLabel->setPosition(ccp(size.width*0.15f, -size.height*0.2f));
+		m_image->setRotation(180);
 		break;
 	}
-	float scale = 1.0f;
-	int tempScore = m_score / 100;
-	while (tempScore > 0)
-	{
-		scale -= 0.2f;
-		tempScore = tempScore / 10;
-	}
-	m_scoreLabel->setScale(scale);
 	addChild(m_scoreLabel);
 	this->setTag(type);
+	setPerfectScale();
 
 	return true;
+}
+
+void TriangleNode::setPerfectScale()
+{
+	if (m_scoreLabel)
+	{
+		float scale = 1.0f;
+		int tempScore = m_score / 10;
+		while (tempScore > 0)
+		{
+			scale -= 0.2f;
+			tempScore = tempScore / 10;
+		}
+		m_scoreLabel->setScale(scale);
+	}
 }
 
 void TriangleNode::setPosition(const cocos2d::CCPoint &position)
@@ -275,6 +296,19 @@ void TriangleNode::doCollisionAction()
 	int damage = MarbleModel::theModel()->getMarbleAttr().damage;
 	int attactRate = GameController::getInstance()->getAttactRate();
 	addScore(-attactRate*damage);
+}
+
+void TriangleNode::addScore(int score)
+{
+	m_score += score;
+	std::string scoreStr = GameUtil::intToString(m_score);
+	if (m_scoreLabel)
+	{
+		m_scoreLabel->setString(scoreStr.c_str());
+		auto image = GameUtil::getBlockImage(kBlock_Triangle, m_score);
+		m_image->initWithFile(image.c_str());
+		setPerfectScale();
+	}
 }
 
 
@@ -306,7 +340,7 @@ bool BossEatMarbleNode::init()
 
 	m_image = CCSprite::create("boss_0.png");
 	auto size = m_image->getContentSize();
-	setContentSize(size);
+	setContentSize(ccp(64, 64));
 
 	/*auto color = ccc3(255, 255 - (m_score * 13) % 256, (m_score * 7) % 256);
 	std::string scoreStr = GameUtil::intToString(m_score);

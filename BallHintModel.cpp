@@ -51,7 +51,7 @@ void BallHintModel::updatePosition(CCPoint pos1, CCPoint pos2, cocos2d::CCPoint 
 	{
 		auto hint = m_ballHints[i];
 		float newX = startPos.x + (hint->getContentSize().width * i * scale + arrowWidth) * x;
-		float newY = startPos.y + (hint->getContentSize().height * i * scale + arrowWidth) * y + 20;
+		float newY = startPos.y + (hint->getContentSize().height * i * scale + arrowWidth) * y;
 		/*if (newX < 0)
 		{
 		newX = -newX;

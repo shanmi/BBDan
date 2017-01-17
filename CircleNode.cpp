@@ -22,11 +22,11 @@ CircleAddMarbleNode *CircleAddMarbleNode::create()
 bool CircleAddMarbleNode::init()
 {
 	m_score = 1;
-	auto sizeSprite = CCSprite::create("brick.png");
+	auto sizeSprite = CCSprite::create("squares/fangkuai_hong1.png");
 	auto size = sizeSprite->getContentSize();
 	setContentSize(size);
 
-	m_image = CCSprite::create("item_0.png");
+	m_image = CCSprite::create("squares/fangkuai_+.png");
 	addChild(m_image);
 	auto fanIn = CCFadeIn::create(0.6f);
 	m_image->runAction(fanIn);
@@ -66,11 +66,11 @@ CircleEliRowNode *CircleEliRowNode::create()
 bool CircleEliRowNode::init()
 {
 	m_score = 1;
-	auto sizeSprite = CCSprite::create("brick.png");
+	auto sizeSprite = CCSprite::create("squares/fangkuai_hong1.png");
 	auto size = sizeSprite->getContentSize();
 	setContentSize(size);
 
-	m_image = CCSprite::create("item_1.png");
+	m_image = CCSprite::create("squares/fangkuai_hengxiao.png");
 	addChild(m_image);
 	auto fanIn = CCFadeIn::create(0.6f);
 	m_image->runAction(fanIn);
@@ -129,11 +129,11 @@ CircleEliColNode *CircleEliColNode::create()
 bool CircleEliColNode::init()
 {
 	m_score = 1;
-	auto sizeSprite = CCSprite::create("brick.png");
+	auto sizeSprite = CCSprite::create("squares/fangkuai_hong1.png");
 	auto size = sizeSprite->getContentSize();
 	setContentSize(size);
 
-	m_image = CCSprite::create("item_2.png");
+	m_image = CCSprite::create("squares/fangkuai_suxiao.png");
 	addChild(m_image);
 	auto fanIn = CCFadeIn::create(0.6f);
 	m_image->runAction(fanIn);
@@ -157,9 +157,11 @@ void CircleEliColNode::doCollisionAction()
 	auto parent = getParent();
 	auto size = parent->getContentSize();
 	auto colorCol = CCLayerColor::create(ccc4(255, 255, 0, 255));
-	colorCol->setContentSize(ccp(kColorHintSize, size.height));
+	colorCol->ignoreAnchorPointForPosition(false);
+	colorCol->setAnchorPoint(ccp(0.5f, 0.5f));
+	colorCol->setContentSize(ccp(kColorHintSize, size.height*0.7f));
 	parent->addChild(colorCol);
-	colorCol->setPositionX(getPositionX() - kColorHintSize / 2);
+	colorCol->setPosition(ccp(getPositionX() - kColorHintSize / 2, size.height * 0.51f));
 	colorCol->stopAllActions();
 	auto actions = ActionSequence::create(colorCol);
 	auto marbles = MarbleModel::theModel()->getMarbles();
@@ -192,11 +194,11 @@ CircleReboundNode *CircleReboundNode::create()
 bool CircleReboundNode::init()
 {
 	m_score = 1;
-	auto sizeSprite = CCSprite::create("brick.png");
+	auto sizeSprite = CCSprite::create("squares/fangkuai_hong1.png");
 	auto size = sizeSprite->getContentSize();
 	setContentSize(size);
 
-	m_image = CCSprite::create("item_3.png");
+	m_image = CCSprite::create("squares/fangkuai_suiji.png");
 	addChild(m_image);
 	auto fanIn = CCFadeIn::create(0.6f);
 	m_image->runAction(fanIn);
@@ -235,18 +237,18 @@ CircleAddCoinNode *CircleAddCoinNode::create()
 bool CircleAddCoinNode::init()
 {
 	m_score = 1;
-	auto sizeSprite = CCSprite::create("brick.png");
+	auto sizeSprite = CCSprite::create("squares/fangkuai_hong1.png");
 	auto size = sizeSprite->getContentSize();
 	setContentSize(size);
 
-	m_image = CCSprite::create("coin.png");
+	m_image = CCSprite::create("squares/fangkuai_zhuanshi.png");
 	addChild(m_image);
 	auto fanIn = CCFadeIn::create(0.6f);
 	m_image->runAction(fanIn);
 
 	auto *flip3d = CCOrbitCamera::create(2, -45, 0, 90, 180, 0, 0);
 	auto repeat = CCRepeatForever::create(flip3d);
-	m_image->runAction(repeat);
+	//m_image->runAction(repeat);
 
 	return true;
 }

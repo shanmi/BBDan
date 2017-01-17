@@ -2,32 +2,40 @@
 #define __COMMONMACROS_H__
 
 #define LABEL_FONT "fonts/SF Square Head Bold.ttf"
+#define FONT_WHITE "numbers/number1.png"
+#define FONT_YELLOW "numbers/number2.png"
 
 enum TouchPriority
 {
 	kPriority_Main = -1,
-	kPriority_Panel = -10,
-	kPriority_Shop = -20,
+	kPriority_Guide = -10,
+	kPriority_Panel = -20,
+	kPriority_Shop = -30,
+	kPriority_Libao = -40
 };
 
 enum GameZOrder
 {
+	kZOrder_Main,
 	kZOrder_Square,
 	kZOrder_Marble,
 	kZOrder_Layout,
+	KZOrder_GuideLayer,
+	KZOrder_PauseLayer,
+	KZOrder_GameOver
 };
 
 enum SquareType
 {
-	kType_Empty = 25,
-	kType_Square = 30,
-	kType_Triangle = 18,
-	kType_AddMarble = 12,
-	kType_AddCoin = 5,
-	kType_Rebound = 4,
-	kType_EliminateRow = 2,
-	kType_EliminateCol = 3,
-	kType_BossEatMarble = 1,
+	kType_Empty = 26,
+	kType_Square = 40,
+	kType_Triangle = 10,
+	kType_AddMarble = 25,
+	kType_AddCoin = 1,
+	kType_Rebound = 3,
+	kType_EliminateRow = 4,
+	kType_EliminateCol = 50,
+	kType_BossEatMarble = 2,
 };
 
 enum CollisionType
@@ -55,6 +63,16 @@ enum ViewTag
 {
 	kTag_Wall = 100,
 	kTag_Marble = 200,
+	kTag_Pause,
+	kTag_GuideLayer,
+	kTag_GameOver
+};
+
+enum PropType
+{
+	kProp_Clear,
+	kProp_DoubleAttact,
+	kProp_Freezing
 };
 
 #define NOTIFY_VIEWS(_FUNC_ ,...)						\

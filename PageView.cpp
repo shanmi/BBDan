@@ -1,6 +1,7 @@
 #include "PageView.h"
-
+#include <algorithm>
 USING_NS_CC;
+using namespace std;
 
 PageView *PageView::create(const CCSize &size)
 {

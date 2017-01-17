@@ -11,6 +11,7 @@ USING_NS_CC;
 
 MarbleNode::MarbleNode(MarbleAttr attr)
 : m_attr(attr)
+, m_body(NULL)
 , m_bIsMoving(false)
 , m_bTrueStop(false)
 , m_reboundTimes(0)
@@ -41,15 +42,19 @@ bool MarbleNode::init()
 
 	setTag(kTag_Marble);
 	setContentSize(size);
-	m_body = Box2dFactory::getInstance()->createMarble(this);
 
 	return true;
+}
+
+void MarbleNode::setBody()
+{
+	m_body = Box2dFactory::getInstance()->createMarble(this);
 }
 
 void MarbleNode::setPosition(const CCPoint &position)
 {
 	CCNode::setPosition(position);
-	if (!isMoving())
+	if (!isMoving() && m_body)
 	{
 		b2Vec2 post = b2Vec2((float)(position.x / PTM_RATIO), (float)(position.y / PTM_RATIO));
 		float angle = CC_DEGREES_TO_RADIANS(this->getRotation());
@@ -119,6 +124,7 @@ void MarbleNode::moveToTargetPos()
 		if (isCounterFull)
 		{
 			GameController::getInstance()->oneRoundEnd();
+			GameController::getInstance()->startOneRound();
 		}
 	});
 	setPosition(pos);

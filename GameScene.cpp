@@ -12,6 +12,9 @@
 #include "UserInfo.h"
 #include "MainMenu.h"
 #include "SoundMgr.h"
+#include "GuideLayer.h"
+#include "libao\FuhuoLibao.h"
+#include "PauseLayer.h"
 
 USING_NS_CC;
 
@@ -43,7 +46,7 @@ void GameScene::keyBackClicked()
 GameScene::GameScene()
 : m_shootDegree(0)
 , m_addMarbleCount(0)
-, m_bIsShoot(false)
+, m_bIsDoubleAttact(false)
 {
 
 }
@@ -80,12 +83,13 @@ bool GameScene::init()
 	Box2dFactory::getInstance()->initPhysics(false);
 
 	auto winSize = CCDirector::sharedDirector()->getWinSize();
-	m_topLayout = UiLayout::create("layout/common_top.xml");
-	m_topLayout->setPosition(ccp(0, winSize.height - m_topLayout->getContentSize().height));
-	addChild(m_topLayout, kZOrder_Layout);
-	initTopLayout();
+	m_mainLayout = UiLayout::create("layout/game_scene.xml");
+	m_mainLayout->setAnchorPoint(ccp(0.5f, 0.5f));
+	m_mainLayout->setPosition(ccpMult(winSize, 0.5f));
+	addChild(m_mainLayout, kZOrder_Main);
+	initMainLayout();
 
-	m_bottomLayout = UiLayout::create("layout/common_bottom.xml");
+	m_bottomLayout = UiLayout::create("layout/game_bottom.xml");
 	m_bottomLayout->setPosition(ccp(0, 0));
 	addChild(m_bottomLayout, kZOrder_Layout);
 	initBottomLayout();
@@ -95,57 +99,81 @@ bool GameScene::init()
 
 	initMarbles();
 	initSquares();
-	
+
+	checkFishGuide();
+
+	updateCoins();
+	updateScore();
 
 	scheduleUpdate();
 	return true;
 }
 
-void GameScene::initTopLayout()
+void GameScene::initMainLayout()
 {
-	CCSprite *line_top = dynamic_cast<CCSprite*>(m_topLayout->getChildById(2));
-	auto worldPos = m_topLayout->convertToWorldSpace(line_top->getPosition());
+	CCSprite *line_top = dynamic_cast<CCSprite*>(m_mainLayout->getChildById(8));
+	auto worldPos = m_mainLayout->convertToWorldSpace(line_top->getPosition());
 	m_topLinePos = worldPos.y;
+
+	CCSprite *line_bottom = dynamic_cast<CCSprite*>(m_mainLayout->getChildById(7));
+	line_bottom->setTag(kTag_Wall);
+	worldPos = line_bottom->convertToWorldSpace(CCPointZero);
+	m_bottomLinePos = worldPos.y;
+	Box2dFactory::getInstance()->createSquare(line_bottom, true);
+
+	CCSprite *character_body = dynamic_cast<CCSprite*>(m_mainLayout->getChildById(9));
+	CCSprite *character_head = dynamic_cast<CCSprite*>(m_mainLayout->getChildById(10));
+	m_arrow = dynamic_cast<CCSprite*>(m_mainLayout->getChildById(11));
+	//m_arrow->setVisible(false);
+	GameController::getInstance()->setTargetPos(m_arrow->getPosition());
+
+	CCMenuItem *pauseItem = dynamic_cast<CCMenuItem*>(m_mainLayout->getChildById(6));
+	pauseItem->setTarget(this, menu_selector(GameScene::onPauseGame));
+}
+
+void GameScene::onPauseGame(CCObject *pSender)
+{
+	PauseLayer *pauseLayer = PauseLayer::create();
+	addChild(pauseLayer, KZOrder_PauseLayer, kTag_Pause);
 }
 
 void GameScene::initBottomLayout()
 {
-	CCSprite *line_bottom = dynamic_cast<CCSprite*>(m_bottomLayout->getChildById(2));
-	line_bottom->setTag(kTag_Wall);
-	auto worldPos = line_bottom->convertToWorldSpace(CCPointZero);
-	m_bottomLinePos = worldPos.y;
-	Box2dFactory::getInstance()->createSquare(line_bottom, true);
-
-	updateCoins();
-
-	CCMenuItem *doubleAttactBtn = dynamic_cast<CCMenuItem*>(m_bottomLayout->getChildById(6));
+	CCMenuItem *doubleAttactBtn = dynamic_cast<CCMenuItem*>(m_bottomLayout->getChildById(5));
 	doubleAttactBtn->setTarget(this, menu_selector(GameScene::onDoubleAttact));
 
-	CCSprite *character_body = dynamic_cast<CCSprite*>(m_bottomLayout->getChildById(3));
-	CCSprite *character_head = dynamic_cast<CCSprite*>(m_bottomLayout->getChildById(12));
-	m_arrow = dynamic_cast<CCSprite*>(m_bottomLayout->getChildById(11));
-	//m_arrow->setVisible(false);
-	GameController::getInstance()->setTargetPos(m_arrow->getPosition());
-
-	CCMenuItem *clearScreenBtn = dynamic_cast<CCMenuItem*>(m_bottomLayout->getChildById(8));
+	CCMenuItem *clearScreenBtn = dynamic_cast<CCMenuItem*>(m_bottomLayout->getChildById(4));
 	clearScreenBtn->setTarget(this, menu_selector(GameScene::onClearScreen));
 
-	CCMenuItem *freezingBtn = dynamic_cast<CCMenuItem*>(m_bottomLayout->getChildById(9));
+	CCMenuItem *freezingBtn = dynamic_cast<CCMenuItem*>(m_bottomLayout->getChildById(3));
 	freezingBtn->setTarget(this, menu_selector(GameScene::onFreezing));
 
 }
 
 void GameScene::onDoubleAttact(CCObject *pSender)
 {
+	int count = UserInfo::getInstance()->getPropsCount(kProp_DoubleAttact);
 	bool ifCoinEnought = GameController::getInstance()->checkCoinsEnought();
-	if (ifCoinEnought)
+	if (!m_bIsDoubleAttact && (ifCoinEnought || count > 0))
 	{
-		UserInfo::getInstance()->addCoins(-DOUBLE_ATTACT_COST_COIN);
+		if (count > 0)
+		{
+			UserInfo::getInstance()->addPropsCount(kProp_DoubleAttact, -1);
+		}
+		else
+		{
+			UserInfo::getInstance()->addCoins(-DOUBLE_ATTACT_COST_COIN);
+		}
 		updateCoins();
+		m_bIsDoubleAttact = true;
 
-		CCMenuItem *item = (CCMenuItem*)(pSender);
-		item->setVisible(false);
 		GameController::getInstance()->setDoubleAttact();
+		CCMenuItem *doubleAttactBtn = dynamic_cast<CCMenuItem*>(m_bottomLayout->getChildById(5));
+		auto scaleby = CCScaleBy::create(0.5f, 1.2f);
+		auto reverse = scaleby->reverse();
+		auto sequence = CCSequence::create(scaleby, reverse, NULL);
+		auto action = CCRepeatForever::create(sequence);
+		doubleAttactBtn->runAction(action);
 	}
 	else
 	{
@@ -155,21 +183,51 @@ void GameScene::onDoubleAttact(CCObject *pSender)
 
 void GameScene::onClearScreen(CCObject *pSender)
 {
+	int count = UserInfo::getInstance()->getPropsCount(kProp_Clear);
 	bool isRoundOver = GameController::getInstance()->isRoundOver();
-	if (isRoundOver)
+	bool ifCoinEnought = GameController::getInstance()->checkCoinsEnought();
+	if (isRoundOver && (ifCoinEnought || count > 0))
 	{
+		if (count > 0)
+		{
+			UserInfo::getInstance()->addPropsCount(kProp_Clear, -1);
+		}
+		else
+		{
+			UserInfo::getInstance()->addCoins(-DOUBLE_ATTACT_COST_COIN);
+		}
+		updateCoins();
 		GameController::getInstance()->setRoundState(false);
 		SquareModel::theModel()->removeAllSquares();
 		oneRoundEnd();
+	}
+	else
+	{
+		// show pay point
 	}
 }
 
 void GameScene::onFreezing(CCObject *pSender)
 {
 	bool isFreezing = SquareModel::theModel()->isFreezing();
-	if (!isFreezing)
+	int count = UserInfo::getInstance()->getPropsCount(kProp_Freezing);
+	bool ifCoinEnought = GameController::getInstance()->checkCoinsEnought();
+	if (!isFreezing && (ifCoinEnought || count > 0))
 	{
+		if (count > 0)
+		{
+			UserInfo::getInstance()->addPropsCount(kProp_Freezing, -1);
+		}
+		else
+		{
+			UserInfo::getInstance()->addCoins(-DOUBLE_ATTACT_COST_COIN);
+		}
+		updateCoins();
 		SquareModel::theModel()->setSquareFreezing(true);
+	}
+	else
+	{
+		// show pay point
 	}
 }
 
@@ -185,10 +243,9 @@ void GameScene::initGameLayout()
 	addChild(m_touchPoint, kZOrder_Layout);
 	m_touchPoint->setVisible(false);
 
-	CCSprite *character_head = dynamic_cast<CCSprite*>(m_bottomLayout->getChildById(12));
+	CCSprite *character_head = dynamic_cast<CCSprite*>(m_mainLayout->getChildById(10));
 	char temp[50] = { 0 };
-	sprintf(temp, "x%d", 10);
-	m_marbleCount = CCLabelTTF::create(temp, LABEL_FONT, 23);
+	m_marbleCount = GameUtil::getImageNum(FONT_WHITE, START_BALL_SIZE);
 	m_marbleCount->setPosition(ccp(character_head->getContentSize().width / 2, character_head->getContentSize().height + m_marbleCount->getContentSize().height));
 	character_head->addChild(m_marbleCount);
 }
@@ -201,9 +258,10 @@ void GameScene::initPhysicBorder()
 
 void GameScene::initMarbles()
 {
-	for (int i = 0; i < 1; i++)
+	for (int i = 0; i < START_BALL_SIZE; i++)
 	{
 		auto marble = MarbleModel::theModel()->createMarble();
+		marble->setBody();
 		marble->setPosition(ccp(m_arrow->getPositionX(), m_bottomLinePos + marble->getContentSize().height / 2 + 4));
 		addChild(marble, kZOrder_Marble);
 		if (i == 0)
@@ -237,7 +295,7 @@ void GameScene::initSquares()
 	for (int i = 0; i < squares.size(); i++)
 	{
 		auto node = squares[i];
-		node->setPosition(ccp((node->getContentSize().width / 2 + SQUARE_SPACING) + node->getIndex() * (node->getContentSize().width + SQUARE_SPACING), 
+		node->setPosition(ccp((node->getContentSize().width / 2 + SQUARE_SPACING) + node->getIndex() * (node->getContentSize().width + SQUARE_SPACING),
 			m_bottomLinePos + (node->getContentSize().height + SQUARE_SPACING) * 7.5));
 		addChild(node, kZOrder_Square);
 	}
@@ -249,7 +307,7 @@ void GameScene::addSquares()
 	for (int i = 0; i < squares.size(); i++)
 	{
 		auto node = squares[i];
-		node->setPosition(ccp(node->getContentSize().width / 2 + SQUARE_SPACING + node->getIndex() * (node->getContentSize().width + SQUARE_SPACING), 
+		node->setPosition(ccp(node->getContentSize().width / 2 + SQUARE_SPACING + node->getIndex() * (node->getContentSize().width + SQUARE_SPACING),
 			m_bottomLinePos + (node->getContentSize().height + SQUARE_SPACING) * 8.5));
 		addChild(node, kZOrder_Square);
 	}
@@ -283,6 +341,12 @@ void GameScene::update(float dt)
 		{
 			b2Vec2 ballPosition = body->GetPosition();
 			ball->setPosition(ccp(ballPosition.x * PTM_RATIO, ballPosition.y * PTM_RATIO));
+			if (ballPosition.y * PTM_RATIO < 0)
+			{
+				marble->setMovingState(false);
+				GameController::getInstance()->addCounter();
+				CCLog("................................................pause");
+			}
 		}
 		else
 		{
@@ -293,7 +357,7 @@ void GameScene::update(float dt)
 			}
 		}
 	}
-	
+
 	//check squares by not check tool
 	GameController::getInstance()->checkSquares();
 
@@ -331,11 +395,12 @@ void GameScene::ccTouchMoved(CCTouch *pTouch, CCEvent *pEvent)
 		BallHintModel::theModel()->setHintVisible(true);
 	}
 
-	BallHintModel::theModel()->updatePosition(curPos, prePos, m_arrow->getPosition(), m_arrow->getContentSize().width - 10);
+	auto targetPos = GameController::getInstance()->getTargetPos();
+	BallHintModel::theModel()->updatePosition(curPos, prePos, targetPos, m_arrow->getContentSize().width);
 
 
-	CCSprite *character_body = dynamic_cast<CCSprite*>(m_bottomLayout->getChildById(3));
-	CCSprite *character_head = dynamic_cast<CCSprite*>(m_bottomLayout->getChildById(12));
+	CCSprite *character_body = dynamic_cast<CCSprite*>(m_mainLayout->getChildById(9));
+	CCSprite *character_head = dynamic_cast<CCSprite*>(m_mainLayout->getChildById(10));
 	if (m_shootDegree < 90)
 	{
 		character_head->setPositionX(character_body->getPositionX() - 20);
@@ -376,11 +441,11 @@ void GameScene::ccTouchEnded(CCTouch *pTouch, CCEvent *pEvent)
 		m_touchPoint->setVisible(false);
 		return;
 	}
-	
+
 	GameController::getInstance()->startOneRound();
 	m_touchPoint->setVisible(false);
 	m_arrow->setVisible(false);
-	CCSprite *character_head = dynamic_cast<CCSprite*>(m_bottomLayout->getChildById(12)); 
+	CCSprite *character_head = dynamic_cast<CCSprite*>(m_mainLayout->getChildById(10));
 	character_head->setRotation(0);
 	BallHintModel::theModel()->setHintVisible(false);
 
@@ -403,6 +468,13 @@ void GameScene::ccTouchEnded(CCTouch *pTouch, CCEvent *pEvent)
 		actions->addAction(action2);
 	}
 	actions->runActions();
+
+	//check guideLayer
+	if (getChildByTag(kTag_GuideLayer))
+	{
+		removeChildByTag(kTag_GuideLayer);
+		UserInfo::getInstance()->setFishGuide(true);
+	}
 }
 
 void GameScene::oneRoundEnd()
@@ -426,6 +498,7 @@ void GameScene::oneRoundEnd()
 	for (int i = 0; i < addCount; i++)
 	{
 		auto marble = MarbleModel::theModel()->createMarble();
+		marble->setBody();
 		marble->setPosition(pos);
 		addChild(marble, kZOrder_Marble);
 		auto streak = GameUtil::getMotionStreak();
@@ -439,17 +512,22 @@ void GameScene::oneRoundEnd()
 
 	//reset doubleAttact buttom
 	GameController::getInstance()->resetAttactRate();
-	CCMenuItem *doubleAttactBtn = dynamic_cast<CCMenuItem*>(m_bottomLayout->getChildById(6));
+	CCMenuItem *doubleAttactBtn = dynamic_cast<CCMenuItem*>(m_bottomLayout->getChildById(5));
+	doubleAttactBtn->setScale(0.7f);
+	doubleAttactBtn->stopAllActions();
+	m_bIsDoubleAttact = false;
 
 	//check character's position
 	auto targetPos = GameController::getInstance()->getTargetPos();
-	CCSprite *character_body = dynamic_cast<CCSprite*>(m_bottomLayout->getChildById(3));
+	CCSprite *character_body = dynamic_cast<CCSprite*>(m_mainLayout->getChildById(9));
 	auto moveTo = CCMoveTo::create(0.5f, ccp(targetPos.x, character_body->getPositionY()));
 	character_body->runAction(moveTo);
 
-	CCSprite *character_head = dynamic_cast<CCSprite*>(m_bottomLayout->getChildById(12));
+	CCSprite *character_head = dynamic_cast<CCSprite*>(m_mainLayout->getChildById(10));
 	auto moveTo2 = CCMoveBy::create(0.5f, ccp(targetPos.x - character_body->getPositionX(), 0));
 	character_head->runAction(moveTo2);
+
+	updateScore();
 }
 
 void GameScene::updateMarbles()
@@ -462,8 +540,28 @@ void GameScene::updateCoins()
 {
 	int coinCount = UserInfo::getInstance()->getCoins();
 	std::string countStr = GameUtil::intToString(coinCount);
-	CCLabelTTF *coinLabel = dynamic_cast<CCLabelTTF*>(m_bottomLayout->getChildById(5));
+	CCLabelAtlas *coinLabel = dynamic_cast<CCLabelAtlas*>(m_mainLayout->getChildById(5));
 	coinLabel->setString(countStr.c_str());
+	updatePropsCount();
+}
+
+void GameScene::updateScore()
+{
+	int score = SquareModel::theModel()->getCurrentScore() - 1;
+	std::string countStr = GameUtil::intToString(score);
+	CCLabelAtlas *scoreLabel = dynamic_cast<CCLabelAtlas*>(m_mainLayout->getChildById(3));
+	scoreLabel->setString(countStr.c_str());
+}
+
+void GameScene::updatePropsCount()
+{
+	for (int i = 0; i < 3; i++)
+	{
+		int propCount = UserInfo::getInstance()->getPropsCount(i);
+		std::string countStr = GameUtil::intToString(propCount);
+		CCLabelAtlas *propLabel = dynamic_cast<CCLabelAtlas*>(m_bottomLayout->getChildById(6 + i));
+		propLabel->setString(countStr.c_str());
+	}
 }
 
 void GameScene::updateMarbleCount()
@@ -473,7 +571,7 @@ void GameScene::updateMarbleCount()
 	{
 		m_addMarbleCount = MarbleModel::theModel()->getMarblesCount();
 	}
-	sprintf(temp, "x%d", m_addMarbleCount);
+	sprintf(temp, "%d", m_addMarbleCount);
 	m_marbleCount->setString(temp);
 }
 
@@ -486,6 +584,18 @@ void GameScene::showGameOver()
 {
 	CCLog("is game over");
 	SoundMgr::theMgr()->playEffect(Effect_GameOver);
-	SquareModel::theModel()->removeBelowSquares();
+	FuhuoLibao *fuhuoLibao = FuhuoLibao::create();
+	addChild(fuhuoLibao, KZOrder_GameOver, kTag_GameOver);
 	//GameController::getInstance()->setRoundState(false);
 }
+
+void GameScene::checkFishGuide()
+{
+	bool isGuideFinish = UserInfo::getInstance()->isFishGuideFinish();
+	if (!isGuideFinish)
+	{
+		GuideLayer *guideLayer = GuideLayer::create();
+		addChild(guideLayer, KZOrder_GuideLayer, kTag_GuideLayer);
+	}
+}
+

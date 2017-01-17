@@ -30,7 +30,7 @@ public:
 	void setIndex(int index){ m_index = index; }
 	int getIndex() { return m_index; }
 
-	void addScore(int score);
+	virtual void addScore(int score);
 	int getScore() { return m_score; }
 
 	int getCollisionType(){ return m_collisionType; }
@@ -43,11 +43,12 @@ public:
 	bool shouldRemoveDirectly();
 	bool canRemoveByProps();
 	void showBombAction();
+	void setPerfectScale();
 
 protected:
 	b2Body *m_body;
 	cocos2d::CCSprite *m_image;
-	cocos2d::CCLabelTTF *m_scoreLabel;
+	cocos2d::CCLabelAtlas *m_scoreLabel;
 	int m_collisionType;
 	int m_score;
 	int m_index;
@@ -60,9 +61,11 @@ public:
 	TriangleNode() : SquareNode(){ m_collisionType = kCollision_Triangle; }
 	static TriangleNode *create();
 	virtual bool init();
+	virtual void addScore(int score);
 	virtual void setPosition(const cocos2d::CCPoint &position);
 	virtual void setBody();
 	virtual void doCollisionAction();
+	void setPerfectScale();
 };
 
 class BossEatMarbleNode : public SquareNode

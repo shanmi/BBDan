@@ -15,7 +15,7 @@ public:
 	virtual void setPosition(const cocos2d::CCPoint &position);
 	
 public:
-	void setBody(b2Body *body){ m_body = body; }
+	void setBody();
 	b2Body *getBody(){ return m_body; }
 
 	void shoot(float degree);
