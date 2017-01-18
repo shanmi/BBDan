@@ -65,6 +65,10 @@ void UserInfo::unlockAllMarble()
 
 bool UserInfo::isUnlock(int type)
 {
+	if (type == kMarble_Normal)
+	{
+		return true;
+	}
 	char temp[50] = { 0 };
 	sprintf(temp, "%s-%d", GAME_UNLOCK_MARBLE, type);
 	return CCUserDefaultEx::sharedUserDefault()->getBoolForKey(temp, false);

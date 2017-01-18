@@ -24,9 +24,9 @@ typedef enum {
 	PAY_TYPE_DIAMOND4, //×êÊ¯4
 
 	PAY_TYPE_TIME_LIBAO = 10,
-	PAY_TYPE_FISH_LIBAO,
 	PAY_TYPE_COIN_LIBAO,
 	PAY_TYPE_FUHUO_LIBAO,
+	PAY_TYPE_FISH_LIBAO,
 	PAY_TYPE_MARBLE_LIBAO
 } MyPayProducts;
 
@@ -60,7 +60,8 @@ public:
 	void startStage(const char * level);
 	void successStage(const char * level);
 	void failStage(const char * level);
-	int getIsboolShangyong();
+	int isBusinessMode();
+	std::string getUserId();
 private:
 	MyPurchase();
 	virtual ~MyPurchase();

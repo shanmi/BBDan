@@ -44,6 +44,7 @@ public:
 	void onClearScreen(cocos2d::CCObject *pSender);
 	void onFreezing(cocos2d::CCObject *pSender);
 	void onPauseGame(cocos2d::CCObject *pSender);
+	void onHelpPanel(cocos2d::CCObject *pSender);
 	void initMainLayout();
 	void initBottomLayout();
 	void initGameLayout();
@@ -54,6 +55,8 @@ public:
 	void updateStreak(float dt);
 
 	void checkFishGuide();
+	void showLibaoDiaolg();
+	void checkLibaoShow();
 
 private:
 	b2World *m_world;

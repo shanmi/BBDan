@@ -62,15 +62,24 @@ bool LibaoDialog::init()
 	addChild(m_mainLayout);
 
 	initLayout();
+
+	return true;
 }
 
 void LibaoDialog::initLayout()
 {
+	bool isBusinessMode = MyPurchase::sharedPurchase()->isBusinessMode();
+
 	CCMenuItem *closeItem = dynamic_cast<CCMenuItem*>(m_mainLayout->getChildById(6));
 	closeItem->setTarget(this, menu_selector(LibaoDialog::closePanel));
 
-	CCMenuItem *buytem = dynamic_cast<CCMenuItem*>(m_mainLayout->getChildById(5));
-	buytem->setTarget(this, menu_selector(LibaoDialog::buyLibao));
+	CCMenuItem *buyItem = dynamic_cast<CCMenuItem*>(m_mainLayout->getChildById(5));
+	buyItem->setTarget(this, menu_selector(LibaoDialog::buyLibao));
+	buyItem->setVisible(!isBusinessMode);
+
+	CCMenuItem *sureItem = dynamic_cast<CCMenuItem*>(m_mainLayout->getChildById(8));
+	sureItem->setTarget(this, menu_selector(LibaoDialog::buyLibao));
+	sureItem->setVisible(isBusinessMode);
 
 	CCSprite *libaoIcon = dynamic_cast<CCSprite*>(m_mainLayout->getChildById(4));
 	std::string libaoImg;
@@ -83,13 +92,23 @@ void LibaoDialog::initLayout()
 		libaoImg = "libao/zujiemian_libao_xinshoulibao.png";
 		break;
 	case PAY_TYPE_COIN_LIBAO:
-		libaoImg = "libao/youxijiemian_youxishibai.png";
+		libaoImg = "libao/zujiemian_libao_xinshoulibao.png";
 		break;
 	default:
 		libaoImg = "libao/zujiemian_libao_xianshidalibao.png";
 		break;
 	}
 	libaoIcon->initWithFile(libaoImg.c_str());
+
+
+	CCLabelTTF *buyTip = dynamic_cast<CCLabelTTF*>(m_mainLayout->getChildById(7));
+	if (isBusinessMode)
+	{
+		auto size = m_mainLayout->getContentSize();
+		buyTip->setPosition(ccp(buyTip->getPositionX(), buyTip->getPositionY() - size.height * 0.8f));
+		buyTip->setScale(0.5f);
+		buyTip->setOpacity(120);
+	}
 }
 
 void LibaoDialog::closePanel(CCObject *pSender)

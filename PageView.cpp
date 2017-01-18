@@ -25,9 +25,9 @@ bool PageView::init()
 	setContentSize(m_size);
 	setAnchorPoint(ccp(0.5f, 1.0f));
 
-	auto colorLayer = CCLayerColor::create(ccc4(125, 0, 0, 255));
+	/*auto colorLayer = CCLayerColor::create(ccc4(125, 0, 0, 255));
 	colorLayer->setContentSize(m_size);
-	addChild(colorLayer);
+	addChild(colorLayer);*/
 
 	auto back = CCLayerColor::create(ccc4(125, 0, 0, 255));
 	m_clippingNode = CCClippingNode::create();
@@ -42,7 +42,7 @@ bool PageView::init()
 	m_container->setPosition(ccp(0, m_size.height / 2));
 	m_clippingNode->addChild(m_container);
 
-	schedule(schedule_selector(PageView::movingPage), 3.0f);
+	//schedule(schedule_selector(PageView::movingPage), 3.0f);
 
 	return true;
 }
@@ -115,6 +115,7 @@ void PageView::onExit()
 
 bool PageView::ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent)
 {
+	return false;
 	if (m_isMoving) return false;
 
 	auto localPos = convertToNodeSpace(pTouch->getLocation());
@@ -123,7 +124,7 @@ bool PageView::ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent)
 	CCRect rect(0, 0, size.width, size.height);
 	if (!rect.containsPoint(localPos)) return false;
 
-	unschedule(schedule_selector(PageView::movingPage));
+	//unschedule(schedule_selector(PageView::movingPage));
 
 	m_isTouching = true;
 	onTouchBegan(pTouch);
@@ -174,6 +175,10 @@ void PageView::dragback()
 	float newX = min(max(curPos.x, minX), maxX);
 	m_container->setPositionX(newX);
 
+	if (m_callback)
+	{
+		m_callback(pageIndex);
+	}
 }
 
 void PageView::checkNodePosition()
@@ -208,7 +213,7 @@ void PageView::checkNodePosition()
 
 void PageView::movingPage(float dt)
 {
-	if (m_isTouching) return;
+	if (m_isTouching || m_isMoving) return;
 
 	m_isMoving = true;
 	if (++pageIndex > getCount() - 1)
@@ -216,11 +221,47 @@ void PageView::movingPage(float dt)
 		pageIndex = 0;
 	}
 	float moveX = -m_size.width * pageIndex;
-	auto moveTo = CCMoveTo::create(1.2f, ccp(moveX, m_container->getPositionY()));
+	auto moveTo = CCMoveTo::create(0.6f, ccp(moveX, m_container->getPositionY()));
 	auto ease = CCEaseSineInOut::create(moveTo);
 	auto callback = CCCallFunc::create(this, callfunc_selector(PageView::movePageEnd));
 	auto sequence = CCSequence::create(ease, callback, NULL);
 	m_container->runAction(sequence);
+}
+
+int PageView::moveToLeft()
+{
+	if (m_isTouching || m_isMoving) return pageIndex;
+
+	m_isMoving = true;
+	if (--pageIndex < 0)
+	{
+		pageIndex = getCount() - 1;
+	}
+	float moveX = -m_size.width * pageIndex;
+	auto moveTo = CCMoveTo::create(0.6f, ccp(moveX, m_container->getPositionY()));
+	auto ease = CCEaseSineInOut::create(moveTo);
+	auto callback = CCCallFunc::create(this, callfunc_selector(PageView::movePageEnd));
+	auto sequence = CCSequence::create(ease, callback, NULL);
+	m_container->runAction(sequence);
+	return pageIndex;
+}
+
+int PageView::moveToRight()
+{
+	if (m_isTouching || m_isMoving) return pageIndex;
+
+	m_isMoving = true;
+	if (++pageIndex > getCount() - 1)
+	{
+		pageIndex = 0;
+	}
+	float moveX = -m_size.width * pageIndex;
+	auto moveTo = CCMoveTo::create(0.6f, ccp(moveX, m_container->getPositionY()));
+	auto ease = CCEaseSineInOut::create(moveTo);
+	auto callback = CCCallFunc::create(this, callfunc_selector(PageView::movePageEnd));
+	auto sequence = CCSequence::create(ease, callback, NULL);
+	m_container->runAction(sequence);
+	return pageIndex;
 }
 
 void PageView::movePageEnd()
@@ -231,5 +272,5 @@ void PageView::movePageEnd()
 void PageView::touchEnd()
 {
 	m_isTouching = false;
-	schedule(schedule_selector(PageView::movingPage), 3.0f);
+	//schedule(schedule_selector(PageView::movingPage), 3.0f);
 }

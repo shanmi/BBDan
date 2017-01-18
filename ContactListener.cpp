@@ -43,7 +43,7 @@ void ContactListener::BeginContact(b2Contact* contact)
 			{
 				auto targetPos = GameController::getInstance()->getTargetPos();
 				GameController::getInstance()->setTargetPos(ccp(spriteB->getPositionX(), targetPos.y));
-				marble->setVisible(true);
+				marble->setVisible(false);
 			}
 			else
 			{
@@ -62,7 +62,7 @@ void ContactListener::BeginContact(b2Contact* contact)
 				GameController::getInstance()->addCounter();
 				if (GameController::getInstance()->getCounter() == 1)
 				{
-					marble->setVisible(true);
+					marble->setVisible(false);
 				}
 				else
 				{

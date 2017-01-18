@@ -16,7 +16,10 @@ public:
 
 public:
 	int m_nDiamondCount;
-	int m_nDiamond[][5];
+	int m_nDiamond[4][5];
+
+	int m_nMarbleCount;
+	int m_nMarble[4][3];
 private:
 	GameConfig();
 

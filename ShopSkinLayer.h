@@ -1,18 +1,19 @@
-#ifndef __SHOP_LAYER_H__
-#define __SHOP_LAYER_H__
+#ifndef __SHOP_SKIN_LAYER_H__
+#define __SHOP_SKIN_LAYER_H__
 
 #include "cocos2d.h"
 #include "GameController.h"
 
 class UiLayout;
-class ShopLayer 
+class PageView;
+class ShopSkinLayer 
 	: public cocos2d::CCLayer
 	, public INotifyView
 {
 public:
 	virtual bool init();
 	static cocos2d::CCScene* scene();
-	CREATE_FUNC(ShopLayer);
+	CREATE_FUNC(ShopSkinLayer);
 
 	void onEnter();
 	void onExit();
@@ -22,14 +23,19 @@ public:
 	virtual void updateCoins();
 public:
 	void initLayout();
+	void initSkinLayout();
 	void closePanel(cocos2d::CCObject *pSender);
-	void toCoinPanel(cocos2d::CCObject *pSender);
-	void toBallPanel(cocos2d::CCObject *pSender);
+	void toLeftPanel(cocos2d::CCObject *pSender);
+	void toRightPanel(cocos2d::CCObject *pSender);
+	void updatePage(int pageIndex);
 
-	void payCallback();
+	void payMarbleItem(cocos2d::CCObject *pSender);
+	void useMarbleItem(cocos2d::CCObject *pSender);
 
 private:
 	UiLayout *m_mainLayout;
+	PageView *m_pageView;
+	int m_pageIndex;
 };
 
 #endif

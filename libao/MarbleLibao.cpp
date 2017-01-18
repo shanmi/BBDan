@@ -49,6 +49,8 @@ bool MarbleLibao::init()
 	addChild(m_mainLayout);
 
 	initLayout();
+
+	return true;
 }
 
 void MarbleLibao::initLayout()

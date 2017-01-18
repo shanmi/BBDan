@@ -32,10 +32,13 @@ public:
 	void addReboundTimes(int times = 1){ m_reboundTimes += times; }
 	int getReboundTimes(){ return m_reboundTimes; }
 
+	void initWithFile(const char* imagePath);
+
 private:
 	MarbleNode(MarbleAttr attr);
 
 private:
+	cocos2d::CCSprite *m_playerBall;
 	MarbleAttr m_attr;
 	b2Body *m_body;
 	bool m_bIsMoving;

@@ -1,10 +1,12 @@
 #ifndef __MAIN_MENU_H__
 #define __MAIN_MENU_H__
-
+#include "MarbleNode.h"
 #include "cocos2d.h"
-
+#include "GameController.h"
 class UiLayout;
-class MainMenu : public cocos2d::CCLayer
+class MainMenu
+	: public cocos2d::CCLayer
+	, public INotifyView
 {
 public:
 	virtual bool init();
@@ -16,6 +18,8 @@ public:
 	void onExit();
 	bool ccTouchBegan(cocos2d::CCTouch *pTouch, cocos2d::CCEvent *pEvent);
 	virtual void keyBackClicked();
+
+	virtual void updateMarbles();
 
 public:
 	void initLayout();
@@ -32,5 +36,6 @@ public:
 
 private:
 	UiLayout *m_mainLayout;
+	MarbleNode *m_marble;
 };
 #endif

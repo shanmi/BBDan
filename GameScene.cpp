@@ -1,3 +1,4 @@
+#include "libao\LibaoDialog.h"
 #include "GameScene.h"
 #include "UiLayout.h"
 #include "GameUtil.h"
@@ -15,13 +16,15 @@
 #include "GuideLayer.h"
 #include "libao\FuhuoLibao.h"
 #include "PauseLayer.h"
+#include "MyPurchase.h"
+#include "HelpLayer.h"
 
 USING_NS_CC;
 
 void GameScene::onEnter()
 {
 	CCLayer::onEnter();
-	CCDirector::sharedDirector()->getTouchDispatcher()->addTargetedDelegate(this, -1, true);
+	CCDirector::sharedDirector()->getTouchDispatcher()->addTargetedDelegate(this, kPriority_Game, true);
 	GameController::getInstance()->addView(this);
 }
 
@@ -40,7 +43,7 @@ void GameScene::draw()
 
 void GameScene::keyBackClicked()
 {
-	GameController::getInstance()->backToMainMenu();
+	onPauseGame(NULL);
 }
 
 GameScene::GameScene()
@@ -86,11 +89,13 @@ bool GameScene::init()
 	m_mainLayout = UiLayout::create("layout/game_scene.xml");
 	m_mainLayout->setAnchorPoint(ccp(0.5f, 0.5f));
 	m_mainLayout->setPosition(ccpMult(winSize, 0.5f));
+	m_mainLayout->setMenuTouchPriority(kPriority_Game - 1);
 	addChild(m_mainLayout, kZOrder_Main);
 	initMainLayout();
 
 	m_bottomLayout = UiLayout::create("layout/game_bottom.xml");
 	m_bottomLayout->setPosition(ccp(0, 0));
+	m_bottomLayout->setMenuTouchPriority(kPriority_Game - 1);
 	addChild(m_bottomLayout, kZOrder_Layout);
 	initBottomLayout();
 	initGameLayout();
@@ -112,10 +117,12 @@ bool GameScene::init()
 void GameScene::initMainLayout()
 {
 	CCSprite *line_top = dynamic_cast<CCSprite*>(m_mainLayout->getChildById(8));
+	line_top->setVisible(false);
 	auto worldPos = m_mainLayout->convertToWorldSpace(line_top->getPosition());
 	m_topLinePos = worldPos.y;
 
 	CCSprite *line_bottom = dynamic_cast<CCSprite*>(m_mainLayout->getChildById(7));
+	line_bottom->setVisible(false);
 	line_bottom->setTag(kTag_Wall);
 	worldPos = line_bottom->convertToWorldSpace(CCPointZero);
 	m_bottomLinePos = worldPos.y;
@@ -148,6 +155,11 @@ void GameScene::initBottomLayout()
 	CCMenuItem *freezingBtn = dynamic_cast<CCMenuItem*>(m_bottomLayout->getChildById(3));
 	freezingBtn->setTarget(this, menu_selector(GameScene::onFreezing));
 
+	CCMenuItem *helpBtn = dynamic_cast<CCMenuItem*>(m_bottomLayout->getChildById(9));
+	helpBtn->setTarget(this, menu_selector(GameScene::onHelpPanel));
+	auto action = GameUtil::getScaleAction();
+	helpBtn->runAction(action);
+
 }
 
 void GameScene::onDoubleAttact(CCObject *pSender)
@@ -178,6 +190,7 @@ void GameScene::onDoubleAttact(CCObject *pSender)
 	else
 	{
 		// show pay point
+		showLibaoDiaolg();
 	}
 }
 
@@ -204,6 +217,7 @@ void GameScene::onClearScreen(CCObject *pSender)
 	else
 	{
 		// show pay point
+		showLibaoDiaolg();
 	}
 }
 
@@ -228,6 +242,34 @@ void GameScene::onFreezing(CCObject *pSender)
 	else
 	{
 		// show pay point
+		showLibaoDiaolg();
+	}
+}
+
+void GameScene::onHelpPanel(CCObject *pSender)
+{
+	HelpLayer *helpLayer = HelpLayer::create();
+	addChild(helpLayer, KZOrder_PauseLayer, kTag_Pause);
+}
+
+void GameScene::showLibaoDiaolg()
+{
+	int random = rand() % 2;
+	int libaoType = PAY_TYPE_TIME_LIBAO;
+	if (random == 0)
+	{
+		libaoType = PAY_TYPE_COIN_LIBAO;
+	}
+	LibaoDialog *dialog = LibaoDialog::create(libaoType);
+	addChild(dialog, KZOrder_LibaoLayer);
+}
+
+void GameScene::checkLibaoShow()
+{
+	int score = SquareModel::theModel()->getCurrentScore() - 1;
+	if (score % 20 == 0)
+	{
+		showLibaoDiaolg();
 	}
 }
 
@@ -239,13 +281,14 @@ void GameScene::initGameLayout()
 		addChild(*iter, kZOrder_Layout);
 	}
 
-	m_touchPoint = CCSprite::create("start_touch_point.png");
+	m_touchPoint = CCSprite::create("game/start_touch_point.png");
 	addChild(m_touchPoint, kZOrder_Layout);
 	m_touchPoint->setVisible(false);
 
 	CCSprite *character_head = dynamic_cast<CCSprite*>(m_mainLayout->getChildById(10));
 	char temp[50] = { 0 };
-	m_marbleCount = GameUtil::getImageNum(FONT_WHITE, START_BALL_SIZE);
+	sprintf(temp, ":%d", START_BALL_SIZE);
+	m_marbleCount = GameUtil::getImageNum(FONT_WHITE, temp);
 	m_marbleCount->setPosition(ccp(character_head->getContentSize().width / 2, character_head->getContentSize().height + m_marbleCount->getContentSize().height));
 	character_head->addChild(m_marbleCount);
 }
@@ -266,7 +309,7 @@ void GameScene::initMarbles()
 		addChild(marble, kZOrder_Marble);
 		if (i == 0)
 		{
-			marble->setVisible(true);
+			marble->setVisible(false);
 		}
 		else
 		{
@@ -318,8 +361,13 @@ void GameScene::update(float dt)
 	bool isRoundOver = GameController::getInstance()->isRoundOver();
 	if (isRoundOver)
 	{
+		//check character's position
 		/*auto targetPos = GameController::getInstance()->getTargetPos();
-		m_arrow->setPosition(targetPos);*/
+		CCSprite *character_body = dynamic_cast<CCSprite*>(m_mainLayout->getChildById(9));
+		character_body->setPosition(ccp(targetPos.x, character_body->getPositionY()));
+
+		CCSprite *character_head = dynamic_cast<CCSprite*>(m_mainLayout->getChildById(10));
+		character_head->setPosition(ccp(targetPos.x, character_head->getPositionY()));*/
 		return;
 	}
 
@@ -407,7 +455,7 @@ void GameScene::ccTouchMoved(CCTouch *pTouch, CCEvent *pEvent)
 		character_body->setFlipX(true);
 		character_head->setFlipX(true);
 
-		m_arrow->setPositionX(character_body->getPositionX() + 20);
+		m_arrow->setPositionX(character_body->getPositionX() + 17);
 		m_arrow->setFlipY(true);
 	}
 	else
@@ -444,7 +492,6 @@ void GameScene::ccTouchEnded(CCTouch *pTouch, CCEvent *pEvent)
 
 	GameController::getInstance()->startOneRound();
 	m_touchPoint->setVisible(false);
-	m_arrow->setVisible(false);
 	CCSprite *character_head = dynamic_cast<CCSprite*>(m_mainLayout->getChildById(10));
 	character_head->setRotation(0);
 	BallHintModel::theModel()->setHintVisible(false);
@@ -467,6 +514,11 @@ void GameScene::ccTouchEnded(CCTouch *pTouch, CCEvent *pEvent)
 		actions->addAction(action1);
 		actions->addAction(action2);
 	}
+	auto action3 = CCFunctionAction::create([=]()
+	{
+		m_arrow->setVisible(false);
+	});
+	actions->addAction(action3);
 	actions->runActions();
 
 	//check guideLayer
@@ -528,6 +580,8 @@ void GameScene::oneRoundEnd()
 	character_head->runAction(moveTo2);
 
 	updateScore();
+
+	checkLibaoShow();
 }
 
 void GameScene::updateMarbles()
@@ -571,7 +625,7 @@ void GameScene::updateMarbleCount()
 	{
 		m_addMarbleCount = MarbleModel::theModel()->getMarblesCount();
 	}
-	sprintf(temp, "%d", m_addMarbleCount);
+	sprintf(temp, ":%d", m_addMarbleCount);
 	m_marbleCount->setString(temp);
 }
 

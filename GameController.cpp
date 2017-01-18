@@ -11,6 +11,7 @@ GameController::GameController()
 , m_bIsRoundOver(true)
 , m_targetPos(ccp(0, 0))
 , m_attactRate(ATTACT_RATE)
+, m_bISFirstIn(true)
 {
 }
 
@@ -110,21 +111,21 @@ void GameController::createPropByMarble(MarbleNode *marble)
 {
 	MarbleModel::theModel()->reboundMarbles();
 	auto targetPos = GameController::getInstance()->getTargetPos();
-	auto node = CCSprite::create("brick.png");
+	auto node = CCSprite::create("squares/fangkuai_hengxiao.png");
 	float posX = (node->getContentSize().width / 2 + SQUARE_SPACING) + 3 * (node->getContentSize().width + SQUARE_SPACING);
 	float posY = targetPos.y + node->getContentSize().height / 2 - marble->getContentSize().height / 2;
 	while (posY < marble->getPositionY())
 	{
 		posY += (node->getContentSize().height + SQUARE_SPACING);
 	}
-	posY = posY - node->getContentSize().height / 2 - SQUARE_SPACING;
+	posY = posY - SQUARE_SPACING;
 	node->setPosition(ccp(posX, posY));
 
 	auto squares = SquareModel::theModel()->getSquares();
 	for (auto iter = squares.begin(); iter != squares.end(); ++iter)
 	{
 		auto square = (*iter);
-		if (square->getCollisionType() != kCollision_EliminateRow && square->getCollisionType() != kCollision_EliminateCol)
+		if (square->getCollisionType() != kCollision_EliminateRow && square->getCollisionType() != kCollision_EliminateCol && square->getCollisionType() != kCollision_Rebound)
 		{
 			auto rect = square->boundingBox();
 			if (rect.containsPoint(ccp(posX, posY)))
@@ -143,6 +144,7 @@ void GameController::backToMainMenu()
 	MarbleModel::theModel()->clearMarbles();
 	BallHintModel::theModel()->clearHints();
 	SquareModel::theModel()->clearSquares();
+	GameController::getInstance()->setRoundState(true);
 	CCDirector* pDirector = CCDirector::sharedDirector();
 	CCScene *pScene = MainMenu::scene();
 	pDirector->replaceScene(pScene);

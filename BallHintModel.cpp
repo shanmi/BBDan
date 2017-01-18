@@ -14,7 +14,7 @@ std::vector<cocos2d::CCSprite*> BallHintModel::createBallHints()
 {
 	for (int i = 0; i < HINT_BALL_SIZE; i++)
 	{
-		auto hint = CCSprite::create("hint.png");
+		auto hint = CCSprite::create("particle/hint.png");
 		hint->setScale(0.2f);
 		hint->setContentSize(hint->getContentSize()*0.6f);
 		hint->setVisible(false);

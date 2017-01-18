@@ -66,7 +66,7 @@ std::string GameUtil::intToString(int value)
 
 CCParticleExplosion *GameUtil::getExplodeEffect(){
 	CCParticleExplosion *pEmitter = CCParticleExplosion::create();
-	pEmitter->setTexture(CCTextureCache::sharedTextureCache()->addImage("particle.png"));
+	pEmitter->setTexture(CCTextureCache::sharedTextureCache()->addImage("particle/explode.png"));
 	pEmitter->setAutoRemoveOnFinish(true);
 
 	ccColor4F c4Start = { 0.3, 0.4, 0.5, 0.6 };
@@ -90,7 +90,7 @@ CCParticleExplosion *GameUtil::getExplodeEffect(){
 
 CCMotionStreak *GameUtil::getMotionStreak()
 {
-	auto streak = CCMotionStreak::create(0.1f, 3, 32, ccGREEN, "streak.png");
+	auto streak = CCMotionStreak::create(0.1f, 3, 32, ccGREEN, "particle/streak.png");
 
 	CCActionInterval *colorAction = CCRepeatForever::create(CCSequence::create(
 		CCTintTo::create(0.2f, 255, 0, 0),
@@ -156,12 +156,37 @@ CCAction *GameUtil::getScaleAction()
 	return action;
 }
 
+CCAction *GameUtil::getBlinkAction()
+{
+	auto blink = CCBlink::create(1.0f, 1);
+	auto action = CCRepeatForever::create(blink);
+	return action;
+}
+
+CCAction *GameUtil::getFadeInOutAction()
+{
+	auto fadeIn = CCFadeIn::create(1.2f);
+	auto fadeOut = CCFadeIn::create(2.0f);
+	auto sequence = CCSequence::create(fadeIn, fadeOut, NULL);
+	auto action = CCRepeatForever::create(sequence);
+	return action;
+}
+
 CCLabelAtlas *GameUtil::getImageNum(std::string fontPath, int num)
 {
 	int kLength = 11;
 	std::string text = intToString(num);
 	auto size = CCSprite::create(fontPath.c_str())->getContentSize();
 	auto numLabel = CCLabelAtlas::create(text.c_str(), fontPath.c_str(), size.width / kLength, size.height, '0');
+	numLabel->setAnchorPoint(ccp(0.5f, 0.5f));
+	return numLabel;
+}
+
+CCLabelAtlas *GameUtil::getImageNum(std::string fontPath, std::string numStr)
+{
+	int kLength = 11;
+	auto size = CCSprite::create(fontPath.c_str())->getContentSize();
+	auto numLabel = CCLabelAtlas::create(numStr.c_str(), fontPath.c_str(), size.width / kLength, size.height, '0');
 	numLabel->setAnchorPoint(ccp(0.5f, 0.5f));
 	return numLabel;
 }

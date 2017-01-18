@@ -33,6 +33,7 @@ public:
 
 	void addPropsCount(int type, int count);
 	int getPropsCount(int type);
+
 private:
 	UserInfo(){}
 };

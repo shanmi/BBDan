@@ -13,6 +13,9 @@ public:
 	void removeNode(int index);
 	int getCount(){ return m_nodes.size(); }
 	virtual void addNode(cocos2d::CCNode *node);
+	void setCallbackListener(std::function <void(int)> callback){ m_callback = callback; }
+	int moveToLeft();
+	int moveToRight();
 
 protected:
 	PageView(const cocos2d::CCSize &size);
@@ -43,6 +46,7 @@ private:
 	bool m_isTouching;
 	bool m_isMoving;
 	int pageIndex;
+	std::function <void(int)> m_callback;
 };
 
 #endif

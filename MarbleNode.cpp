@@ -35,15 +35,20 @@ MarbleNode *MarbleNode::create(MarbleAttr attr)
 bool MarbleNode::init()
 {
 	char temp[30] = { 0 };
-	sprintf(temp, "play_ball_%d.png", m_attr.skin);
-	CCSprite *playerBall = CCSprite::create(temp); 
-	addChild(playerBall);
-	auto size = playerBall->getContentSize();
+	sprintf(temp, "marbles/ball_%d.png", m_attr.skin);
+	m_playerBall = CCSprite::create(temp);
+	addChild(m_playerBall);
+	auto size = m_playerBall->getContentSize();
 
 	setTag(kTag_Marble);
 	setContentSize(size);
 
 	return true;
+}
+
+void MarbleNode::initWithFile(const char* imagePath)
+{
+	m_playerBall->initWithFile(imagePath);
 }
 
 void MarbleNode::setBody()

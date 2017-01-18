@@ -18,7 +18,7 @@ MarbleModel *MarbleModel::theModel()
 
 MarbleNode* MarbleModel::createMarble()
 {
-	m_attr = FasterMarle();
+	//m_attr = FasterMarle();
 	MarbleNode *marble = MarbleNode::create(m_attr);
 	marble->setVisible(false);
 	m_marbles.push_back(marble);

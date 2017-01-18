@@ -36,6 +36,13 @@ bool GuideLayer::init()
 
 	auto winSize = CCDirector::sharedDirector()->getWinSize();
 
+	auto tips = CCSprite::create("guide/guide_tip.png");
+	tips->setPosition(ccp(winSize.width * 0.5f, winSize.height * 0.68f));
+	addChild(tips);
+	auto blink = CCBlink::create(1.0f, 2);
+	auto repeat = CCRepeatForever::create(blink);
+	tips->runAction(repeat);
+
 	auto finger = CCSprite::create("guide/finger.png");
 	finger->setPosition(ccpMult(winSize, 0.6f));
 	addChild(finger);

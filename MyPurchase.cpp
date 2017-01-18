@@ -221,6 +221,12 @@ void MyPurchaseResult::onPayResult(int ret, const char* msg){
 		case PAY_TYPE_MARBLE_LIBAO:
 			UserInfo::getInstance()->unlockAllMarble();
 			break;
+		case PAY_TYPE_COIN_LIBAO:
+			buyCount = 200;
+			break;
+		case PAY_TYPE_FUHUO_LIBAO:
+
+			break;
 
 		}
 		orderCoins = buyCount + presentCount;
@@ -319,7 +325,7 @@ void MyPurchase::failStage(const char * level){
 #endif
 }
 
-int MyPurchase::getIsboolShangyong(){
+int MyPurchase::isBusinessMode(){
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 	const char* funstr = "org/cocos2dx/lib/PayAndroidApi";
 
@@ -336,7 +342,7 @@ int MyPurchase::getIsboolShangyong(){
 	jint carrietType;
 	isHave = JniHelper::getMethodInfo(minfo,
 		funstr,
-		"isboolShangyong",
+		"isBusinessMode",
 		"()I");
 	if (isHave)
 	{
@@ -345,4 +351,37 @@ int MyPurchase::getIsboolShangyong(){
 	return carrietType;
 #endif
 	return 1;
+}
+
+std::string MyPurchase::getUserId()
+{
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+	const char* funstr = "org/cocos2dx/lib/PayAndroidApi";
+
+	JniMethodInfo minfo;
+	bool isHave = JniHelper::getStaticMethodInfo(minfo,
+		funstr,
+		"rtnActivity",
+		"()Ljava/lang/Object;");
+	jobject jobj;
+	if (isHave)
+	{
+		jobj = minfo.env->CallStaticObjectMethod(minfo.classID, minfo.methodID);
+	}
+	isHave = JniHelper::getMethodInfo(minfo,
+		funstr,
+		"getUserId",
+		"()Ljava/lang/String;");
+	if (isHave)
+	{
+		jstring jstr = (jstring)(minfo.env->CallObjectMethod(jobj, minfo.methodID));
+		return JniHelper::jstring2string(jstr);
+	}
+	else
+	{
+		return "unkown";
+	}
+#else
+	return "61462952";
+#endif
 }

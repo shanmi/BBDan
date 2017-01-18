@@ -57,6 +57,8 @@ bool FuhuoLibao::init()
 	addChild(m_mainLayout);
 
 	initLayout();
+
+	return true;
 }
 
 void FuhuoLibao::initLayout()
@@ -67,6 +69,15 @@ void FuhuoLibao::initLayout()
 	CCMenuItem *buyItem = dynamic_cast<CCMenuItem*>(m_mainLayout->getChildById(5));
 	buyItem->setTarget(this, menu_selector(FuhuoLibao::buyLibao));
 
+	CCLabelTTF *buyTip = dynamic_cast<CCLabelTTF*>(m_mainLayout->getChildById(7));
+	bool isBusinessMode = MyPurchase::sharedPurchase()->isBusinessMode();
+	if (isBusinessMode)
+	{
+		auto size = m_mainLayout->getContentSize();
+		buyTip->setPosition(ccp(size.width * 0.5f, -size.height));
+		buyTip->setScale(0.5f);
+		buyTip->setOpacity(120);
+	}
 }
 
 void FuhuoLibao::closePanel(CCObject *pSender)

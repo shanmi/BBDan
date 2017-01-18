@@ -70,7 +70,7 @@ bool HelloWorld::init()
 
 	/*auto m_emitter = CCParticleGalaxy::create();
 	addChild(m_emitter, 10);
-	m_emitter->setTexture(CCTextureCache::sharedTextureCache()->addImage("particle.png"));
+	m_emitter->setTexture(CCTextureCache::sharedTextureCache()->addImage("particle/explode.png"));
 	m_emitter->setScale(0.3f);
 	auto moveTo = CCMoveBy::create(2.0f, ccp(0,500));
 	auto moveBack = moveTo->reverse();
@@ -83,7 +83,7 @@ bool HelloWorld::init()
 	par->setEmissionRate(100);
 	par->setAnchorPoint(ccp(0.5f, 0.5f));
 	par->setPosition(0, 0);
-	par->setTexture(CCTextureCache::sharedTextureCache()->addImage("fire.png"));
+	par->setTexture(CCTextureCache::sharedTextureCache()->addImage("particle/fire.png"));
 	addChild(par, 10);
 
 	//auto fire = CCParticleMeteor::create();

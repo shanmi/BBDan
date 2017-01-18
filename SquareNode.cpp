@@ -188,7 +188,7 @@ void SquareNode::setFreezing(bool isFreezing)
 {
 	if (isFreezing)
 	{
-		auto freezing = CCSprite::create("freezing.png");
+		auto freezing = CCSprite::create("game/freezing.png");
 		addChild(freezing, 100, 100);
 	}
 	else
@@ -335,10 +335,10 @@ bool BossEatMarbleNode::init()
 	sun->setEmissionRate(100);
 	sun->setAnchorPoint(ccp(0.5f, 0.5f));
 	sun->setPosition(0, 0);
-	sun->setTexture(CCTextureCache::sharedTextureCache()->addImage("fire.png"));
+	sun->setTexture(CCTextureCache::sharedTextureCache()->addImage("particle/fire.png"));
 	addChild(sun);
 
-	m_image = CCSprite::create("boss_0.png");
+	m_image = CCSprite::create("squares/fangkuai_hengxiao.png");
 	auto size = m_image->getContentSize();
 	setContentSize(ccp(64, 64));
 

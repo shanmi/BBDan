@@ -2,6 +2,8 @@
 #include "UiLayout.h"
 #include "CommonMacros.h"
 #include "MyPurchase.h"
+#include "GameConfig.h"
+#include "GameUtil.h"
 
 USING_NS_CC;
 USING_NS_CC_EXT;
@@ -35,8 +37,16 @@ bool ShopBallNode::init()
 
 void ShopBallNode::initLayout()
 {
-	CCMenuItem * buyBtn = dynamic_cast<CCMenuItem *>((m_mainLayout->getChildById(5)));
-	buyBtn->setTarget(this, menu_selector(ShopBallNode::buyItem));
+	/*CCMenuItem *leftItem = dynamic_cast<CCMenuItem*>(m_mainLayout->getChildById(3));
+	leftItem->setTarget(this, menu_selector(ShopSkinLayer::toLeftPanel));
+
+	CCMenuItem *rightItem = dynamic_cast<CCMenuItem*>(m_mainLayout->getChildById(4));
+	rightItem->setTarget(this, menu_selector(ShopSkinLayer::toRightPanel));*/
+
+	CCSprite * ballDesc = dynamic_cast<CCSprite *>((m_mainLayout->getChildById(1)));
+	char temp[50] = { 0 };
+	sprintf(temp, "shop/ball_%d.png", m_attr.skin);
+	ballDesc->initWithFile(temp);
 }
 
 void ShopBallNode::buyItem(CCObject *pSender)

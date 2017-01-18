@@ -41,5 +41,19 @@ void GameConfig::preloadData()
 				}
 			}
 		}
+
+		Value &marbles = root["marbles"];
+		if (marbles.IsArray()){
+			m_nMarbleCount = marbles.Size();
+			for (int i = 0; i < m_nMarbleCount; i++){
+				Value &marble = marbles[i];
+				if (!marble.IsArray()){
+					break;
+				}
+				for (int j = 0; j < 3; j++){
+					m_nMarble[i][j] = marble[j].GetInt();
+				}
+			}
+		}
 	}
 }

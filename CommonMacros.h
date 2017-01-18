@@ -8,10 +8,11 @@
 enum TouchPriority
 {
 	kPriority_Main = -1,
-	kPriority_Guide = -10,
-	kPriority_Panel = -20,
-	kPriority_Shop = -30,
-	kPriority_Libao = -40
+	kPriority_Game = -10,
+	kPriority_Guide = -20,
+	kPriority_Pause = -30,
+	kPriority_Shop = -40,
+	kPriority_Libao = -50
 };
 
 enum GameZOrder
@@ -22,7 +23,8 @@ enum GameZOrder
 	kZOrder_Layout,
 	KZOrder_GuideLayer,
 	KZOrder_PauseLayer,
-	KZOrder_GameOver
+	KZOrder_GameOver,
+	KZOrder_LibaoLayer
 };
 
 enum SquareType
@@ -34,7 +36,7 @@ enum SquareType
 	kType_AddCoin = 1,
 	kType_Rebound = 3,
 	kType_EliminateRow = 4,
-	kType_EliminateCol = 50,
+	kType_EliminateCol = 5,
 	kType_BossEatMarble = 2,
 };
 
@@ -56,8 +58,8 @@ enum MarbleType
 	kMarble_Faster,
 	kMarble_Biger,
 	kMarble_Dispersed,
-	kMarble_Across,
 	kMarble_Bomb,
+	kMarble_Across,
 };
 enum ViewTag
 {

@@ -33,7 +33,7 @@ struct BiggerMarle : public MarbleAttr
 
 struct DispersedMarle : public MarbleAttr
 {
-	DispersedMarle() : MarbleAttr(kMarble_Dispersed, 2.0f, 1){}
+	DispersedMarle() : MarbleAttr(kMarble_Dispersed, 1.0f, 1){}
 };
 
 struct AcrossdMarle : public MarbleAttr

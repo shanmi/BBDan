@@ -53,6 +53,9 @@ public:
 	void createPropByMarble(MarbleNode *marble);
 
 	void backToMainMenu();
+
+	bool isFirshInGame(){ return m_bISFirstIn; }
+	void setFirstInGame(bool firtIn){ m_bISFirstIn = firtIn; }
 private:
 	GameController();
 
@@ -62,6 +65,8 @@ private:
 	int m_counter;
 	int m_attactRate;
 	bool m_bIsRoundOver;
+
+	bool m_bISFirstIn;
 };
 
 #endif
