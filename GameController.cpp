@@ -73,6 +73,16 @@ void GameController::checkSquares(bool isCheckTool /* = false */)
 	}
 }
 
+void GameController::updateMarblePos()
+{
+	auto marbles = MarbleModel::theModel()->getMarbles();
+	for (auto iter = marbles.begin(); iter != marbles.end(); ++iter)
+	{
+		auto square = *iter;
+		square->setPosition(m_targetPos);
+	}
+}
+
 bool GameController::checkGameOver()
 {
 	auto squares = SquareModel::theModel()->getSquares();
@@ -118,7 +128,7 @@ void GameController::createPropByMarble(MarbleNode *marble)
 	{
 		posY += (node->getContentSize().height + SQUARE_SPACING);
 	}
-	posY = posY - SQUARE_SPACING;
+	posY = marble->getPositionY();// posY - node->getContentSize().height / 2 - SQUARE_SPACING;
 	node->setPosition(ccp(posX, posY));
 
 	auto squares = SquareModel::theModel()->getSquares();

@@ -39,9 +39,10 @@ void ContactListener::BeginContact(b2Contact* contact)
 			{
 				GameController::getInstance()->addCounter();
 			}
-			if (GameController::getInstance()->getCounter() == 1)
+			auto targetPos = GameController::getInstance()->getTargetPos();
+			auto winSize = CCDirector::sharedDirector()->getWinSize();
+			if (GameController::getInstance()->getCounter() == 1 || targetPos.x < 0 || targetPos.x > winSize.width || targetPos.y < 0)
 			{
-				auto targetPos = GameController::getInstance()->getTargetPos();
 				GameController::getInstance()->setTargetPos(ccp(spriteB->getPositionX(), targetPos.y));
 				marble->setVisible(false);
 			}

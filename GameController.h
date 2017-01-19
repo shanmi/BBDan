@@ -34,7 +34,7 @@ public:
 	void startOneRound();
 
 	void addCounter(){ ++m_counter; }
-	void reduceCounter(){ --m_counter; }
+	void resetCounter(){ m_counter = 0; }
 	int getCounter(){ return m_counter; }
 	void setTargetPos(cocos2d::CCPoint pos){ m_targetPos = pos; }
 	cocos2d::CCPoint getTargetPos(){ return m_targetPos; }
@@ -43,6 +43,7 @@ public:
 	bool isRoundOver(){ return m_bIsRoundOver; }
 	void setRoundState(bool isOver) { m_bIsRoundOver = isOver; }
 	void checkSquares(bool isCheckTool = false);
+	void updateMarblePos();
 	bool checkGameOver();
 
 	void setDoubleAttact(){ m_attactRate = ATTACT_RATE * 2; }

@@ -118,7 +118,7 @@ void LibaoDialog::closePanel(CCObject *pSender)
 
 void LibaoDialog::buyLibao(CCObject *pSender)
 {
-	MyPurchase::sharedPurchase()->payForProducts((MyPayProducts)m_type);
+	MyPurchase::sharedPurchase()->payForProducts(m_type);
 }
 
 void LibaoDialog::updateCoins()

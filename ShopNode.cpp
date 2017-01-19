@@ -111,7 +111,7 @@ void ShopCoinNode::initMainLayout()
 void ShopCoinNode::buyItem(CCObject *pSender)
 {
 	CCLOG("itemId==========================%d", m_config.id);
-	MyPurchase::sharedPurchase()->payForProducts((MyPayProducts)m_config.id);
+	MyPurchase::sharedPurchase()->payForProducts(m_config.id);
 }
 
 void ShopCoinNode::payCallBack(CCNode* nouse, int payType, int payResult, int payIntNoUse){

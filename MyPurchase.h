@@ -17,7 +17,12 @@ enum PayResult{
 	PAY_RESULT_TIMEOUT
 };
 
-typedef enum {
+enum ToastIndex
+{
+	Toast_
+};
+
+enum MyPayProducts{
 	PAY_TYPE_DIAMOND1 = 1, //×êÊ¯1
 	PAY_TYPE_DIAMOND2, //×êÊ¯2
 	PAY_TYPE_DIAMOND3, //×êÊ¯3
@@ -28,7 +33,7 @@ typedef enum {
 	PAY_TYPE_FUHUO_LIBAO,
 	PAY_TYPE_FISH_LIBAO,
 	PAY_TYPE_MARBLE_LIBAO
-} MyPayProducts;
+};
 
 class MyPurchaseResult
 {
@@ -47,19 +52,18 @@ public:
 	static void purgePurchase();
 	void loadIAPPlugin();
 	void setPayResult(int result);
-	void payForProducts(MyPayProducts product);
-	void showToast(const char * hint);
+	void payForProducts(int product);
+	void showToast(int index);
 	bool exitGame();
 	void exitGameMM();
 	bool musicEnable();
 	void moreGame();
 	MyPurchaseResult* s_pRetListener;
-	int m_nReturnResult;
 	void delayPayUpdate(float dt);
 
-	void startStage(const char * level);
-	void successStage(const char * level);
-	void failStage(const char * level);
+	void startStage(int level);
+	void successStage(int level);
+	void failStage(int level);
 	int isBusinessMode();
 	std::string getUserId();
 private:

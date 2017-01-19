@@ -20,10 +20,12 @@ enum GameZOrder
 	kZOrder_Main,
 	kZOrder_Square,
 	kZOrder_Marble,
+	kZOrder_Character,
 	kZOrder_Layout,
 	KZOrder_GuideLayer,
 	KZOrder_PauseLayer,
 	KZOrder_GameOver,
+	kZOrder_Shop,
 	KZOrder_LibaoLayer
 };
 
@@ -63,9 +65,12 @@ enum MarbleType
 };
 enum ViewTag
 {
-	kTag_Wall = 100,
-	kTag_Marble = 200,
+	kTag_Streak = 100,
+	kTag_Wall = 200,
+	kTag_Marble = 300,
 	kTag_Pause,
+	kTag_Shop,
+	kTag_Libao,
 	kTag_GuideLayer,
 	kTag_GameOver
 };

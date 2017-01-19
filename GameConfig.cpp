@@ -4,6 +4,9 @@ USING_NS_CC;
 using namespace rapidjson;
 
 GameConfig::GameConfig()
+:m_nDiamondCount(0)
+, m_nMarbleCount(0)
+, m_userId(0)
 {
 
 }
@@ -55,5 +58,12 @@ void GameConfig::preloadData()
 				}
 			}
 		}
+
+		auto key = "userId";
+		if (!root[key].IsNull())
+		{
+			m_userId = root[key].GetInt();
+		}
+
 	}
 }

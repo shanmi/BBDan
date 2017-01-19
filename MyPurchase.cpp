@@ -36,7 +36,7 @@ void MyPurchase::loadIAPPlugin(){
 	}
 }
 
-void MyPurchase::payForProducts(MyPayProducts product){
+void MyPurchase::payForProducts(int product){
 	CCLOG("payForProducts product = %d", product);
 	s_pRetListener->setCallback(product);
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
@@ -63,7 +63,7 @@ void MyPurchase::payForProducts(MyPayProducts product){
 #endif
 }
 
-void MyPurchase::showToast(const char * hint){
+void MyPurchase::showToast(int index){
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 	const char* funstr = "org/cocos2dx/lib/PayAndroidApi";
 
@@ -80,10 +80,9 @@ void MyPurchase::showToast(const char * hint){
 	isHave = JniHelper::getMethodInfo(minfo, 
 		funstr,
 		"showToast",
-		"(Ljava/lang/String;)V");  
+		"(I)V");  
 	if (isHave) {
-		jstring stringArg = minfo.env->NewStringUTF(hint);
-		minfo.env->CallVoidMethod(jobj, minfo.methodID, stringArg);
+		minfo.env->CallVoidMethod(jobj, minfo.methodID, index);
 	}
 
 #endif
@@ -168,7 +167,6 @@ void MyPurchase::moreGame(){
 
 void MyPurchase::setPayResult(int result)
 {	
-	m_nReturnResult = result;
 	s_pRetListener->onPayResult(result, NULL);
 }
 
@@ -243,7 +241,7 @@ MyPurchaseResult::MyPurchaseResult()
 
 }
 
-void MyPurchase::startStage(const char * level)
+void MyPurchase::startStage(int level)
 {
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 	const char* funstr = "org/cocos2dx/lib/PayAndroidApi";
@@ -261,17 +259,16 @@ void MyPurchase::startStage(const char * level)
 	isHave = JniHelper::getMethodInfo(minfo,
 		funstr,
 		"startStage",
-		"(Ljava/lang/String;)V");
+		"(I)V");
 	if (isHave)
 	{
-		jstring stringArg = minfo.env->NewStringUTF(level);
-		minfo.env->CallVoidMethod(jobj, minfo.methodID, stringArg);
+		minfo.env->CallVoidMethod(jobj, minfo.methodID, level);
 	}
 
 #endif
 }
 
-void MyPurchase::successStage(const char * level){
+void MyPurchase::successStage(int level){
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 	const char* funstr = "org/cocos2dx/lib/PayAndroidApi";
 
@@ -288,17 +285,16 @@ void MyPurchase::successStage(const char * level){
 	isHave = JniHelper::getMethodInfo(minfo,
 		funstr,
 		"successStage",
-		"(Ljava/lang/String;)V");
+		"(I)V");
 	if (isHave)
 	{
-		jstring stringArg = minfo.env->NewStringUTF(level);
-		minfo.env->CallVoidMethod(jobj, minfo.methodID, stringArg);
+		minfo.env->CallVoidMethod(jobj, minfo.methodID, level);
 	}
 
 #endif
 }
 
-void MyPurchase::failStage(const char * level){
+void MyPurchase::failStage(int level){
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 	const char* funstr = "org/cocos2dx/lib/PayAndroidApi";
 
@@ -315,11 +311,10 @@ void MyPurchase::failStage(const char * level){
 	isHave = JniHelper::getMethodInfo(minfo,
 		funstr,
 		"failStage",
-		"(Ljava/lang/String;)V");
+		"(I)V");
 	if (isHave)
 	{
-		jstring stringArg = minfo.env->NewStringUTF(level);
-		minfo.env->CallVoidMethod(jobj, minfo.methodID, stringArg);
+		minfo.env->CallVoidMethod(jobj, minfo.methodID, level);
 	}
 
 #endif
@@ -379,7 +374,7 @@ std::string MyPurchase::getUserId()
 	}
 	else
 	{
-		return "unkown";
+		return "61462952";
 	}
 #else
 	return "61462952";

@@ -37,6 +37,8 @@ bool MarbleNode::init()
 	char temp[30] = { 0 };
 	sprintf(temp, "marbles/ball_%d.png", m_attr.skin);
 	m_playerBall = CCSprite::create(temp);
+	m_playerBall->setPosition(ccpMult(m_playerBall->getContentSize(), 0.5f));
+	m_playerBall->setAnchorPoint(ccp(0.5f, 0.5f));
 	addChild(m_playerBall);
 	auto size = m_playerBall->getContentSize();
 
@@ -116,24 +118,22 @@ void MarbleNode::moveToTargetPos()
 	m_bTrueStop = true;
 
 	auto pos = GameController::getInstance()->getTargetPos();
-	auto actions = ActionSequence::create(this);
-	auto move = CCMoveTo::create(0.5f, pos);
-	bool isFirst = GameController::getInstance()->getCounter() == 1;
+	setPosition(pos);
+	//auto actions = ActionSequence::create(this);
+	//auto move = CCMoveTo::create(0.5f, pos);
+	int count = GameController::getInstance()->getCounter();
 	bool isCounterFull = GameController::getInstance()->isCounterFull();
+	if (isCounterFull)
+	{
+		GameController::getInstance()->oneRoundEnd();
+		GameController::getInstance()->resetCounter();
+	}
 	auto callback = CCFunctionAction::create([=]()
 	{
-		/*if (!isFirst)
-		{
-			this->setVisible(false);
-		}*/
-		if (isCounterFull)
-		{
-			GameController::getInstance()->oneRoundEnd();
-			GameController::getInstance()->startOneRound();
-		}
+		
 	});
-	setPosition(pos);
-	//actions->addAction(move);
+	
+	/*actions->addAction(move);
 	actions->addAction(callback);
-	actions->runActions();
+	actions->runActions();*/
 }

@@ -12,6 +12,7 @@
 #include "ShopCoinLayer.h"
 #include "ShopSkinLayer.h"
 #include "MarbleModel.h"
+#include "GameConfig.h"
 
 USING_NS_CC;
 
@@ -36,8 +37,21 @@ bool MainMenu::ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent)
 
 void MainMenu::keyBackClicked()
 {
-	MyPurchase::sharedPurchase()->exitGame();
-	//CCDirector::sharedDirector()->end();
+	if (getChildByTag(kTag_Libao))
+	{
+		removeChildByTag(kTag_Libao);
+		return;
+	}
+	if (getChildByTag(kTag_Shop))
+	{
+		removeChildByTag(kTag_Shop);
+		return;
+	}
+	bool isExit = MyPurchase::sharedPurchase()->exitGame();
+	if (isExit)
+	{
+		CCDirector::sharedDirector()->end();
+	}
 }
 
 CCScene* MainMenu::scene()
@@ -131,17 +145,14 @@ void MainMenu::initLayout()
 	toMusicOn->setVisible(!isMute);
 
 	CCLabelTTF *userIdLabel = dynamic_cast<CCLabelTTF*>(m_mainLayout->getChildById(13));
-	std::string userId = MyPurchase::sharedPurchase()->getUserId();
-	if (userId.compare("unkown"))
+	if (userIdLabel)
 	{
+		std::string userId = MyPurchase::sharedPurchase()->getUserId();
 		char temp[50] = { 0 };
 		sprintf(temp, userIdLabel->getString(), userId.c_str());
 		userIdLabel->setString(temp);
 	}
-	else
-	{
-		userIdLabel->setVisible(false);
-	}
+	
 }
 
 void MainMenu::toStartGameOne(CCObject* pSender)
@@ -161,7 +172,7 @@ void MainMenu::toStartGameTwo(CCObject* pSender)
 void MainMenu::toShopLayer(CCObject *pSender)
 {
 	ShopCoinLayer *shopLayer = ShopCoinLayer::create();
-	addChild(shopLayer);
+	addChild(shopLayer, kZOrder_Shop, kTag_Shop);
 }
 
 void MainMenu::toSettingLayer(CCObject *pSender)
@@ -171,7 +182,7 @@ void MainMenu::toSettingLayer(CCObject *pSender)
 void MainMenu::toSkinLayer(CCObject *pSender)
 {
 	ShopSkinLayer *skinLayer = ShopSkinLayer::create();
-	addChild(skinLayer);
+	addChild(skinLayer, kZOrder_Shop, kTag_Shop);
 }
 
 void MainMenu::toMoreGame(CCObject *pSender)
@@ -182,13 +193,13 @@ void MainMenu::toMoreGame(CCObject *pSender)
 void MainMenu::toLibao1(CCObject *pSender)
 {
 	LibaoDialog *dialog = LibaoDialog::create(PAY_TYPE_TIME_LIBAO);
-	addChild(dialog);
+	addChild(dialog, KZOrder_LibaoLayer, kTag_Libao);
 }
 
 void MainMenu::toLibao2(CCObject *pSender)
 {
 	LibaoDialog *dialog = LibaoDialog::create(PAY_TYPE_COIN_LIBAO);
-	addChild(dialog);
+	addChild(dialog, KZOrder_LibaoLayer, kTag_Libao);
 }
 
 void MainMenu::toSoundSwitch(CCObject *pSender)

@@ -118,7 +118,7 @@ void ShopCoinLayer::closePanel(CCObject *pSender)
 void ShopCoinLayer::buyCoinItem(CCObject *pSender)
 {
 	int tag = ((CCNode*)pSender)->getTag();
-	MyPurchase::sharedPurchase()->payForProducts((MyPayProducts)tag);
+	MyPurchase::sharedPurchase()->payForProducts(tag);
 }
 
 void ShopCoinLayer::payCallback()
