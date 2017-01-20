@@ -21,7 +21,7 @@ public:
 	int m_nMarbleCount;
 	int m_nMarble[10][3];
 
-	int m_userId;
+	int m_yijian;
 private:
 	GameConfig();
 

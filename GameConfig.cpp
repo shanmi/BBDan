@@ -6,7 +6,7 @@ using namespace rapidjson;
 GameConfig::GameConfig()
 :m_nDiamondCount(0)
 , m_nMarbleCount(0)
-, m_userId(0)
+, m_yijian(0)
 {
 
 }
@@ -59,10 +59,10 @@ void GameConfig::preloadData()
 			}
 		}
 
-		auto key = "userId";
+		auto key = "yijian";
 		if (!root[key].IsNull())
 		{
-			m_userId = root[key].GetInt();
+			m_yijian = root[key].GetInt();
 		}
 
 	}

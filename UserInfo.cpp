@@ -36,7 +36,7 @@ void UserInfo::setBestScore(int score)
 	int bestScore = getBestScore();
 	if (score > bestScore)
 	{
-		CCUserDefaultEx::sharedUserDefault()->setIntegerForKey(GAME_BEST_SCORE, bestScore);
+		CCUserDefaultEx::sharedUserDefault()->setIntegerForKey(GAME_BEST_SCORE, score);
 		CCUserDefaultEx::sharedUserDefault()->flush();
 	}
 }

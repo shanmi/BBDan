@@ -61,6 +61,10 @@ void BallHintModel::updatePosition(CCPoint pos1, CCPoint pos2, cocos2d::CCPoint 
 		radian = GameUtil::getRadian(degree + 10);
 		newX = winSize.width - (newX - winSize.width);
 		}*/
+		if (i == 0)
+		{
+			m_shootPosition = ccp(newX, newY);
+		}
 		hint->setPosition(ccp(newX, newY));
 	}
 }

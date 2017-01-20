@@ -37,13 +37,14 @@ bool MarbleNode::init()
 	char temp[30] = { 0 };
 	sprintf(temp, "marbles/ball_%d.png", m_attr.skin);
 	m_playerBall = CCSprite::create(temp);
-	m_playerBall->setPosition(ccpMult(m_playerBall->getContentSize(), 0.5f));
+	m_playerBall->setPosition(ccp(m_playerBall->getContentSize().width * 0.5f, m_playerBall->getContentSize().height * 0.5f));
 	m_playerBall->setAnchorPoint(ccp(0.5f, 0.5f));
 	addChild(m_playerBall);
 	auto size = m_playerBall->getContentSize();
 
 	setTag(kTag_Marble);
 	setContentSize(size);
+	setAnchorPoint(ccp(0.5f, 0.5f));
 
 	return true;
 }

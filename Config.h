@@ -4,7 +4,7 @@
 #define START_BALL_SIZE 3
 #define BALL_MOVE_PACE 22
 #define BALL_COL_SIZE 7
-#define HINT_BALL_SIZE 32
+#define HINT_BALL_SIZE 22
 #define SQUARE_SPACING  4
 
 #define ADD_COINS 1

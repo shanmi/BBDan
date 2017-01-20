@@ -18,6 +18,7 @@
 #include "PauseLayer.h"
 #include "MyPurchase.h"
 #include "HelpLayer.h"
+#include "GameConfig.h"
 
 USING_NS_CC;
 
@@ -159,8 +160,9 @@ void GameScene::initCharacterLayout()
 	CCSprite *character_body = dynamic_cast<CCSprite*>(m_characterLayout->getChildById(9));
 	CCSprite *character_head = dynamic_cast<CCSprite*>(m_characterLayout->getChildById(10));
 	m_arrow = dynamic_cast<CCSprite*>(m_characterLayout->getChildById(11));
-	//m_arrow->setVisible(false);
-	GameController::getInstance()->setTargetPos(m_arrow->getPosition());
+	/*character_body->setVisible(false);
+	character_head->setVisible(false);
+	m_arrow->setVisible(false);*/
 }
 
 void GameScene::initBottomLayout()
@@ -185,7 +187,13 @@ void GameScene::onDoubleAttact(CCObject *pSender)
 {
 	int count = UserInfo::getInstance()->getPropsCount(kProp_DoubleAttact);
 	bool ifCoinEnought = GameController::getInstance()->checkCoinsEnought();
-	if (!m_bIsDoubleAttact && (ifCoinEnought || count > 0))
+	if (!ifCoinEnought && count <= 0)
+	{
+		// show pay point
+		showLibaoDiaolg();
+		return;
+	}
+	if (!m_bIsDoubleAttact)
 	{
 		if (count > 0)
 		{
@@ -208,8 +216,7 @@ void GameScene::onDoubleAttact(CCObject *pSender)
 	}
 	else
 	{
-		// show pay point
-		showLibaoDiaolg();
+
 	}
 }
 
@@ -218,7 +225,12 @@ void GameScene::onClearScreen(CCObject *pSender)
 	int count = UserInfo::getInstance()->getPropsCount(kProp_Clear);
 	bool isRoundOver = GameController::getInstance()->isRoundOver();
 	bool ifCoinEnought = GameController::getInstance()->checkCoinsEnought();
-	if (isRoundOver && (ifCoinEnought || count > 0))
+	if (!ifCoinEnought && count <= 0)
+	{
+		// show pay point
+		showLibaoDiaolg();
+	}
+	if (isRoundOver)
 	{
 		if (count > 0)
 		{
@@ -233,11 +245,6 @@ void GameScene::onClearScreen(CCObject *pSender)
 		SquareModel::theModel()->removeAllSquares();
 		oneRoundEnd();
 	}
-	else
-	{
-		// show pay point
-		showLibaoDiaolg();
-	}
 }
 
 void GameScene::onFreezing(CCObject *pSender)
@@ -245,7 +252,12 @@ void GameScene::onFreezing(CCObject *pSender)
 	bool isFreezing = SquareModel::theModel()->isFreezing();
 	int count = UserInfo::getInstance()->getPropsCount(kProp_Freezing);
 	bool ifCoinEnought = GameController::getInstance()->checkCoinsEnought();
-	if (!isFreezing && (ifCoinEnought || count > 0))
+	if (!ifCoinEnought && count <= 0)
+	{
+		// show pay point
+		showLibaoDiaolg();
+	}
+	if (!isFreezing)
 	{
 		if (count > 0)
 		{
@@ -257,11 +269,6 @@ void GameScene::onFreezing(CCObject *pSender)
 		}
 		updateCoins();
 		SquareModel::theModel()->setSquareFreezing(true);
-	}
-	else
-	{
-		// show pay point
-		showLibaoDiaolg();
 	}
 }
 
@@ -278,6 +285,14 @@ void GameScene::onHelpPanel(CCObject *pSender)
 
 void GameScene::showLibaoDiaolg()
 {
+
+	bool isBusinessMode = MyPurchase::sharedPurchase()->isBusinessMode();
+	int isYijian = GameConfig::getInstance()->m_yijian;
+	if (isBusinessMode && isYijian)
+	{
+		MyPurchase::sharedPurchase()->payForProducts(PAY_TYPE_COIN_LIBAO);
+		return;
+	}
 	int random = rand() % 2;
 	int libaoType = PAY_TYPE_TIME_LIBAO;
 	if (random == 0)
@@ -342,6 +357,7 @@ void GameScene::initMarbles()
 		auto streak = GameUtil::getMotionStreak();
 		streak->setTag(kTag_Streak + i);
 		addChild(streak, kZOrder_Marble);
+		GameController::getInstance()->setTargetPos(marble->getPosition());
 	}
 	schedule(schedule_selector(GameScene::updateStreak));
 }
@@ -352,7 +368,7 @@ void GameScene::updateStreak(float dt)
 	for (int i = 0; i < marbles.size(); i++)
 	{
 		auto node = getChildByTag(kTag_Streak + i);
-		node->setPosition(marbles[i]->convertToWorldSpace(CCPointZero));
+		node->setPosition(marbles[i]->getPosition());
 	}
 }
 
@@ -423,7 +439,7 @@ void GameScene::update(float dt)
 		{
 			if (!marble->isTrueStop())
 			{
-				m_addMarbleCount++;
+				//m_addMarbleCount++;
 				marble->moveToTargetPos();
 			}
 		}
@@ -471,8 +487,6 @@ void GameScene::ccTouchMoved(CCTouch *pTouch, CCEvent *pEvent)
 	}
 
 	auto targetPos = GameController::getInstance()->getTargetPos();
-	BallHintModel::theModel()->updatePosition(curPos, prePos, targetPos, m_arrow->getContentSize().width);
-
 
 	CCSprite *character_body = dynamic_cast<CCSprite*>(m_characterLayout->getChildById(9));
 	CCSprite *character_head = dynamic_cast<CCSprite*>(m_characterLayout->getChildById(10));
@@ -482,7 +496,8 @@ void GameScene::ccTouchMoved(CCTouch *pTouch, CCEvent *pEvent)
 		character_body->setFlipX(true);
 		character_head->setFlipX(true);
 
-		m_arrow->setPosition(ccp(character_body->getPositionX() + 12, targetPos.y + 6));
+		m_arrow->setAnchorPoint(ccp(0.73f, 0.35f));
+		m_arrow->setPosition(ccp(character_body->getPositionX() + 10, targetPos.y + 6));
 		m_arrow->setFlipY(true);
 	}
 	else
@@ -491,9 +506,11 @@ void GameScene::ccTouchMoved(CCTouch *pTouch, CCEvent *pEvent)
 		character_body->setFlipX(false);
 		character_head->setFlipX(false);
 
-		m_arrow->setPosition(ccp(character_body->getPositionX() - 15, targetPos.y));
+		m_arrow->setAnchorPoint(ccp(0.73f, 0.65f));
+		m_arrow->setPosition(ccp(character_body->getPositionX() - 12, targetPos.y + 6));
 		m_arrow->setFlipY(false);
 	}
+	BallHintModel::theModel()->updatePosition(curPos, prePos, m_arrow->getPosition(), m_arrow->getContentSize().width);
 
 	if (m_shootDegree > 60 && m_shootDegree < 90)
 	{
@@ -506,19 +523,6 @@ void GameScene::ccTouchMoved(CCTouch *pTouch, CCEvent *pEvent)
 	else
 	{
 		character_head->setRotation(0);
-	}
-
-
-	float radian = GameUtil::getRadian(m_shootDegree);
-	float x = cos(radian);
-	float y = sin(radian);
-	float newX = targetPos.x + m_arrow->getContentSize().width * x;
-	float newY = targetPos.y + m_arrow->getContentSize().height * y;
-	auto marbles = MarbleModel::theModel()->getMarbles();
-	for (auto iter = marbles.begin(); iter != marbles.end(); ++iter)
-	{
-		auto &marble = *iter;
-		marble->setPosition(ccp(newX, newY));
 	}
 }
 
@@ -540,13 +544,21 @@ void GameScene::ccTouchEnded(CCTouch *pTouch, CCEvent *pEvent)
 	auto actions = ActionSequence::create(this);
 	auto marbles = MarbleModel::theModel()->getMarbles();
 	m_addMarbleCount = marbles.size();
+
+	auto shootPos = BallHintModel::theModel()->getShootPosition();
 	for (auto iter = marbles.begin(); iter != marbles.end(); ++iter)
 	{
 		auto &ball = (*iter);
+		//ball->setPosition(shootPos);
 		ball->setMovingState(true);
 		auto action1 = CCFunctionAction::create([=]()
 		{
 			m_addMarbleCount--;
+			if (m_addMarbleCount == 0)
+			{
+				auto fadeOut = CCFadeOut::create(0.6f);
+				m_marbleCount->runAction(fadeOut);
+			}
 			ball->shoot(m_shootDegree);
 			ball->setVisible(true);
 		});
@@ -598,7 +610,10 @@ void GameScene::oneRoundEnd()
 		addChild(streak, kZOrder_Marble);
 	}
 	GameController::getInstance()->updateMarblePos();
+	m_addMarbleCount = marbles.size();
 	updateMarbleCount();
+	auto fadeIn = CCFadeIn::create(0.6f);
+	m_marbleCount->runAction(fadeIn);
 
 	//check tools when one round end and delete "0 score" tool
 	GameController::getInstance()->checkSquares(true);
@@ -627,7 +642,7 @@ void GameScene::oneRoundEnd()
 void GameScene::updateMarbles()
 {
 	// just show adding marble action
-	m_addMarbleCount++;
+	//m_addMarbleCount++;
 }
 
 void GameScene::updateCoins()
@@ -651,10 +666,10 @@ void GameScene::updateScore()
 	{
 		bestScore = score;
 		UserInfo::getInstance()->setBestScore(score);
-		std::string bestStr = GameUtil::intToString(bestScore);
-		CCLabelAtlas *bestScoreLabel = dynamic_cast<CCLabelAtlas*>(m_mainLayout->getChildById(13));
-		bestScoreLabel->setString(bestStr.c_str());
 	}
+	std::string bestStr = GameUtil::intToString(bestScore);
+	CCLabelAtlas *bestScoreLabel = dynamic_cast<CCLabelAtlas*>(m_mainLayout->getChildById(13));
+	bestScoreLabel->setString(bestStr.c_str());
 }
 
 void GameScene::updatePropsCount()

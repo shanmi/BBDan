@@ -44,7 +44,7 @@ void ContactListener::BeginContact(b2Contact* contact)
 			if (GameController::getInstance()->getCounter() == 1 || targetPos.x < 0 || targetPos.x > winSize.width || targetPos.y < 0)
 			{
 				GameController::getInstance()->setTargetPos(ccp(spriteB->getPositionX(), targetPos.y));
-				marble->setVisible(false);
+				marble->setVisible(true);
 			}
 			else
 			{

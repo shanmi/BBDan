@@ -3,6 +3,7 @@
 #include "UiLayout.h"
 #include "MyPurchase.h"
 #include "GameController.h"
+#include "GameConfig.h"
 
 USING_NS_CC;
 
@@ -69,6 +70,7 @@ bool LibaoDialog::init()
 void LibaoDialog::initLayout()
 {
 	bool isBusinessMode = MyPurchase::sharedPurchase()->isBusinessMode();
+	int isYijian = GameConfig::getInstance()->m_yijian;
 
 	CCMenuItem *closeItem = dynamic_cast<CCMenuItem*>(m_mainLayout->getChildById(6));
 	closeItem->setTarget(this, menu_selector(LibaoDialog::closePanel));
@@ -86,7 +88,14 @@ void LibaoDialog::initLayout()
 	switch (m_type)
 	{
 	case PAY_TYPE_TIME_LIBAO:
-		libaoImg = "libao/zujiemian_libao_xianshidalibao.png";
+		if (isYijian)
+		{
+			libaoImg = "libao/zujiemian_libao_huoqudaoju.png";
+		}
+		else
+		{
+			libaoImg = "libao/zujiemian_libao_xianshidalibao.png";
+		}
 		break;
 	case PAY_TYPE_FISH_LIBAO:
 		libaoImg = "libao/zujiemian_libao_xinshoulibao.png";
@@ -108,6 +117,11 @@ void LibaoDialog::initLayout()
 		buyTip->setPosition(ccp(buyTip->getPositionX(), buyTip->getPositionY() - size.height * 0.8f));
 		buyTip->setScale(0.5f);
 		buyTip->setOpacity(120);
+
+		if (isYijian)
+		{
+			buyTip->setVisible(false);
+		}
 	}
 }
 

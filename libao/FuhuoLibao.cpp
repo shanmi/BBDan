@@ -4,6 +4,7 @@
 #include "MyPurchase.h"
 #include "GameController.h"
 #include "SquareModel.h"
+#include "GameConfig.h"
 
 USING_NS_CC;
 
@@ -77,6 +78,12 @@ void FuhuoLibao::initLayout()
 		buyTip->setPosition(ccp(size.width * 0.5f, -size.height));
 		buyTip->setScale(0.5f);
 		buyTip->setOpacity(120);
+
+		int isYijian = GameConfig::getInstance()->m_yijian;
+		if (isYijian)
+		{
+			buyTip->setVisible(false);
+		}
 	}
 }
 
