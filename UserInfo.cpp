@@ -46,6 +46,17 @@ int UserInfo::getBestScore()
 	return CCUserDefaultEx::sharedUserDefault()->getIntegerForKey(GAME_BEST_SCORE, 0);
 }
 
+void UserInfo::setCurMarbleType(int type)
+{
+	CCUserDefaultEx::sharedUserDefault()->setIntegerForKey(GAME_MARBLE_TYPE, type);
+	CCUserDefaultEx::sharedUserDefault()->flush();
+}
+
+int UserInfo::getCurMarbleType()
+{
+	return CCUserDefaultEx::sharedUserDefault()->getIntegerForKey(GAME_MARBLE_TYPE, kMarble_Normal);
+}
+
 void UserInfo::unlockMarble(int type)
 {
 	char temp[50] = { 0 };

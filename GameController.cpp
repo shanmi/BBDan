@@ -52,7 +52,7 @@ bool GameController::isCounterFull()
 	return false;
 }
 
-void GameController::checkSquares(bool isCheckTool /* = false */)
+void GameController::checkSquares(bool isRoundEnd /* = false */)
 {
 	auto squares = SquareModel::theModel()->getSquares();
 	for (auto iter = squares.begin(); iter != squares.end(); ++iter)
@@ -60,7 +60,7 @@ void GameController::checkSquares(bool isCheckTool /* = false */)
 		auto square = *iter;
 		if (square->getScore() <= 0)
 		{
-			if (square->shouldRemoveDirectly() || isCheckTool)
+			if (square->shouldRemoveDirectly() || isRoundEnd)
 			{
 				SquareModel::theModel()->removeSquareNode(square);
 			}
@@ -91,7 +91,7 @@ bool GameController::checkGameOver()
 		auto &square = (*iter);
 		if (square->getPositionY() - square->getContentSize().height < m_targetPos.y)
 		{
-			if (square->getCollisionType() == kCollision_Square || square->getCollisionType() == kCollision_Triangle)
+			if (square->getSquareType() == kType_Square || square->getSquareType() == kType_Triangle)
 			{
 				showGameOver();
 				return true;
@@ -135,7 +135,7 @@ void GameController::createPropByMarble(MarbleNode *marble)
 	for (auto iter = squares.begin(); iter != squares.end(); ++iter)
 	{
 		auto square = (*iter);
-		if (square->getCollisionType() != kCollision_EliminateRow && square->getCollisionType() != kCollision_EliminateCol && square->getCollisionType() != kCollision_Rebound)
+		if (square->getSquareType() != kType_EliminateRow && square->getSquareType() != kType_EliminateCol && square->getSquareType() != kType_Rebound)
 		{
 			auto rect = square->boundingBox();
 			if (rect.containsPoint(ccp(posX, posY)))

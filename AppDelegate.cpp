@@ -32,7 +32,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
 #elif (CC_TARGET_PLATFORM == CC_PLATFORM_WP8 )
 	pEGLView->setDesignResolutionSize(designSize.width, designSize.height, kResolutionFixedWidth);
 #else
-	pEGLView->setDesignResolutionSize(designSize.width, designSize.height, kResolutionFixedWidth);
+	pEGLView->setDesignResolutionSize(designSize.width, designSize.height, kResolutionFixedHeight);
 #endif
 
     // turn on display FPS

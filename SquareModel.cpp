@@ -4,6 +4,7 @@
 #include "GameController.h"
 #include "Box2dFactory.h"
 #include "CircleNode.h"
+#include "GameConfig.h"
 
 SquareModel::SquareModel()
 :m_curScore(1)
@@ -18,7 +19,7 @@ SquareModel *SquareModel::theModel()
 	return &model;
 }
 
-SquareNode *SquareModel::createSquareNode(int type)
+SquareNode *SquareModel::createSquareNode(int type, int shap /* = -1 */)
 {
 	SquareNode *node;
 	switch (type)
@@ -27,7 +28,7 @@ SquareNode *SquareModel::createSquareNode(int type)
 		node = SquareNode::create();
 		break;
 	case kType_Triangle:
-		node = TriangleNode::create();
+		node = TriangleNode::create(shap);
 		break;
 	case kType_AddMarble:
 		node = CircleAddMarbleNode::create();
@@ -38,6 +39,9 @@ SquareNode *SquareModel::createSquareNode(int type)
 	case kType_EliminateCol:
 		node = CircleEliColNode::create();
 		break;
+	case kType_EliminateCross:
+		node = CircleEliCrossNode::create();
+		break;
 	case kType_Rebound:
 		node = CircleReboundNode::create();
 		break;
@@ -47,11 +51,14 @@ SquareNode *SquareModel::createSquareNode(int type)
 	case kType_BossEatMarble:
 		node = BossEatMarbleNode::create();
 		break;
+	case kType_Protect:
+		node = CircleProtectNode::create();
+		break;
 	case kType_Empty:
 		node = nullptr;
 		break;
 	default:
-		assert(false && type && "not exit square type!");
+		assert(false && "not exit square type!");
 		break;
 	}
 	if (node != nullptr)
@@ -81,6 +88,15 @@ void SquareModel::removeAllSquares()
 	}
 }
 
+std::vector<SquareNode*> SquareModel::loadSquareList(bool autoAddScore /* = true */)
+{
+	if (m_squares.size() == 0)
+	{
+		return createSquareList();
+	}
+	return m_squares;
+}
+
 std::vector<SquareNode*> SquareModel::createSquareList(bool autoAddScore /* = true */)
 {
 	srand(time(NULL));
@@ -101,7 +117,7 @@ std::vector<SquareNode*> SquareModel::createSquareList(bool autoAddScore /* = tr
 		if (node != nullptr)
 		{
 			node->setBody();
-			node->setIndex(i);
+			node->setIndex(i, 0);
 			nodes.push_back(node);
 		}
 	}
@@ -118,10 +134,20 @@ std::vector<int> SquareModel::getBallListType()
 	for (int i = 0; i < BALL_COL_SIZE; i++)
 	{
 		int type = getBallType();
-		if (type == kType_AddMarble || type == kType_AddCoin || type == kType_Rebound || type == kType_EliminateRow || type == kType_EliminateCol || type == kType_BossEatMarble)
+		if (type == kType_AddMarble || type == kType_AddCoin || type == kType_Rebound || type == kType_EliminateRow || type == kType_EliminateCol || type == kType_EliminateCross || type == kType_BossEatMarble)
 		{
 			auto iter = find(types.begin(), types.end(), type);
 			while (iter != types.end())
+			{
+				type = getBallType();
+				iter = find(types.begin(), types.end(), type);
+			}
+		}
+		int curSocre = SquareModel::theModel()->getCurrentScore();
+		if (curSocre <= 3 && (type == kType_Rebound || type == kType_EliminateRow || type == kType_EliminateCol || type == kType_EliminateCross))
+		{
+			auto iter = find(types.begin(), types.end(), type);
+			while (type == kType_Rebound || type == kType_EliminateRow || type == kType_EliminateCol || type == kType_EliminateCross)
 			{
 				type = getBallType();
 				iter = find(types.begin(), types.end(), type);
@@ -134,26 +160,32 @@ std::vector<int> SquareModel::getBallListType()
 
 int SquareModel::getBallType()
 {
-	std::vector<int> types;
-	types.push_back(kType_Empty);
-	types.push_back(kType_Square);
-	types.push_back(kType_Triangle);
-	types.push_back(kType_AddMarble);
-	types.push_back(kType_AddCoin);
-	types.push_back(kType_Rebound);
-	types.push_back(kType_EliminateRow);
-	types.push_back(kType_EliminateCol);
-	types.push_back(kType_BossEatMarble);
-
-	int random = rand() % (kType_Empty + kType_Square + kType_Triangle + kType_AddMarble + kType_AddCoin + kType_Rebound + kType_EliminateRow + kType_EliminateCol + kType_BossEatMarble);
-	int total = 0;
-	for (auto iter = types.begin(); iter != types.end(); ++iter)
+	std::vector<int> probs;
+	auto probabilitys = GameConfig::getInstance()->m_probability;
+	int probAll = 0;
+	for (int i = 0; i < SQUARE_SIZE; i++)
 	{
-		int type = (*iter);
-		total += type;
+		int prob = probabilitys[i][1];
+		int curScore = SquareModel::theModel()->getCurrentScore();
+		int m_showLibaoLevel = GameConfig::getInstance()->m_showLibaoLevel;
+		if (curScore % m_showLibaoLevel == 0)
+		{
+			prob += probabilitys[i][2] * (curScore / m_showLibaoLevel);
+		}
+		probAll += prob;
+		probs.push_back(prob);
+	}
+
+	int random = rand() % (probAll);
+	int total = 0;
+	for (auto iter = probs.begin(); iter != probs.end(); ++iter)
+	{
+		int prob = (*iter);
+		total += prob;
 		if (random < total)
 		{
-			return type;
+			int index = iter - probs.begin();
+			return probabilitys[index][0];
 		}
 	}
 }
@@ -167,7 +199,10 @@ void SquareModel::squareMoveDown()
 		{
 			isLastOne = true;
 		}
-		(*iter)->moveDown(isLastOne);
+		auto &square = *iter;
+		square->moveDown(isLastOne);
+		Index index = square->getIndex();
+		square->setIndex(index.x, index.y + 1);
 	}
 }
 

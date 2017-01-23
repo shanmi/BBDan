@@ -41,7 +41,7 @@ void ContactShooterListener::BeginContact(b2Contact* contact)
 		{
 			auto square = dynamic_cast<SquareNode*>(node);
 			square->doCollisionAction();
-			if (square->getCollisionType() == kCollision_Rebound)
+			if (square->getSquareType() == kType_Rebound)
 			{
 				float degree = rand() % 60 + 60;
 				marble->shoot(degree);

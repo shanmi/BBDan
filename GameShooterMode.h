@@ -35,13 +35,16 @@ public:
 	void addMarble(float dt);
 	void addSquareNode(SquareNode *node);
 	void showGameOver();
+	void useProtectEffect();
 
 public:
-
+	void onPauseGame(cocos2d::CCObject *pSender);
 	void onDoubleAttact(cocos2d::CCObject *pSender);
 	void onClearScreen(cocos2d::CCObject *pSender);
 	void onFreezing(cocos2d::CCObject *pSender);
-	void initTopLayout();
+	void onHelpPanel(cocos2d::CCObject *pSender);
+	void initMainLayout();
+	void initCharacterLayout();
 	void initBottomLayout();
 	void initGameLayout();
 	void initPhysicBorder();
@@ -49,16 +52,22 @@ public:
 	void initSquares();
 	void addSquares();
 	void updateStreak(float dt);
+	void checkLibaoShow();
+	void showLibaoDiaolg();
 
 private:
 	b2World *m_world;
-	UiLayout *m_topLayout;
+	UiLayout *m_mainLayout;
+	UiLayout *m_characterLayout;
 	UiLayout *m_bottomLayout;
 	cocos2d::CCSprite *m_character;
 	float m_topLinePos;
 	float m_bottomLinePos;
+	float m_shootDegree;
 	int m_moveCounter;
 
+	bool m_bIsDoubleAttact;
 	float m_freezingTime;
+	float m_protectTime;
 };
 #endif

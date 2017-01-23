@@ -115,7 +115,6 @@ void PageView::onExit()
 
 bool PageView::ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent)
 {
-	return false;
 	if (m_isMoving) return false;
 
 	auto localPos = convertToNodeSpace(pTouch->getLocation());
@@ -174,11 +173,6 @@ void PageView::dragback()
 
 	float newX = min(max(curPos.x, minX), maxX);
 	m_container->setPositionX(newX);
-
-	if (m_callback)
-	{
-		m_callback(pageIndex);
-	}
 }
 
 void PageView::checkNodePosition()
@@ -208,6 +202,10 @@ void PageView::checkNodePosition()
 		auto ease = CCEaseSineInOut::create(moveTo);
 		auto sequence = CCSequence::create(ease, callback, NULL);
 		m_container->runAction(sequence);
+	}
+	if (m_callback)
+	{
+		m_callback(pageIndex);
 	}
 }
 

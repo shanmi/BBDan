@@ -12,12 +12,13 @@ public:
 public:
 	MarbleNode* createMarble();
 	void removeMarble(MarbleNode *node);
-	void setMarbleAttr(MarbleAttr attr){ m_attr = attr; }
+	void setMarbleAttr(MarbleAttr attr);
 	MarbleAttr getMarbleAttr(){ return m_attr; }
 	std::vector<MarbleNode *> getMarbles(){ return m_marbles; }
 	bool haveMarbleMoving();
 
 	void addMarblesCount(){ m_marblesCount++; }
+	void setMarblesCount(int count){ m_marblesCount = count; }
 	int getMarblesCount(){ return m_marblesCount; }
 
 	int checkMarblesCount();

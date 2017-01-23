@@ -7,6 +7,7 @@
 #define GAME_UNLOCK_MARBLE  "game-unlock-marble"
 #define GAME_FISH_GUIDE		"game-fish-guide"
 #define GAME_PROP_COUNT     "game-prop-count"
+#define GAME_MARBLE_TYPE    "game-marble-type"
 
 class UserInfo
 {
@@ -23,6 +24,9 @@ public:
 
 	void setBestScore(int score);
 	int getBestScore();
+
+	void setCurMarbleType(int type);
+	int getCurMarbleType();
 
 	void unlockMarble(int type);
 	void unlockAllMarble();

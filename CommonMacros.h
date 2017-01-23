@@ -31,27 +31,17 @@ enum GameZOrder
 
 enum SquareType
 {
-	kType_Empty = 26,
-	kType_Square = 40,
-	kType_Triangle = 10,
-	kType_AddMarble = 25,
-	kType_AddCoin = 1,
-	kType_Rebound = 3,
-	kType_EliminateRow = 4,
-	kType_EliminateCol = 5,
-	kType_BossEatMarble = 2,
-};
-
-enum CollisionType
-{
-	kCollision_Square,
-	kCollision_Triangle,
-	kCollision_AddMarble,
-	kCollision_AddCoin,
-	kCollision_Rebound,
-	kCollision_EliminateRow,
-	kCollision_EliminateCol,
-	kCollision_BossEatMarble
+	kType_Empty,
+	kType_Square,
+	kType_Triangle,
+	kType_AddMarble,
+	kType_AddCoin,
+	kType_Rebound,
+	kType_EliminateRow,
+	kType_EliminateCol,
+	kType_EliminateCross,
+	kType_BossEatMarble,
+	kType_Protect,
 };
 
 enum MarbleType
@@ -72,7 +62,8 @@ enum ViewTag
 	kTag_Shop,
 	kTag_Libao,
 	kTag_GuideLayer,
-	kTag_GameOver
+	kTag_GameOver,
+	kTag_Protect,
 };
 
 enum PropType

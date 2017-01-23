@@ -9,7 +9,7 @@
 #include "UserInfo.h"
 #include "GameUtil.h"
 #include "MyPurchase.h"
-#include "libao\LibaoDialog.h"
+#include "LibaoDialog.h"
 #include "MarbleModel.h"
 
 USING_NS_CC;

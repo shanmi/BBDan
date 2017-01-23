@@ -10,12 +10,14 @@ public:
 	~SquareModel(){}
 
 public:
-	SquareNode *createSquareNode(int type);
+	SquareNode *createSquareNode(int type, int shap = -1);
 	void removeSquareNode(SquareNode *node);
+	std::vector<SquareNode*> loadSquareList(bool autoAddScore = true);
 	std::vector<SquareNode*> createSquareList(bool autoAddScore = true);
 	std::vector<int> getBallListType();
 	int getBallType();
 	int getCurrentScore(){ return m_curScore; }
+	void setCurrentScore(int score){ m_curScore = score; }
 
 	std::vector<SquareNode*> getSquares(){ return m_squares; }
 	void removeAllSquares();

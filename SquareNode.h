@@ -5,6 +5,18 @@
 #include "Box2D/Box2D.h"
 #include "CommonMacros.h"
 
+struct Index
+{
+	int x;
+	int y;
+	Index(){}
+	Index(int x, int y)
+	{
+		this->x = x;
+		this->y = y;
+	}
+};
+
 struct CommonAction
 {
 	virtual void setBody(){}
@@ -27,13 +39,15 @@ public:
 	virtual void doCollisionAction();
 	virtual void runRemoveAction();
 public:
-	void setIndex(int index){ m_index = index; }
-	int getIndex() { return m_index; }
+	void setIndex(Index index){ m_index = index; }
+	void setIndex(int x, int y){ m_index = Index(x, y); }
+	Index getIndex() { return m_index; }
 
 	virtual void addScore(int score);
 	int getScore() { return m_score; }
+	void setScore(int score){ m_score = score; addScore(0); }
 
-	int getCollisionType(){ return m_collisionType; }
+	int getSquareType(){ return m_squareType; }
 	b2Body *getBody(){ return m_body; }
 
 	void setFreezing(bool isFreezing);
@@ -49,18 +63,19 @@ protected:
 	b2Body *m_body;
 	cocos2d::CCSprite *m_image;
 	cocos2d::CCLabelAtlas *m_scoreLabel;
-	int m_collisionType;
+	int m_squareType;
 	int m_score;
-	int m_index;
+	Index m_index;
+	int m_color;
 
 };
 
 class TriangleNode : public SquareNode
 {
 public:
-	TriangleNode() : SquareNode(){ m_collisionType = kCollision_Triangle; }
-	static TriangleNode *create();
-	virtual bool init();
+	TriangleNode() : SquareNode(){ m_squareType = kType_Triangle; }
+	static TriangleNode *create(int shap = -1);
+	virtual bool init(int shap = -1);
 	virtual void addScore(int score);
 	virtual void setPosition(const cocos2d::CCPoint &position);
 	virtual void setBody();
@@ -71,7 +86,7 @@ public:
 class BossEatMarbleNode : public SquareNode
 {
 public:
-	BossEatMarbleNode() : SquareNode(){ m_collisionType = kCollision_BossEatMarble; }
+	BossEatMarbleNode() : SquareNode(){ m_squareType = kType_BossEatMarble; }
 	static BossEatMarbleNode *create();
 	virtual bool init();
 	virtual void setBody();

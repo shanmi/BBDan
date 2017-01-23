@@ -93,17 +93,17 @@ void CircleEliRowNode::doCollisionAction()
 	int kColorHintSize = 15;
 	auto parent = getParent();
 	auto size = parent->getContentSize();
-	auto colorCol = CCLayerColor::create(ccc4(255, 255, 0, 255));
-	colorCol->setContentSize(ccp(size.width, kColorHintSize));
-	parent->addChild(colorCol);
-	colorCol->setPositionY(getPositionY() - kColorHintSize / 2);
-	colorCol->stopAllActions();
-	auto actions = ActionSequence::create(colorCol);
+	auto colorRow = CCLayerColor::create(ccc4(255, 255, 0, 255));
+	colorRow->setContentSize(ccp(size.width, kColorHintSize));
+	parent->addChild(colorRow);
+	colorRow->setPositionY(getPositionY() - kColorHintSize / 2);
+	colorRow->stopAllActions();
+	auto actions = ActionSequence::create(colorRow);
 	auto marbles = MarbleModel::theModel()->getMarbles();
 	auto action1 = CCBlink::create(0.1f, 1);
 	auto action2 = CCFunctionAction::create([=]()
 	{
-		colorCol->removeFromParent();
+		colorRow->removeFromParent();
 	});
 	actions->addAction(action1);
 	actions->addAction(action2);
@@ -181,6 +181,83 @@ void CircleEliColNode::doCollisionAction()
 	SquareModel::theModel()->elimateSameColSquare(this);
 }
 
+///////////////////////////////////////////////////////
+CircleEliCrossNode *CircleEliCrossNode::create()
+{
+	CircleEliCrossNode *node = new CircleEliCrossNode();
+	node->autorelease();
+	node->init();
+	return node;
+}
+
+bool CircleEliCrossNode::init()
+{
+	m_score = 1;
+	auto sizeSprite = CCSprite::create("squares/fangkuai_hong1.png");
+	auto size = sizeSprite->getContentSize();
+	setContentSize(size);
+
+	m_image = CCSprite::create("squares/fangkuai_sizixiao.png");
+	addChild(m_image);
+	auto fanIn = CCFadeIn::create(0.6f);
+	m_image->runAction(fanIn);
+
+	return true;
+}
+
+void CircleEliCrossNode::setBody()
+{
+	m_body = Box2dFactory::getInstance()->createCircle(this, m_image->getContentSize(), true);
+}
+
+void CircleEliCrossNode::runRemoveAction()
+{
+	removeFromParent();
+}
+
+void CircleEliCrossNode::doCollisionAction()
+{
+	int kColorHintSize = 15;
+	auto parent = getParent();
+	auto size = parent->getContentSize();
+	auto colorCol = CCLayerColor::create(ccc4(255, 255, 0, 255));
+	colorCol->ignoreAnchorPointForPosition(false);
+	colorCol->setAnchorPoint(ccp(0.5f, 0.5f));
+	colorCol->setContentSize(ccp(kColorHintSize, size.height*0.7f));
+	parent->addChild(colorCol);
+	colorCol->setPosition(ccp(getPositionX() - kColorHintSize / 2, size.height * 0.51f));
+	auto actions = ActionSequence::create(colorCol);
+	auto marbles = MarbleModel::theModel()->getMarbles();
+	auto action1 = CCBlink::create(0.1f, 1);
+	auto action2 = CCFunctionAction::create([=]()
+	{
+		colorCol->removeFromParent();
+	});
+	actions->addAction(action1);
+	actions->addAction(action2);
+	actions->runActions();
+
+	auto colorRow = CCLayerColor::create(ccc4(255, 255, 0, 255));
+	colorRow->setContentSize(ccp(size.width, kColorHintSize));
+	parent->addChild(colorRow);
+	colorRow->setPositionY(getPositionY() - kColorHintSize / 2);
+	actions = ActionSequence::create(colorRow);
+	auto action3 = CCBlink::create(0.1f, 1);
+	auto action4 = CCFunctionAction::create([=]()
+	{
+		colorRow->removeFromParent();
+	});
+	actions->addAction(action3);
+	actions->addAction(action4);
+	actions->runActions();
+
+	int attactRate = GameController::getInstance()->getAttactRate();
+	addScore(-attactRate);// delete
+
+	doScaleAction();
+	SquareModel::theModel()->elimateSameColSquare(this);
+	SquareModel::theModel()->elimateSameRowSquare(this);
+}
 
 ///////////////////////////////////////////////////////
 CircleReboundNode *CircleReboundNode::create()
@@ -270,4 +347,50 @@ void CircleAddCoinNode::doCollisionAction()
 
 	UserInfo::getInstance()->addCoins(ADD_COINS);
 	GameController::getInstance()->updateCoins();
+}
+
+///////////////////////////////////////////////////////
+CircleProtectNode *CircleProtectNode::create()
+{
+	CircleProtectNode *node = new CircleProtectNode();
+	node->autorelease();
+	node->init();
+	return node;
+}
+
+bool CircleProtectNode::init()
+{
+	m_score = 1;
+	auto sizeSprite = CCSprite::create("squares/fangkuai_hong1.png");
+	auto size = sizeSprite->getContentSize();
+	setContentSize(size);
+
+	m_image = CCSprite::create("squares/fangkuai_baohuzhao.png");
+	addChild(m_image);
+	auto fanIn = CCFadeIn::create(0.6f);
+	m_image->runAction(fanIn);
+
+	auto *flip3d = CCOrbitCamera::create(2, -45, 0, 90, 180, 0, 0);
+	auto repeat = CCRepeatForever::create(flip3d);
+	//m_image->runAction(repeat);
+
+	return true;
+}
+
+void CircleProtectNode::setBody()
+{
+	m_body = Box2dFactory::getInstance()->createCircle(this, m_image->getContentSize(), true);
+}
+
+void CircleProtectNode::runRemoveAction()
+{
+	removeFromParent();
+}
+
+void CircleProtectNode::doCollisionAction()
+{
+	int attactRate = GameController::getInstance()->getAttactRate();
+	addScore(-attactRate); //delete
+
+	GameController::getInstance()->useProtectEffect();
 }

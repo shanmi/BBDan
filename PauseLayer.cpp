@@ -11,6 +11,7 @@ void PauseLayer::onEnter()
 	CCLayer::onEnter();
 	CCDirector::sharedDirector()->getTouchDispatcher()->addTargetedDelegate(this, kPriority_Pause, true);
 	GameController::getInstance()->addView(this);
+	CCDirector::sharedDirector()->pause();
 }
 
 void PauseLayer::onExit()
@@ -18,6 +19,7 @@ void PauseLayer::onExit()
 	CCLayer::onExit();
 	CCDirector::sharedDirector()->getTouchDispatcher()->removeDelegate(this);
 	GameController::getInstance()->removeView(this);
+	CCDirector::sharedDirector()->resume();
 }
 
 bool PauseLayer::ccTouchBegan(cocos2d::CCTouch *pTouch, cocos2d::CCEvent *pEvent)

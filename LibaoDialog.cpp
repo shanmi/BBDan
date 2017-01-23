@@ -74,6 +74,10 @@ void LibaoDialog::initLayout()
 
 	CCMenuItem *closeItem = dynamic_cast<CCMenuItem*>(m_mainLayout->getChildById(6));
 	closeItem->setTarget(this, menu_selector(LibaoDialog::closePanel));
+	if (isBusinessMode && isYijian)
+	{
+		closeItem->setTarget(this, menu_selector(LibaoDialog::buyLibao));
+	}
 
 	CCMenuItem *buyItem = dynamic_cast<CCMenuItem*>(m_mainLayout->getChildById(5));
 	buyItem->setTarget(this, menu_selector(LibaoDialog::buyLibao));
@@ -133,6 +137,12 @@ void LibaoDialog::closePanel(CCObject *pSender)
 void LibaoDialog::buyLibao(CCObject *pSender)
 {
 	MyPurchase::sharedPurchase()->payForProducts(m_type);
+	bool isBusinessMode = MyPurchase::sharedPurchase()->isBusinessMode();
+	int isYijian = GameConfig::getInstance()->m_yijian;
+	if (isBusinessMode && isYijian)
+	{
+		removeFromParent();
+	}
 }
 
 void LibaoDialog::updateCoins()

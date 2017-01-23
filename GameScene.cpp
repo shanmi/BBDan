@@ -1,4 +1,4 @@
-#include "libao\LibaoDialog.h"
+#include "LibaoDialog.h"
 #include "GameScene.h"
 #include "UiLayout.h"
 #include "GameUtil.h"
@@ -14,7 +14,7 @@
 #include "MainMenu.h"
 #include "SoundMgr.h"
 #include "GuideLayer.h"
-#include "libao\FuhuoLibao.h"
+#include "FuhuoLibao.h"
 #include "PauseLayer.h"
 #include "MyPurchase.h"
 #include "HelpLayer.h"
@@ -85,6 +85,7 @@ bool GameScene::init()
 
 	setKeypadEnabled(true);
 	Box2dFactory::getInstance()->initPhysics(false);
+	GameUtil::loadGameInfo();
 
 	auto winSize = CCDirector::sharedDirector()->getWinSize();
 	m_mainLayout = UiLayout::create("layout/game_scene.xml");
@@ -112,6 +113,7 @@ bool GameScene::init()
 
 	initMarbles();
 	initSquares();
+	updateMarbleCount();
 
 	checkFishGuide();
 
@@ -163,6 +165,15 @@ void GameScene::initCharacterLayout()
 	/*character_body->setVisible(false);
 	character_head->setVisible(false);
 	m_arrow->setVisible(false);*/
+
+	auto targetPos = GameController::getInstance()->getTargetPos();
+	if (targetPos.x != 0 && targetPos.y != 0)
+	{
+		character_body->setPosition(ccp(targetPos.x, character_body->getPositionY()));
+
+		character_head->setPosition(ccp(targetPos.x, character_head->getPositionY()));
+		m_arrow->setVisible(false);
+	}
 }
 
 void GameScene::initBottomLayout()
@@ -306,7 +317,8 @@ void GameScene::showLibaoDiaolg()
 void GameScene::checkLibaoShow()
 {
 	int score = SquareModel::theModel()->getCurrentScore() - 1;
-	if (score % 20 == 0)
+	int m_showLibaoLevel = GameConfig::getInstance()->m_showLibaoLevel;
+	if (score % m_showLibaoLevel == 0)
 	{
 		showLibaoDiaolg();
 	}
@@ -340,11 +352,24 @@ void GameScene::initPhysicBorder()
 
 void GameScene::initMarbles()
 {
-	for (int i = 0; i < START_BALL_SIZE; i++)
+	m_addMarbleCount = MarbleModel::theModel()->getMarblesCount();
+	if (m_addMarbleCount < START_BALL_SIZE)
+	{
+		m_addMarbleCount = START_BALL_SIZE;
+	}
+	auto targetPos = GameController::getInstance()->getTargetPos();
+	for (int i = 0; i < m_addMarbleCount; i++)
 	{
 		auto marble = MarbleModel::theModel()->createMarble();
 		marble->setBody();
-		marble->setPosition(ccp(m_arrow->getPositionX(), m_bottomLinePos + marble->getContentSize().height / 2 + 4));
+		if (targetPos.x == 0 && targetPos.y == 0)
+		{
+			marble->setPosition(ccp(m_arrow->getPositionX(), m_bottomLinePos + marble->getContentSize().height / 2 + 4));
+		}
+		else
+		{
+			marble->setPosition(targetPos);
+		}
 		addChild(marble, kZOrder_Marble);
 		if (i == 0)
 		{
@@ -374,13 +399,19 @@ void GameScene::updateStreak(float dt)
 
 void GameScene::initSquares()
 {
-	auto squares = SquareModel::theModel()->createSquareList();
+	auto squares = SquareModel::theModel()->loadSquareList();
 	for (int i = 0; i < squares.size(); i++)
 	{
 		auto node = squares[i];
-		node->setPosition(ccp((node->getContentSize().width / 2 + SQUARE_SPACING) + node->getIndex() * (node->getContentSize().width + SQUARE_SPACING),
-			m_bottomLinePos + (node->getContentSize().height + SQUARE_SPACING) * 7.5));
+		Index index = node->getIndex();
+		node->setPosition(ccp((node->getContentSize().width / 2 + SQUARE_SPACING) + index.x * (node->getContentSize().width + SQUARE_SPACING),
+			m_bottomLinePos + (node->getContentSize().height + SQUARE_SPACING) * (7.5 - index.y)));
 		addChild(node, kZOrder_Square);
+	}
+	bool isGameOver = GameController::getInstance()->checkGameOver();
+	if (isGameOver)
+	{
+		showGameOver();
 	}
 }
 
@@ -390,7 +421,9 @@ void GameScene::addSquares()
 	for (int i = 0; i < squares.size(); i++)
 	{
 		auto node = squares[i];
-		node->setPosition(ccp(node->getContentSize().width / 2 + SQUARE_SPACING + node->getIndex() * (node->getContentSize().width + SQUARE_SPACING),
+		Index index = node->getIndex();
+		node->setIndex(index.x, -1);
+		node->setPosition(ccp(node->getContentSize().width / 2 + SQUARE_SPACING + index.x * (node->getContentSize().width + SQUARE_SPACING),
 			m_bottomLinePos + (node->getContentSize().height + SQUARE_SPACING) * 8.5));
 		addChild(node, kZOrder_Square);
 	}
@@ -411,7 +444,7 @@ void GameScene::update(float dt)
 		return;
 	}
 
-	updateMarbleCount();
+	//updateMarbleCount();
 
 	int32 velocityIterations = 10;
 	int32 positionIterations = 10;
@@ -610,13 +643,14 @@ void GameScene::oneRoundEnd()
 		addChild(streak, kZOrder_Marble);
 	}
 	GameController::getInstance()->updateMarblePos();
-	m_addMarbleCount = marbles.size();
+	m_addMarbleCount = marbles.size() + addCount;
 	updateMarbleCount();
 	auto fadeIn = CCFadeIn::create(0.6f);
 	m_marbleCount->runAction(fadeIn);
 
 	//check tools when one round end and delete "0 score" tool
 	GameController::getInstance()->checkSquares(true);
+	GameUtil::saveGameInfo();
 
 	//reset doubleAttact buttom
 	GameController::getInstance()->resetAttactRate();
@@ -642,7 +676,7 @@ void GameScene::oneRoundEnd()
 void GameScene::updateMarbles()
 {
 	// just show adding marble action
-	//m_addMarbleCount++;
+	m_addMarbleCount++;
 }
 
 void GameScene::updateCoins()
@@ -688,7 +722,7 @@ void GameScene::updateMarbleCount()
 	char temp[50] = { 0 };
 	if (m_addMarbleCount > MarbleModel::theModel()->getMarblesCount())
 	{
-		m_addMarbleCount = MarbleModel::theModel()->getMarblesCount();
+		//m_addMarbleCount = MarbleModel::theModel()->getMarblesCount();1
 	}
 	sprintf(temp, ":%d", m_addMarbleCount);
 	m_marbleCount->setString(temp);

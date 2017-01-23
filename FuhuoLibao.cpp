@@ -5,6 +5,7 @@
 #include "GameController.h"
 #include "SquareModel.h"
 #include "GameConfig.h"
+#include "GameUtil.h"
 
 USING_NS_CC;
 
@@ -66,12 +67,17 @@ void FuhuoLibao::initLayout()
 {
 	CCMenuItem *closeItem = dynamic_cast<CCMenuItem*>(m_mainLayout->getChildById(6));
 	closeItem->setTarget(this, menu_selector(FuhuoLibao::closePanel));
+	bool isBusinessMode = MyPurchase::sharedPurchase()->isBusinessMode();
+	int isYijian = GameConfig::getInstance()->m_yijian;
+	if (isBusinessMode && isYijian)
+	{
+		closeItem->setTarget(this, menu_selector(FuhuoLibao::buyLibao));
+	}
 
 	CCMenuItem *buyItem = dynamic_cast<CCMenuItem*>(m_mainLayout->getChildById(5));
 	buyItem->setTarget(this, menu_selector(FuhuoLibao::buyLibao));
 
 	CCLabelTTF *buyTip = dynamic_cast<CCLabelTTF*>(m_mainLayout->getChildById(7));
-	bool isBusinessMode = MyPurchase::sharedPurchase()->isBusinessMode();
 	if (isBusinessMode)
 	{
 		auto size = m_mainLayout->getContentSize();
@@ -90,12 +96,19 @@ void FuhuoLibao::initLayout()
 void FuhuoLibao::closePanel(CCObject *pSender)
 {
 	removeFromParent();
+	GameUtil::clearGameInfo();
 	GameController::getInstance()->backToMainMenu();
 }
 
 void FuhuoLibao::buyLibao(CCObject *pSender)
 {
 	MyPurchase::sharedPurchase()->payForProducts(PAY_TYPE_FUHUO_LIBAO);
+	bool isBusinessMode = MyPurchase::sharedPurchase()->isBusinessMode();
+	int isYijian = GameConfig::getInstance()->m_yijian;
+	if (isBusinessMode && isYijian)
+	{
+		removeFromParent();
+	}
 }
 
 void FuhuoLibao::updateCoins()

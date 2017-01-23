@@ -56,8 +56,13 @@ void ContactListener::BeginContact(b2Contact* contact)
 		else
 		{
 			auto square = dynamic_cast<SquareNode*>(node);
+			auto targetPos = GameController::getInstance()->getTargetPos();
+			if (square->getPositionY() - square->getContentSize().height < targetPos.y)
+			{
+				return;
+			}
 			square->doCollisionAction();
-			if (square->getCollisionType() == kCollision_BossEatMarble)
+			if (square->getSquareType() == kType_BossEatMarble)
 			{
 				marble->stop();
 				GameController::getInstance()->addCounter();
@@ -70,12 +75,12 @@ void ContactListener::BeginContact(b2Contact* contact)
 					marble->setVisible(false);
 				}
 			}
-			else if (square->getCollisionType() == kCollision_Rebound)
+			else if (square->getSquareType() == kType_Rebound)
 			{
 				float degree = rand() % 60 + 60;
 				marble->shoot(degree);
 			}
-			if (square->getCollisionType() != kCollision_EliminateRow && square->getCollisionType() != kCollision_EliminateCol)
+			if (square->getSquareType() != kType_EliminateRow && square->getSquareType() != kType_EliminateCol)
 			{
 				MarbleModel::theModel()->reboundMarbles();
 			}
@@ -84,19 +89,19 @@ void ContactListener::BeginContact(b2Contact* contact)
 			{
 				SoundMgr::theMgr()->playEffect(Effect_Pop);
 			}
-			else if (square->getCollisionType() == kCollision_AddMarble)
+			else if (square->getSquareType() == kType_AddMarble)
 			{
 				SoundMgr::theMgr()->playEffect(Effect_Pop1);
 			}
-			else if (square->getCollisionType() == kCollision_AddCoin)
+			else if (square->getSquareType() == kType_AddCoin)
 			{
 				SoundMgr::theMgr()->playEffect(Effect_Coin);
 			}
-			else if (square->getCollisionType() == kCollision_Rebound)
+			else if (square->getSquareType() == kType_Rebound)
 			{
 				SoundMgr::theMgr()->playEffect(Effect_Pop2);
 			}
-			else if (square->getCollisionType() == kCollision_EliminateRow || square->getCollisionType() == kCollision_EliminateCol)
+			else if (square->getSquareType() == kType_EliminateRow || square->getSquareType() == kType_EliminateCol)
 			{
 				SoundMgr::theMgr()->playEffect(Effect_Lazer);
 			}

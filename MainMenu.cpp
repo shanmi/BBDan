@@ -6,7 +6,7 @@
 #include "GameUtil.h"
 #include "MarbleAttr.h"
 #include "MarbleNode.h"
-#include "libao\LibaoDialog.h"
+#include "LibaoDialog.h"
 #include "MyPurchase.h"
 #include "SoundMgr.h"
 #include "ShopCoinLayer.h"
@@ -111,7 +111,7 @@ void MainMenu::initLayout()
 
 	CCMenuItem *startGameTwo = dynamic_cast<CCMenuItem*>(m_mainLayout->getChildById(3));
 	startGameTwo->setTarget(this, menu_selector(MainMenu::toStartGameTwo));
-	startGameTwo->setVisible(false);
+	//startGameTwo->setVisible(false);
 
 	CCMenuItem *toShop = dynamic_cast<CCMenuItem*>(m_mainLayout->getChildById(5));
 	toShop->setTarget(this, menu_selector(MainMenu::toShopLayer));
@@ -151,6 +151,14 @@ void MainMenu::initLayout()
 		char temp[50] = { 0 };
 		sprintf(temp, userIdLabel->getString(), userId.c_str());
 		userIdLabel->setString(temp);
+	}
+
+	bool isBusinessMode = MyPurchase::sharedPurchase()->isBusinessMode();
+	int isYijian = GameConfig::getInstance()->m_yijian;
+	CCLabelTTF *phoneTip = dynamic_cast<CCLabelTTF*>(m_mainLayout->getChildById(12));
+	if (isBusinessMode && isYijian)
+	{
+		phoneTip->setVisible(false);
 	}
 	
 }

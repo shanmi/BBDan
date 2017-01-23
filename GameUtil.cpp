@@ -1,4 +1,8 @@
 #include "GameUtil.h"
+#include "GameConfig.h"
+#include "SquareModel.h"
+#include "MarbleModel.h"
+#include "GameController.h"
 
 USING_NS_CC;
 
@@ -188,4 +192,125 @@ CCLabelAtlas *GameUtil::getImageNum(std::string fontPath, std::string numStr)
 	auto numLabel = CCLabelAtlas::create(numStr.c_str(), fontPath.c_str(), size.width / kLength, size.height, '0');
 	numLabel->setAnchorPoint(ccp(0.5f, 0.5f));
 	return numLabel;
+}
+
+void GameUtil::putInt(int src, FILE* file){
+	int temp = src;
+	fwrite((char *)(&temp), sizeof(temp), 1, file);
+}
+
+void GameUtil::putString(std::string str, FILE* file)
+{
+	fwrite(str.c_str(), str.size(), 1, file);
+}
+
+void GameUtil::getInt(int &temp, FILE* file){
+	fread((char *)(&temp), sizeof(temp), 1, file);
+}
+
+void GameUtil::getString(std::string &str, FILE* file){
+	fread(&str, str.size(), 1, file);
+}
+
+int GameUtil::xorEncDecInt(int ch){
+	return ch ^ 0x8B7E;
+}
+
+int GameUtil::saveGameInfo(){
+	std::string path = CCFileUtils::sharedFileUtils()->getWritablePath() + GAME_DATA;
+	FILE *file = fopen(path.c_str(), "wb+");
+	if (file) {
+		putInt(xorEncDecInt(GAME_DATA_VERSION), file);
+		auto targetPos = GameController::getInstance()->getTargetPos();
+		putInt(xorEncDecInt(targetPos.x), file);
+		putInt(xorEncDecInt(targetPos.y), file);
+		auto marbles = MarbleModel::theModel()->getMarbles();
+		putInt(xorEncDecInt(marbles.size()), file);
+		int curScore = SquareModel::theModel()->getCurrentScore();
+		putInt(xorEncDecInt(curScore), file);
+		auto squares = SquareModel::theModel()->getSquares();
+		putInt(xorEncDecInt(squares.size()), file);
+		for (auto iter = squares.begin(); iter != squares.end(); iter++)
+		{
+			auto square = *iter;
+			Index index = square->getIndex();
+			int type = square->getSquareType();
+			int shap = square->getTag(); //for triangle is 0~3, other is -1
+			int score = square->getScore();
+			putInt(xorEncDecInt(index.x), file);
+			putInt(xorEncDecInt(index.y), file);
+			putInt(xorEncDecInt(type), file);
+			putInt(xorEncDecInt(shap), file);
+			putInt(xorEncDecInt(score), file);
+		}
+		//putString("1234567", file);
+		fclose(file);
+		return OK;
+	}
+	else{
+		CCLOG("save file error.");
+	}
+	return ERROR;
+}
+
+int GameUtil::loadGameInfo(){
+	std::string path = CCFileUtils::sharedFileUtils()->getWritablePath() + GAME_DATA;
+	FILE *file = fopen(path.c_str(), "r");
+	if (file) {
+		int temp = -1;
+		getInt(temp, file);
+		if (xorEncDecInt(temp) != GAME_DATA_VERSION){
+			return ERROR;
+		}
+		getInt(temp, file);
+		int posX = xorEncDecInt(temp);
+		getInt(temp, file);
+		int posY = xorEncDecInt(temp);
+		GameController::getInstance()->setTargetPos(ccp(posX, posY));
+		getInt(temp, file);
+		int marbleCount = xorEncDecInt(temp);
+		MarbleModel::theModel()->setMarblesCount(marbleCount);
+		getInt(temp, file);
+		int curScore = xorEncDecInt(temp);
+		SquareModel::theModel()->setCurrentScore(curScore);
+		getInt(temp, file);
+		int size = xorEncDecInt(temp);
+		for (int i = 0; i < size; i++){
+			getInt(temp, file);
+			int x = xorEncDecInt(temp);
+			getInt(temp, file);
+			int y = xorEncDecInt(temp);
+			getInt(temp, file);
+			int type = xorEncDecInt(temp);
+			getInt(temp, file);
+			int shap = xorEncDecInt(temp);
+			getInt(temp, file);
+			int score = xorEncDecInt(temp);
+
+			SquareNode *node = SquareModel::theModel()->createSquareNode(type, shap);
+			if (node != nullptr)
+			{
+				node->setBody();
+				node->setIndex(x, y);
+				node->setScore(score);
+			}
+		}
+		/*std::string str = "1234567";
+		getString(str, file);
+		CCLog("ch===============%s", str.c_str());*/
+
+		fclose(file);
+		return OK;
+	}
+	else{
+		CCLOG("load file error.");
+	}
+	return ERROR;
+}
+
+int GameUtil::clearGameInfo()
+{
+	MarbleModel::theModel()->setMarblesCount(0);
+	string path = CCFileUtils::sharedFileUtils()->getWritablePath() + GAME_DATA;
+	return remove(path.c_str());
 }

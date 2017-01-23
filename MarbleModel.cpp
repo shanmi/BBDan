@@ -3,10 +3,35 @@
 #include "Config.h"
 #include "CommonMacros.h"
 #include "Box2dFactory.h"
+#include "UserInfo.h"
 
 MarbleModel::MarbleModel()
 {
-	m_attr = NormalMarle();
+	int type = UserInfo::getInstance()->getCurMarbleType();
+	switch (type)
+	{
+	case kMarble_Normal:
+		m_attr = NormalMarle();
+		break;
+	case kMarble_Faster:
+		m_attr = FasterMarle();
+		break;
+	case kMarble_Biger:
+		m_attr = BiggerMarle();
+		break;
+	case kMarble_Dispersed:
+		m_attr = DispersedMarle();
+		break;
+	case kMarble_Bomb:
+		m_attr = BombMarle();
+		break;
+	case kMarble_Across:
+		m_attr = AcrossdMarle();
+		break;
+	default:
+		m_attr = NormalMarle();
+		break;
+	}
 
 	m_marblesCount = 0;
 }
@@ -35,6 +60,12 @@ void MarbleModel::removeMarble(MarbleNode *node)
 	}
 	Box2dFactory::getInstance()->removeBody(node->getBody());
 	node->removeFromParent();
+}
+
+void MarbleModel::setMarbleAttr(MarbleAttr attr)
+{
+	m_attr = attr; 
+	UserInfo::getInstance()->setCurMarbleType(m_attr.skin);
 }
 
 bool MarbleModel::haveMarbleMoving()

@@ -13,7 +13,7 @@ USING_NS_CC;
 SquareNode::SquareNode()
 :m_scoreLabel(NULL)
 , m_body(NULL)
-, m_collisionType(kCollision_Square)
+, m_squareType(kType_Square)
 {
 
 }
@@ -114,12 +114,12 @@ void SquareNode::moveDown(bool isLastOne /* = false */)
 
 bool SquareNode::shouldRemoveDirectly()
 {
-	switch (m_collisionType)
+	switch (m_squareType)
 	{
-	case kCollision_Square:
-	case kCollision_Triangle:
-	case kCollision_AddMarble:
-	case kCollision_AddCoin:
+	case kType_Square:
+	case kType_Triangle:
+	case kType_AddMarble:
+	case kType_AddCoin:
 		return true;
 		break;
 	default:
@@ -130,11 +130,11 @@ bool SquareNode::shouldRemoveDirectly()
 
 bool SquareNode::canRemoveByProps()
 {
-	switch (m_collisionType)
+	switch (m_squareType)
 	{
-	case kCollision_Square:
-	case kCollision_Triangle:
-	case kCollision_BossEatMarble:
+	case kType_Square:
+	case kType_Triangle:
+	case kType_BossEatMarble:
 		return true;
 		break;
 	default:
@@ -142,6 +142,7 @@ bool SquareNode::canRemoveByProps()
 	}
 	return false;
 }
+
 void SquareNode::runRemoveAction()
 {
 	auto explore = GameUtil::getExplodeEffect();
@@ -198,15 +199,15 @@ void SquareNode::setFreezing(bool isFreezing)
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
-TriangleNode *TriangleNode::create()
+TriangleNode *TriangleNode::create(int shap /* = -1 */)
 {
 	TriangleNode *node = new TriangleNode();
 	node->autorelease();
-	node->init();
+	node->init(shap);
 	return node;
 }
 
-bool TriangleNode::init()
+bool TriangleNode::init(int shap /* = -1 */)
 {
 	m_score = SquareModel::theModel()->getCurrentScore();
 	if (m_score % 10 == 0)
@@ -218,9 +219,12 @@ bool TriangleNode::init()
 		}
 	}
 
-	int type = rand() % 4;
+	if (shap < 0)
+	{
+		shap = rand() % 4;
+	}
 	char temp[50] = { 0 };
-	sprintf(temp, "half_%d.png", type);
+	sprintf(temp, "half_%d.png", shap);
 	auto image = GameUtil::getBlockImage(kBlock_Triangle, m_score);
 	m_image = CCSprite::create(image.c_str());
 	addChild(m_image);
@@ -231,7 +235,7 @@ bool TriangleNode::init()
 	setContentSize(ccp(64, 64));
 
 	m_scoreLabel = GameUtil::getImageNum(FONT_WHITE, m_score);
-	switch (type)
+	switch (shap)
 	{
 	case 0:
 		m_scoreLabel->setPosition(ccp(-size.width*0.15f, -size.height*0.2f));
@@ -251,7 +255,7 @@ bool TriangleNode::init()
 		break;
 	}
 	addChild(m_scoreLabel);
-	this->setTag(type);
+	this->setTag(shap);
 	setPerfectScale();
 
 	return true;

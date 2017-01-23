@@ -7,7 +7,7 @@
 class CircleAddMarbleNode : public SquareNode
 {
 public:
-	CircleAddMarbleNode() : SquareNode(){ m_collisionType = kCollision_AddMarble; }
+	CircleAddMarbleNode() : SquareNode(){ m_squareType = kType_AddMarble; }
 	static CircleAddMarbleNode *create();
 	virtual bool init();
 	virtual void setBody();
@@ -18,7 +18,7 @@ public:
 class CircleEliRowNode : public SquareNode
 {
 public:
-	CircleEliRowNode() : SquareNode(){ m_collisionType = kCollision_EliminateRow; }
+	CircleEliRowNode() : SquareNode(){ m_squareType = kType_EliminateRow; }
 	static CircleEliRowNode *create();
 	virtual bool init();
 	virtual void setBody();
@@ -29,7 +29,7 @@ public:
 class CircleEliColNode : public SquareNode
 {
 public:
-	CircleEliColNode() : SquareNode(){ m_collisionType = kCollision_EliminateCol; }
+	CircleEliColNode() : SquareNode(){ m_squareType = kType_EliminateCol; }
 	static CircleEliColNode *create();
 	virtual bool init();
 	virtual void setBody();
@@ -37,11 +37,21 @@ public:
 	virtual void doCollisionAction();
 };
 
+class CircleEliCrossNode : public SquareNode
+{
+public:
+	CircleEliCrossNode() : SquareNode(){ m_squareType = kType_EliminateCross; }
+	static CircleEliCrossNode *create();
+	virtual bool init();
+	virtual void setBody();
+	virtual void runRemoveAction();
+	virtual void doCollisionAction();
+};
 
 class CircleReboundNode : public SquareNode
 {
 public:
-	CircleReboundNode() : SquareNode(){ m_collisionType = kCollision_Rebound; }
+	CircleReboundNode() : SquareNode(){ m_squareType = kType_Rebound; }
 	static CircleReboundNode *create();
 	virtual bool init();
 	virtual void setBody();
@@ -52,8 +62,19 @@ public:
 class CircleAddCoinNode : public SquareNode
 {
 public:
-	CircleAddCoinNode() : SquareNode(){ m_collisionType = kCollision_AddCoin; }
+	CircleAddCoinNode() : SquareNode(){ m_squareType = kType_AddCoin; }
 	static CircleAddCoinNode *create();
+	virtual bool init();
+	virtual void setBody();
+	virtual void runRemoveAction();
+	virtual void doCollisionAction();
+};
+
+class CircleProtectNode : public SquareNode
+{
+public:
+	CircleProtectNode() : SquareNode(){ m_squareType = kType_Protect; }
+	static CircleProtectNode *create();
 	virtual bool init();
 	virtual void setBody();
 	virtual void runRemoveAction();

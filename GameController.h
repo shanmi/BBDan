@@ -14,6 +14,7 @@ struct INotifyView
 	virtual void updateCoins(){}
 	virtual void showGameOver(){}
 	virtual void addSquareNode(SquareNode *node){}
+	virtual void useProtectEffect(){}
 };
 
 class GameController
@@ -30,6 +31,7 @@ public:
 	void updateMarbles() { NOTIFY_VIEWS(updateMarbles); }
 	void updateCoins() { NOTIFY_VIEWS(updateCoins); }
 	void addSquareNode(SquareNode *node);
+	void useProtectEffect() { NOTIFY_VIEWS(useProtectEffect); }
 public:
 	void startOneRound();
 
@@ -42,7 +44,7 @@ public:
 	bool isCounterFull();
 	bool isRoundOver(){ return m_bIsRoundOver; }
 	void setRoundState(bool isOver) { m_bIsRoundOver = isOver; }
-	void checkSquares(bool isCheckTool = false);
+	void checkSquares(bool isRoundEnd = false);
 	void updateMarblePos();
 	bool checkGameOver();
 
@@ -66,7 +68,6 @@ private:
 	int m_counter;
 	int m_attactRate;
 	bool m_bIsRoundOver;
-
 	bool m_bISFirstIn;
 };
 

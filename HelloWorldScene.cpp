@@ -58,7 +58,7 @@ bool HelloWorld::init()
 		for (int i = 0; i < squares.size(); i++)
 		{
 			auto node = squares[i];
-			node->setPosition(ccp(node->getContentSize().width / 2 + 4 + node->getIndex() * (node->getContentSize().width + 4), node->getContentSize().height / 2 + n*(node->getContentSize().height+4)));
+			node->setPosition(ccp(node->getContentSize().width / 2 + 4 + node->getIndex().x * (node->getContentSize().width + 4), node->getContentSize().height / 2 + n*(node->getContentSize().height+4)));
 			//addChild(node);
 		}
 	}

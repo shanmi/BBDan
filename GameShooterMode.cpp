@@ -11,6 +11,11 @@
 #include "CCFunctionAction.h"
 #include "UserInfo.h"
 #include "MainMenu.h"
+#include "PauseLayer.h"
+#include "HelpLayer.h"
+#include "MyPurchase.h"
+#include "GameConfig.h"
+#include "LibaoDialog.h"
 
 USING_NS_CC;
 
@@ -41,7 +46,9 @@ void GameShooterMode::keyBackClicked()
 
 GameShooterMode::GameShooterMode()
 : m_moveCounter(0)
+, m_shootDegree(90)
 , m_freezingTime(0)
+, m_protectTime(0)
 {
 
 }
@@ -78,12 +85,21 @@ bool GameShooterMode::init()
 	Box2dFactory::getInstance()->initPhysics(true);
 
 	auto winSize = CCDirector::sharedDirector()->getWinSize();
-	m_topLayout = UiLayout::create("layout/common_top.xml");
-	m_topLayout->setPosition(ccp(0, winSize.height - m_topLayout->getContentSize().height));
-	addChild(m_topLayout);
-	initTopLayout();
+	m_mainLayout = UiLayout::create("layout/game_scene.xml");
+	m_mainLayout->setAnchorPoint(ccp(0.5f, 0.5f));
+	m_mainLayout->setPosition(ccpMult(winSize, 0.5f));
+	m_mainLayout->setMenuTouchPriority(kPriority_Game - 1);
+	addChild(m_mainLayout, kZOrder_Main);
+	initMainLayout();
 
-	m_bottomLayout = UiLayout::create("layout/common_bottom.xml");
+	m_characterLayout = UiLayout::create("layout/character_node.xml");
+	m_characterLayout->setAnchorPoint(ccp(0.5f, 0.5f));
+	m_characterLayout->setPosition(ccpMult(winSize, 0.5f));
+	m_characterLayout->setMenuTouchPriority(kPriority_Game - 1);
+	addChild(m_characterLayout, kZOrder_Character);
+	initCharacterLayout();
+
+	m_bottomLayout = UiLayout::create("layout/game_bottom.xml");
 	m_bottomLayout->setPosition(ccp(0, 0));
 	addChild(m_bottomLayout);
 	initBottomLayout();
@@ -99,48 +115,121 @@ bool GameShooterMode::init()
 	return true;
 }
 
-void GameShooterMode::initTopLayout()
+void GameShooterMode::initMainLayout()
 {
-	CCSprite *line_top = dynamic_cast<CCSprite*>(m_topLayout->getChildById(2));
-	auto worldPos = m_topLayout->convertToWorldSpace(line_top->getPosition());
+	CCSprite *line_top = dynamic_cast<CCSprite*>(m_mainLayout->getChildById(8));
+	line_top->setVisible(false);
+	auto worldPos = m_mainLayout->convertToWorldSpace(line_top->getPosition());
 	m_topLinePos = worldPos.y;
+
+	CCSprite *line_bottom = dynamic_cast<CCSprite*>(m_mainLayout->getChildById(7));
+	line_bottom->setPositionY(line_bottom->getPositionY() + 60);
+	line_bottom->setVisible(true);
+	line_bottom->setTag(kTag_Wall);
+	worldPos = line_bottom->convertToWorldSpace(CCPointZero);
+	m_bottomLinePos = worldPos.y;
+	Box2dFactory::getInstance()->createSquare(line_bottom, true);
+
+	CCMenuItem *pauseItem = dynamic_cast<CCMenuItem*>(m_mainLayout->getChildById(6));
+	pauseItem->setTarget(this, menu_selector(GameShooterMode::onPauseGame));
+}
+
+void GameShooterMode::initCharacterLayout()
+{
+	CCSprite *character_body = dynamic_cast<CCSprite*>(m_characterLayout->getChildById(9));
+	CCSprite *character_head = dynamic_cast<CCSprite*>(m_characterLayout->getChildById(10));
+	m_character = dynamic_cast<CCSprite*>(m_characterLayout->getChildById(11));
+	/*character_body->setVisible(false);
+	character_head->setVisible(false);
+	m_arrow->setVisible(false);*/
+
+	auto targetPos = GameController::getInstance()->getTargetPos();
+	m_character->setRotation(m_shootDegree);
+	if (targetPos.x != 0 && targetPos.y != 0)
+	{
+		character_body->setPosition(ccp(targetPos.x, character_body->getPositionY()));
+
+		character_head->setPosition(ccp(targetPos.x, character_head->getPositionY()));
+		//m_character->setVisible(false);
+	}
+	if (m_shootDegree > 60 && m_shootDegree < 90)
+	{
+		character_head->setRotation(60 - m_shootDegree);
+	}
+	else if (m_shootDegree >= 90 && m_shootDegree < 120)
+	{
+		character_head->setRotation(120 - m_shootDegree);
+	}
+	else
+	{
+		character_head->setRotation(0);
+	}
+	GameController::getInstance()->setTargetPos(m_character->getPosition());
+}
+
+void GameShooterMode::onPauseGame(CCObject *pSender)
+{
+	if (getChildByTag(kTag_Pause))
+	{
+		removeChildByTag(kTag_Pause);
+		return;
+	}
+	if (getChildByTag(kTag_GameOver))
+	{
+		return;
+	}
+	PauseLayer *pauseLayer = PauseLayer::create();
+	addChild(pauseLayer, KZOrder_PauseLayer, kTag_Pause);
 }
 
 void GameShooterMode::initBottomLayout()
 {
-	CCSprite *line_bottom = dynamic_cast<CCSprite*>(m_bottomLayout->getChildById(2));
-	line_bottom->setTag(kTag_Wall);
-	auto worldPos = line_bottom->convertToWorldSpace(CCPointZero);
-	m_bottomLinePos = worldPos.y;
-	Box2dFactory::getInstance()->createSquare(line_bottom, true);
-
-	updateCoins();
-
-	CCMenuItem *doubleAttactBtn = dynamic_cast<CCMenuItem*>(m_bottomLayout->getChildById(6));
+	CCMenuItem *doubleAttactBtn = dynamic_cast<CCMenuItem*>(m_bottomLayout->getChildById(5));
 	doubleAttactBtn->setTarget(this, menu_selector(GameShooterMode::onDoubleAttact));
 
-	m_character = dynamic_cast<CCSprite*>(m_bottomLayout->getChildById(3));
-	m_character->setPosition(ccp(100, m_bottomLinePos + 15));
-
-	CCMenuItem *clearScreenBtn = dynamic_cast<CCMenuItem*>(m_bottomLayout->getChildById(8));
+	CCMenuItem *clearScreenBtn = dynamic_cast<CCMenuItem*>(m_bottomLayout->getChildById(4));
 	clearScreenBtn->setTarget(this, menu_selector(GameShooterMode::onClearScreen));
 
-	CCMenuItem *freezingBtn = dynamic_cast<CCMenuItem*>(m_bottomLayout->getChildById(9));
+	CCMenuItem *freezingBtn = dynamic_cast<CCMenuItem*>(m_bottomLayout->getChildById(3));
 	freezingBtn->setTarget(this, menu_selector(GameShooterMode::onFreezing));
+
+	CCMenuItem *helpBtn = dynamic_cast<CCMenuItem*>(m_bottomLayout->getChildById(9));
+	//helpBtn->setTarget(this, menu_selector(GameShooterMode::onHelpPanel));
+	auto action = GameUtil::getScaleAction();
+	helpBtn->runAction(action);
 
 }
 
 void GameShooterMode::onDoubleAttact(CCObject *pSender)
 {
+	int count = UserInfo::getInstance()->getPropsCount(kProp_DoubleAttact);
 	bool ifCoinEnought = GameController::getInstance()->checkCoinsEnought();
-	if (ifCoinEnought)
+	if (!ifCoinEnought && count <= 0)
 	{
-		UserInfo::getInstance()->addCoins(-DOUBLE_ATTACT_COST_COIN);
+		// show pay point
+		showLibaoDiaolg();
+		return;
+	}
+	if (!m_bIsDoubleAttact)
+	{
+		if (count > 0)
+		{
+			UserInfo::getInstance()->addPropsCount(kProp_DoubleAttact, -1);
+		}
+		else
+		{
+			UserInfo::getInstance()->addCoins(-DOUBLE_ATTACT_COST_COIN);
+		}
 		updateCoins();
+		m_bIsDoubleAttact = true;
 
-		CCMenuItem *item = (CCMenuItem*)(pSender);
-		item->setVisible(false);
 		GameController::getInstance()->setDoubleAttact();
+		CCMenuItem *doubleAttactBtn = dynamic_cast<CCMenuItem*>(m_bottomLayout->getChildById(5));
+		auto scaleby = CCScaleBy::create(0.5f, 1.2f);
+		auto reverse = scaleby->reverse();
+		auto sequence = CCSequence::create(scaleby, reverse, NULL);
+		auto action = CCRepeatForever::create(sequence);
+		doubleAttactBtn->runAction(action);
 	}
 	else
 	{
@@ -150,27 +239,99 @@ void GameShooterMode::onDoubleAttact(CCObject *pSender)
 
 void GameShooterMode::onClearScreen(CCObject *pSender)
 {
-	bool isRoundOver = GameController::getInstance()->isRoundOver();
-	if (isRoundOver)
+	int count = UserInfo::getInstance()->getPropsCount(kProp_Clear);
+	bool ifCoinEnought = GameController::getInstance()->checkCoinsEnought();
+	if (!ifCoinEnought && count <= 0)
 	{
-		GameController::getInstance()->setRoundState(false);
-		SquareModel::theModel()->removeAllSquares();
-		oneRoundEnd();
+		// show pay point
+		showLibaoDiaolg();
 	}
+	if (count > 0)
+	{
+		UserInfo::getInstance()->addPropsCount(kProp_Clear, -1);
+	}
+	else
+	{
+		UserInfo::getInstance()->addCoins(-DOUBLE_ATTACT_COST_COIN);
+	}
+	updateCoins();
+	GameController::getInstance()->setRoundState(false);
+	SquareModel::theModel()->removeAllSquares();
+	oneRoundEnd();
 }
 
 void GameShooterMode::onFreezing(CCObject *pSender)
 {
 	bool isFreezing = SquareModel::theModel()->isFreezing();
+	int count = UserInfo::getInstance()->getPropsCount(kProp_Freezing);
+	bool ifCoinEnought = GameController::getInstance()->checkCoinsEnought();
+	if (!ifCoinEnought && count <= 0)
+	{
+		// show pay point
+		showLibaoDiaolg();
+	}
 	if (!isFreezing)
 	{
+		if (count > 0)
+		{
+			UserInfo::getInstance()->addPropsCount(kProp_Freezing, -1);
+		}
+		else
+		{
+			UserInfo::getInstance()->addCoins(-DOUBLE_ATTACT_COST_COIN);
+		}
+		updateCoins();
 		SquareModel::theModel()->setSquareFreezing(true);
+	}
+}
+
+void GameShooterMode::onHelpPanel(CCObject *pSender)
+{
+	if (getChildByTag(kTag_Pause))
+	{
+		removeChildByTag(kTag_Pause);
+		return;
+	}
+	HelpLayer *helpLayer = HelpLayer::create();
+	addChild(helpLayer, KZOrder_PauseLayer, kTag_Pause);
+}
+
+void GameShooterMode::showLibaoDiaolg()
+{
+	bool isBusinessMode = MyPurchase::sharedPurchase()->isBusinessMode();
+	int isYijian = GameConfig::getInstance()->m_yijian;
+	if (isBusinessMode && isYijian)
+	{
+		MyPurchase::sharedPurchase()->payForProducts(PAY_TYPE_COIN_LIBAO);
+		return;
+	}
+	int random = rand() % 2;
+	int libaoType = PAY_TYPE_TIME_LIBAO;
+	if (random == 0)
+	{
+		libaoType = PAY_TYPE_COIN_LIBAO;
+	}
+	LibaoDialog *dialog = LibaoDialog::create(libaoType);
+	addChild(dialog, KZOrder_LibaoLayer);
+}
+
+void GameShooterMode::checkLibaoShow()
+{
+	int score = SquareModel::theModel()->getCurrentScore() - 1;
+	int m_showLibaoLevel = GameConfig::getInstance()->m_showLibaoLevel;
+	if (score % m_showLibaoLevel == 0)
+	{
+		showLibaoDiaolg();
 	}
 }
 
 void GameShooterMode::initGameLayout()
 {
-
+	/*auto ballHints = BallHintModel::theModel()->createBallHints();
+	for (auto iter = ballHints.begin(); iter != ballHints.end(); ++iter)
+	{
+	addChild(*iter, kZOrder_Layout);
+	}*/
 }
 
 void GameShooterMode::initPhysicBorder()
@@ -191,24 +352,9 @@ void GameShooterMode::updateStreak(float dt)
 	/*auto marbles = MarbleModel::theModel()->getMarbles();
 	for (int i = 0; i < marbles.size(); i++)
 	{
-	auto node = getChildByTag(100 + i);
-	node->setPosition(marbles[i]->convertToWorldSpace(CCPointZero));
+	auto node = getChildByTag(kTag_Streak + i);
+	node->setPosition(marbles[i]->getPosition());
 	}*/
-}
-
-void GameShooterMode::initSquares()
-{
-	for (int i = 0; i < 3; i++)
-	{
-		auto squares = SquareModel::theModel()->createSquareList(false);
-		for (int j = 0; j < squares.size(); j++)
-		{
-			auto node = squares[j];
-			node->setPosition(ccp((node->getContentSize().width / 2 + SQUARE_SPACING) + node->getIndex() * (node->getContentSize().width + SQUARE_SPACING), 
-				m_bottomLinePos + (node->getContentSize().height + SQUARE_SPACING) * (i + 6.5)));
-			addChild(node);
-		}
-	}
 }
 
 void GameShooterMode::addMarble(float dt)
@@ -238,15 +384,35 @@ void GameShooterMode::addMarble(float dt)
 	addChild(streak);
 }
 
+void GameShooterMode::initSquares()
+{
+	auto squares = SquareModel::theModel()->loadSquareList();
+	for (int i = 0; i < squares.size(); i++)
+	{
+		auto node = squares[i];
+		Index index = node->getIndex();
+		node->setPosition(ccp((node->getContentSize().width / 2 + SQUARE_SPACING) + index.x * (node->getContentSize().width + SQUARE_SPACING),
+			m_bottomLinePos + (node->getContentSize().height + SQUARE_SPACING) * (7.5 - index.y)));
+		addChild(node, kZOrder_Square);
+	}
+	bool isGameOver = GameController::getInstance()->checkGameOver();
+	if (isGameOver)
+	{
+		showGameOver();
+	}
+}
+
 void GameShooterMode::addSquares()
 {
 	auto squares = SquareModel::theModel()->createSquareList(false);
 	for (int i = 0; i < squares.size(); i++)
 	{
 		auto node = squares[i];
-		node->setPosition(ccp(node->getContentSize().width / 2 + SQUARE_SPACING + node->getIndex() * (node->getContentSize().width + SQUARE_SPACING), 
+		Index index = node->getIndex();
+		node->setIndex(index.x, -1);
+		node->setPosition(ccp(node->getContentSize().width / 2 + SQUARE_SPACING + index.x * (node->getContentSize().width + SQUARE_SPACING),
 			m_bottomLinePos + (node->getContentSize().height + SQUARE_SPACING) * 8.5));
-		addChild(node);
+		addChild(node, kZOrder_Square);
 	}
 }
 
@@ -276,6 +442,19 @@ void GameShooterMode::update(float dt)
 		}
 	}
 
+	if (m_protectTime > 0)
+	{
+		m_protectTime -= dt;
+	}
+	if (m_protectTime < 0)
+	{
+		m_protectTime = 0;
+		if (m_character->getChildByTag(kTag_Protect))
+		{
+			m_character->removeChildByTag(kTag_Protect);
+		}
+	}
+
 	bool isFreezing = SquareModel::theModel()->isFreezing();
 	if (isFreezing)
 	{
@@ -288,13 +467,18 @@ void GameShooterMode::update(float dt)
 	}
 	else
 	{
+		auto targetPos = GameController::getInstance()->getTargetPos();
 		auto squares = SquareModel::theModel()->getSquares();
 		for (auto iter = squares.begin(); iter != squares.end(); ++iter)
 		{
 			auto square = *iter;
 			square->setPosition(ccp(square->getPositionX(), square->getPositionY() - (square->getContentSize().height + SQUARE_SPACING) / BALL_MOVE_SPEED));
-			if (square->getPositionY() < m_bottomLinePos)
+			if (square->getPositionY() - square->getContentSize().height / 2 < m_bottomLinePos)
 			{
+				if (square->getSquareType() == kType_Square || square->getSquareType() == kType_Triangle)
+				{
+					//showGameOver();
+				}
 				SquareModel::theModel()->removeSquareNode(square);
 			}
 		}
@@ -305,7 +489,7 @@ void GameShooterMode::update(float dt)
 			addSquares();
 		}
 	}
-	
+
 	//check squares by not check tool
 	GameController::getInstance()->checkSquares(true);
 
@@ -313,15 +497,47 @@ void GameShooterMode::update(float dt)
 
 bool GameShooterMode::ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent)
 {
+	auto winSize = CCDirector::sharedDirector()->getWinSize();
 	auto location = pTouch->getLocation();
-	m_character->setPositionX(location.x - m_character->getContentSize().width/2);
+	if (location.x - m_character->getContentSize().width / 2 < 0)
+	{
+		m_character->setPositionX(m_character->getContentSize().width / 2);
+	}
+	else if (location.x + m_character->getContentSize().width / 2 > winSize.width)
+	{
+		m_character->setPositionX(winSize.width - m_character->getContentSize().width / 2);
+	}
+	else
+	{
+		m_character->setPositionX(location.x);
+	}
+	CCSprite *character_body = dynamic_cast<CCSprite*>(m_characterLayout->getChildById(9));
+	CCSprite *character_head = dynamic_cast<CCSprite*>(m_characterLayout->getChildById(10));
+	character_body->setPositionX(m_character->getPositionX());
+	character_head->setPositionX(m_character->getPositionX());
 	return true;
 }
 
 void GameShooterMode::ccTouchMoved(CCTouch *pTouch, CCEvent *pEvent)
 {
+	auto winSize = CCDirector::sharedDirector()->getWinSize();
 	auto location = pTouch->getLocation();
-	m_character->setPositionX(location.x - m_character->getContentSize().width / 2);
+	if (location.x - m_character->getContentSize().width / 2 < 0)
+	{
+		m_character->setPositionX(m_character->getContentSize().width / 2);
+	}
+	else if (location.x + m_character->getContentSize().width / 2 > winSize.width)
+	{
+		m_character->setPositionX(winSize.width - m_character->getContentSize().width / 2);
+	}
+	else
+	{
+		m_character->setPositionX(location.x);
+	}
+	CCSprite *character_body = dynamic_cast<CCSprite*>(m_characterLayout->getChildById(9));
+	CCSprite *character_head = dynamic_cast<CCSprite*>(m_characterLayout->getChildById(10));
+	character_body->setPositionX(m_character->getPositionX());
+	character_head->setPositionX(m_character->getPositionX());
 }
 
 void GameShooterMode::ccTouchEnded(CCTouch *pTouch, CCEvent *pEvent)
@@ -349,7 +565,7 @@ void GameShooterMode::updateCoins()
 {
 	int coinCount = UserInfo::getInstance()->getCoins();
 	std::string countStr = GameUtil::intToString(coinCount);
-	CCLabelTTF *coinLabel = dynamic_cast<CCLabelTTF*>(m_bottomLayout->getChildById(5));
+	CCLabelAtlas *coinLabel = dynamic_cast<CCLabelAtlas*>(m_mainLayout->getChildById(5));
 	coinLabel->setString(countStr.c_str());
 }
 
@@ -363,4 +579,13 @@ void GameShooterMode::showGameOver()
 	CCLog("is game over");
 	SquareModel::theModel()->removeBelowSquares();
 	//GameController::getInstance()->setRoundState(false);
+}
+
+void GameShooterMode::useProtectEffect()
+{
+	m_protectTime = PROTECT_TIME;
+	auto protect = CCSprite::create("game/protected.png");
+	protect->setTag(kTag_Protect);
+	m_character->addChild(protect);
+
 }
