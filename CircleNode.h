@@ -81,4 +81,37 @@ public:
 	virtual void doCollisionAction();
 };
 
+class CircleShotgunsNode : public SquareNode
+{
+public:
+	CircleShotgunsNode() : SquareNode(){ m_squareType = kType_Shotguns; }
+	static CircleShotgunsNode *create();
+	virtual bool init();
+	virtual void setBody();
+	virtual void runRemoveAction();
+	virtual void doCollisionAction();
+};
+
+class CircleBloodNode : public SquareNode
+{
+public:
+	CircleBloodNode() : SquareNode(){ m_squareType = kType_Blood; }
+	static CircleBloodNode *create();
+	virtual bool init();
+	virtual void setBody();
+	virtual void runRemoveAction();
+	virtual void doCollisionAction();
+};
+
+class CircleRocketNode : public SquareNode
+{
+public:
+	CircleRocketNode() : SquareNode(){ m_squareType = kType_Rocket; }
+	static CircleRocketNode *create();
+	virtual bool init();
+	virtual void setBody();
+	virtual void runRemoveAction();
+	virtual void doCollisionAction();
+};
+
 #endif

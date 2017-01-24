@@ -49,6 +49,7 @@ GameShooterMode::GameShooterMode()
 , m_shootDegree(90)
 , m_freezingTime(0)
 , m_protectTime(0)
+, m_shotgunsTime(0)
 {
 
 }
@@ -359,29 +360,46 @@ void GameShooterMode::updateStreak(float dt)
 
 void GameShooterMode::addMarble(float dt)
 {
-	auto marbles = MarbleModel::theModel()->getMarbles();
+	int shootCount = 1;
+	if (m_shotgunsTime > 0)
+	{
+		shootCount = 3;
+	}
 	auto actions = ActionSequence::create(this);
 	MarbleAttr m_attr = FasterMarle();
-	auto ball = MarbleModel::theModel()->createMarble();
-	ball->setBody();
-	ball->setPosition(ccp(m_character->getPositionX(), m_bottomLinePos + ball->getContentSize().height / 2 + 4));
-	addChild(ball);
-	ball->setMovingState(true);
-	ball->shooterShoot();
-	ball->setVisible(true);
-	auto attr = MarbleModel::theModel()->getMarbleAttr();
-	auto action1 = CCDelayTime::create(0.2f / attr.speed);
-	auto action2 = CCFunctionAction::create([=]()
+	for (int i = 0; i < shootCount; i++)
+	{
+		auto marbles = MarbleModel::theModel()->getMarbles();
+		auto ball = MarbleModel::theModel()->createMarble();
+		ball->setBody();
+		ball->setPosition(ccp(m_character->getPositionX(), m_bottomLinePos + ball->getContentSize().height / 2 + 4));
+		addChild(ball);
+		ball->setMovingState(true);
+
+		if (shootCount == 1)
+		{
+			ball->shooterShoot(90);
+		}
+		else
+		{
+			ball->shooterShoot(75 + 15* i);
+		}
+		
+		ball->setVisible(true);
+		auto attr = MarbleModel::theModel()->getMarbleAttr();
+		auto action1 = CCDelayTime::create(0.2f / attr.speed);
+		actions->addAction(action1);
+
+		auto streak = GameUtil::getMotionStreak();
+		streak->setTag(kTag_Streak + marbles.size());
+		addChild(streak);
+	}
+	auto callback = CCFunctionAction::create([=]()
 	{
 		addMarble(0);
 	});
-	actions->addAction(action1);
-	actions->addAction(action2);
+	actions->addAction(callback);
 	actions->runActions();
-
-	auto streak = GameUtil::getMotionStreak();
-	streak->setTag(100 + marbles.size());
-	addChild(streak);
 }
 
 void GameShooterMode::initSquares()
@@ -440,6 +458,11 @@ void GameShooterMode::update(float dt)
 		{
 			MarbleModel::theModel()->removeMarble(marble);
 		}
+	}
+
+	if(m_shotgunsTime > 0)
+	{
+		m_shotgunsTime -= dt;
 	}
 
 	if (m_protectTime > 0)
@@ -584,8 +607,22 @@ void GameShooterMode::showGameOver()
 void GameShooterMode::useProtectEffect()
 {
 	m_protectTime = PROTECT_TIME;
+	if (m_character->getChildByTag(kTag_Protect))
+	{
+		m_character->removeChildByTag(kTag_Protect);
+	}
 	auto protect = CCSprite::create("game/protected.png");
 	protect->setTag(kTag_Protect);
 	m_character->addChild(protect);
 
+}
+
+void GameShooterMode::useShotGunsEffect()
+{
+	m_shotgunsTime = SHOTGUNS_TIME;
+}
+
+void GameShooterMode::getBloodEffect()
+{
+	CCLog("add blood effect");
 }

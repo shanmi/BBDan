@@ -11,9 +11,9 @@ GameConfig::GameConfig()
 , m_showLibaoLevel(20)
 , m_yijian(0)
 {
-	memset(m_nDiamond, 0, sizeof(int)* 10 * 5);
+	/*memset(m_nDiamond, 0, sizeof(int)* 10 * 5);
 	memset(m_nMarble, 0, sizeof(int)* 10 * 3);
-	memset(m_probability, 0, sizeof(int)* SQUARE_SIZE * 3);
+	memset(m_probability, 0, sizeof(int)* 10 * 3);*/
 }
 
 GameConfig::~GameConfig()
@@ -64,15 +64,30 @@ void GameConfig::preloadData()
 			}
 		}
 
-		Value &probability = root["probability"];
-		if (probability.IsArray()){
-			for (int i = 0; i < 9; i++){
-				Value &prop = probability[i];
+		Value &probability1 = root["probability1"];
+		if (probability1.IsArray()){
+			m_probabilityCount1 = probability1.Size();
+			for (int i = 0; i < m_probabilityCount1; i++){
+				Value &prop = probability1[i];
 				if (!prop.IsArray()){
 					break;
 				}
 				for (int j = 0; j < 3; j++){
-					m_probability[i][j] = prop[j].GetInt();
+					m_probability1[i][j] = prop[j].GetInt();
+				}
+			}
+		}
+
+		Value &probability2 = root["probability2"];
+		if (probability2.IsArray()){
+			m_probabilityCount2 = probability2.Size();
+			for (int i = 0; i < m_probabilityCount2; i++){
+				Value &prop = probability2[i];
+				if (!prop.IsArray()){
+					break;
+				}
+				for (int j = 0; j < 3; j++){
+					m_probability2[i][j] = prop[j].GetInt();
 				}
 			}
 		}

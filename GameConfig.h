@@ -11,8 +11,6 @@
 #define ERROR 0
 #define OVER_FLOW -2
 
-#define SQUARE_SIZE 10
-
 class GameConfig
 {
 public:
@@ -30,7 +28,11 @@ public:
 	int m_nMarbleCount;
 	int m_nMarble[10][3];
 
-	int m_probability[SQUARE_SIZE][3];
+	int m_probabilityCount1;
+	int m_probability1[20][3];
+
+	int m_probabilityCount2;
+	int m_probability2[20][3];
 
 	int m_showLibaoLevel;
 

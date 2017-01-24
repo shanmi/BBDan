@@ -88,7 +88,7 @@ void MarbleNode::shoot(float degree)
 	m_body->SetLinearVelocity(v_t);
 }
 
-void MarbleNode::shooterShoot()
+void MarbleNode::shooterShoot(float degree)
 {
 	if (m_attr.skin == kMarble_Dispersed)
 	{
@@ -96,8 +96,8 @@ void MarbleNode::shooterShoot()
 	}
 	m_bTrueStop = false;
 	b2Vec2 v_t;
-	v_t.x = BALL_MOVE_PACE * cos(CC_DEGREES_TO_RADIANS(90)) * m_attr.speed;
-	v_t.y = BALL_MOVE_PACE * sin(CC_DEGREES_TO_RADIANS(90)) * m_attr.speed;
+	v_t.x = BALL_MOVE_PACE * cos(CC_DEGREES_TO_RADIANS(degree)) * m_attr.speed;
+	v_t.y = BALL_MOVE_PACE * sin(CC_DEGREES_TO_RADIANS(degree)) * m_attr.speed;
 	m_body->SetLinearVelocity(v_t);
 }
 

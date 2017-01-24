@@ -9,6 +9,7 @@
 #include "Config.h"
 #include "ActionSequence.h"
 #include "CCFunctionAction.h"
+#include "GameUtil.h"
 USING_NS_CC;
 
 CircleAddMarbleNode *CircleAddMarbleNode::create()
@@ -370,10 +371,6 @@ bool CircleProtectNode::init()
 	auto fanIn = CCFadeIn::create(0.6f);
 	m_image->runAction(fanIn);
 
-	auto *flip3d = CCOrbitCamera::create(2, -45, 0, 90, 180, 0, 0);
-	auto repeat = CCRepeatForever::create(flip3d);
-	//m_image->runAction(repeat);
-
 	return true;
 }
 
@@ -393,4 +390,133 @@ void CircleProtectNode::doCollisionAction()
 	addScore(-attactRate); //delete
 
 	GameController::getInstance()->useProtectEffect();
+}
+
+///////////////////////////////////////////////////////
+CircleShotgunsNode *CircleShotgunsNode::create()
+{
+	CircleShotgunsNode *node = new CircleShotgunsNode();
+	node->autorelease();
+	node->init();
+	return node;
+}
+
+bool CircleShotgunsNode::init()
+{
+	m_score = 1;
+	auto sizeSprite = CCSprite::create("squares/fangkuai_hong1.png");
+	auto size = sizeSprite->getContentSize();
+	setContentSize(size);
+
+	m_image = CCSprite::create("squares/fangkuai_sandanqiang.png");
+	addChild(m_image);
+	auto fanIn = CCFadeIn::create(0.6f);
+	m_image->runAction(fanIn);
+
+	return true;
+}
+
+void CircleShotgunsNode::setBody()
+{
+	m_body = Box2dFactory::getInstance()->createCircle(this, m_image->getContentSize(), true);
+}
+
+void CircleShotgunsNode::runRemoveAction()
+{
+	removeFromParent();
+}
+
+void CircleShotgunsNode::doCollisionAction()
+{
+	int attactRate = GameController::getInstance()->getAttactRate();
+	addScore(-attactRate); //delete
+
+	GameController::getInstance()->useShotGunsEffect();
+}
+
+///////////////////////////////////////////////////////
+CircleBloodNode *CircleBloodNode::create()
+{
+	CircleBloodNode *node = new CircleBloodNode();
+	node->autorelease();
+	node->init();
+	return node;
+}
+
+bool CircleBloodNode::init()
+{
+	m_score = 1;
+	auto sizeSprite = CCSprite::create("squares/fangkuai_hong1.png");
+	auto size = sizeSprite->getContentSize();
+	setContentSize(size);
+
+	m_image = CCSprite::create("squares/fangkuai_xueliangbao.png");
+	addChild(m_image);
+	auto fanIn = CCFadeIn::create(0.6f);
+	m_image->runAction(fanIn);
+
+	return true;
+}
+
+void CircleBloodNode::setBody()
+{
+	m_body = Box2dFactory::getInstance()->createCircle(this, m_image->getContentSize(), true);
+}
+
+void CircleBloodNode::runRemoveAction()
+{
+	removeFromParent();
+}
+
+void CircleBloodNode::doCollisionAction()
+{
+	int attactRate = GameController::getInstance()->getAttactRate();
+	addScore(-attactRate); //delete
+
+	GameController::getInstance()->getBloodEffect();
+}
+
+///////////////////////////////////////////////////////
+CircleRocketNode *CircleRocketNode::create()
+{
+	CircleRocketNode *node = new CircleRocketNode();
+	node->autorelease();
+	node->init();
+	return node;
+}
+
+bool CircleRocketNode::init()
+{
+	m_score = 1;
+	auto sizeSprite = CCSprite::create("squares/fangkuai_hong1.png");
+	auto size = sizeSprite->getContentSize();
+	setContentSize(size);
+
+	m_image = CCSprite::create("squares/fangkuai_huojianpao.png");
+	addChild(m_image);
+	auto fanIn = CCFadeIn::create(0.6f);
+	m_image->runAction(fanIn);
+
+	return true;
+}
+
+void CircleRocketNode::setBody()
+{
+	m_body = Box2dFactory::getInstance()->createCircle(this, m_image->getContentSize(), true);
+}
+
+void CircleRocketNode::runRemoveAction()
+{
+	auto explore = GameUtil::getExplodeEffect();
+	explore->setPosition(getPosition());
+	getParent()->addChild(explore);
+	removeFromParent();
+}
+
+void CircleRocketNode::doCollisionAction()
+{
+	int attactRate = GameController::getInstance()->getAttactRate();
+	addScore(-attactRate); //delete
+
+	SquareModel::theModel()->elimateAroundSquare(this);
 }

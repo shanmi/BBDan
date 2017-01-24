@@ -12,6 +12,7 @@ GameController::GameController()
 , m_targetPos(ccp(0, 0))
 , m_attactRate(ATTACT_RATE)
 , m_bISFirstIn(true)
+, m_bloodCount(PLAYER_BLOOD_COUNT)
 {
 }
 
@@ -110,11 +111,6 @@ bool GameController::checkCoinsEnought()
 		return true;
 	}
 	return false;
-}
-
-void GameController::addSquareNode(SquareNode *node)
-{
-	NOTIFY_VIEWS(addSquareNode, node);
 }
 
 void GameController::createPropByMarble(MarbleNode *marble)

@@ -19,7 +19,7 @@ public:
 	b2Body *getBody(){ return m_body; }
 
 	void shoot(float degree);
-	void shooterShoot();
+	void shooterShoot(float degree);
 	void stop();
 
 	void setMovingState(bool isMoving){ m_bIsMoving = isMoving; }

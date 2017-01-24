@@ -15,6 +15,8 @@ struct INotifyView
 	virtual void showGameOver(){}
 	virtual void addSquareNode(SquareNode *node){}
 	virtual void useProtectEffect(){}
+	virtual void useShotGunsEffect(){}
+	virtual void getBloodEffect(){}
 };
 
 class GameController
@@ -30,8 +32,10 @@ public:
 	void showGameOver() { NOTIFY_VIEWS(showGameOver); }
 	void updateMarbles() { NOTIFY_VIEWS(updateMarbles); }
 	void updateCoins() { NOTIFY_VIEWS(updateCoins); }
-	void addSquareNode(SquareNode *node);
+	void addSquareNode(SquareNode *node){ NOTIFY_VIEWS(addSquareNode, node); }
 	void useProtectEffect() { NOTIFY_VIEWS(useProtectEffect); }
+	void useShotGunsEffect() { NOTIFY_VIEWS(useShotGunsEffect); }
+	void getBloodEffect(){ addBloodCount(1); NOTIFY_VIEWS(getBloodEffect); }
 public:
 	void startOneRound();
 
@@ -59,6 +63,17 @@ public:
 
 	bool isFirshInGame(){ return m_bISFirstIn; }
 	void setFirstInGame(bool firtIn){ m_bISFirstIn = firtIn; }
+
+	int getBloodCount(){ return m_bloodCount; }
+	void addBloodCount(int count)
+	{ 
+		m_bloodCount += count; 
+		if (m_bloodCount >= PLAYER_BLOOD_COUNT)
+		{
+			m_bloodCount = PLAYER_BLOOD_COUNT;
+		}
+	}
+
 private:
 	GameController();
 
@@ -69,6 +84,7 @@ private:
 	int m_attactRate;
 	bool m_bIsRoundOver;
 	bool m_bISFirstIn;
+	int m_bloodCount;
 };
 
 #endif

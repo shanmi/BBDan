@@ -36,7 +36,8 @@ public:
 	void addSquareNode(SquareNode *node);
 	void showGameOver();
 	void useProtectEffect();
-
+	void useShotGunsEffect();
+	void getBloodEffect();
 public:
 	void onPauseGame(cocos2d::CCObject *pSender);
 	void onDoubleAttact(cocos2d::CCObject *pSender);
@@ -69,5 +70,6 @@ private:
 	bool m_bIsDoubleAttact;
 	float m_freezingTime;
 	float m_protectTime;
+	float m_shotgunsTime;
 };
 #endif

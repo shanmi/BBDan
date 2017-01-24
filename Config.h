@@ -17,8 +17,10 @@
 #define BALL_MOVE_SPEED 300
 #define FREEZING_TIME 5
 #define PROTECT_TIME  10
-#define DISPREAD_TIME 10
+#define SHOTGUNS_TIME 10
 #define BLOOD_COUNT   1
 #define ROCKET_TIME   10
+
+#define PLAYER_BLOOD_COUNT	3
 
 #endif
