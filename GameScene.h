@@ -47,6 +47,7 @@ public:
 	void onHelpPanel(cocos2d::CCObject *pSender);
 	void initMainLayout();
 	void initCharacterLayout();
+	void initTopLayout();
 	void initBottomLayout();
 	void initGameLayout();
 	void initPhysicBorder();
@@ -63,6 +64,7 @@ private:
 	b2World *m_world;
 	UiLayout *m_mainLayout;
 	UiLayout *m_characterLayout;
+	UiLayout *m_topLayout;
 	UiLayout *m_bottomLayout;
 	cocos2d::CCSprite *m_touchPoint;
 	cocos2d::CCSprite *m_arrow;

@@ -142,6 +142,14 @@ std::vector<SquareNode*> SquareModel::createSquareList(bool autoAddScore /* = tr
 	{
 		m_curScore++;
 	}
+	else
+	{
+		m_curScore++;
+		if (m_curScore > 48)
+		{
+			m_curScore = 1;
+		}
+	}
 	return nodes;
 }
 

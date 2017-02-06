@@ -100,6 +100,12 @@ bool GameShooterMode::init()
 	addChild(m_characterLayout, kZOrder_Character);
 	initCharacterLayout();
 
+	m_topLayout = UiLayout::create("layout/game_top.xml");
+	m_topLayout->setPosition(ccp(0, winSize.height - m_topLayout->getContentSize().height));
+	m_topLayout->setMenuTouchPriority(kPriority_Game - 1);
+	addChild(m_topLayout, kZOrder_Layout);
+	initTopLayout();
+
 	m_bottomLayout = UiLayout::create("layout/game_bottom.xml");
 	m_bottomLayout->setPosition(ccp(0, 0));
 	addChild(m_bottomLayout);
@@ -131,8 +137,6 @@ void GameShooterMode::initMainLayout()
 	m_bottomLinePos = worldPos.y;
 	Box2dFactory::getInstance()->createSquare(line_bottom, true);
 
-	CCMenuItem *pauseItem = dynamic_cast<CCMenuItem*>(m_mainLayout->getChildById(6));
-	pauseItem->setTarget(this, menu_selector(GameShooterMode::onPauseGame));
 }
 
 void GameShooterMode::initCharacterLayout()
@@ -181,6 +185,12 @@ void GameShooterMode::onPauseGame(CCObject *pSender)
 	}
 	PauseLayer *pauseLayer = PauseLayer::create();
 	addChild(pauseLayer, KZOrder_PauseLayer, kTag_Pause);
+}
+
+void GameShooterMode::initTopLayout()
+{
+	CCMenuItem *pauseItem = dynamic_cast<CCMenuItem*>(m_topLayout->getChildById(6));
+	pauseItem->setTarget(this, menu_selector(GameShooterMode::onPauseGame));
 }
 
 void GameShooterMode::initBottomLayout()
@@ -588,7 +598,7 @@ void GameShooterMode::updateCoins()
 {
 	int coinCount = UserInfo::getInstance()->getCoins();
 	std::string countStr = GameUtil::intToString(coinCount);
-	CCLabelAtlas *coinLabel = dynamic_cast<CCLabelAtlas*>(m_mainLayout->getChildById(5));
+	CCLabelAtlas *coinLabel = dynamic_cast<CCLabelAtlas*>(m_topLayout->getChildById(5));
 	coinLabel->setString(countStr.c_str());
 }
 

@@ -102,6 +102,12 @@ bool GameScene::init()
 	addChild(m_characterLayout, kZOrder_Character);
 	initCharacterLayout();
 
+	m_topLayout = UiLayout::create("layout/game_top.xml");
+	m_topLayout->setPosition(ccp(0, winSize.height - m_topLayout->getContentSize().height));
+	m_topLayout->setMenuTouchPriority(kPriority_Game - 1);
+	addChild(m_topLayout, kZOrder_Layout);
+	initTopLayout();
+
 	m_bottomLayout = UiLayout::create("layout/game_bottom.xml");
 	m_bottomLayout->setPosition(ccp(0, 0));
 	m_bottomLayout->setMenuTouchPriority(kPriority_Game - 1);
@@ -137,9 +143,6 @@ void GameScene::initMainLayout()
 	worldPos = line_bottom->convertToWorldSpace(CCPointZero);
 	m_bottomLinePos = worldPos.y;
 	Box2dFactory::getInstance()->createSquare(line_bottom, true);
-
-	CCMenuItem *pauseItem = dynamic_cast<CCMenuItem*>(m_mainLayout->getChildById(6));
-	pauseItem->setTarget(this, menu_selector(GameScene::onPauseGame));
 }
 
 void GameScene::onPauseGame(CCObject *pSender)
@@ -174,6 +177,12 @@ void GameScene::initCharacterLayout()
 		character_head->setPosition(ccp(targetPos.x, character_head->getPositionY()));
 		m_arrow->setVisible(false);
 	}
+}
+
+void GameScene::initTopLayout()
+{
+	CCMenuItem *pauseItem = dynamic_cast<CCMenuItem*>(m_topLayout->getChildById(6));
+	pauseItem->setTarget(this, menu_selector(GameScene::onPauseGame));
 }
 
 void GameScene::initBottomLayout()
@@ -530,7 +539,7 @@ void GameScene::ccTouchMoved(CCTouch *pTouch, CCEvent *pEvent)
 		character_head->setFlipX(true);
 
 		m_arrow->setAnchorPoint(ccp(0.73f, 0.35f));
-		m_arrow->setPosition(ccp(character_body->getPositionX() + 10, targetPos.y + 6));
+		m_arrow->setPosition(ccp(character_body->getPositionX() + 10, character_body->getPositionY() + 6));
 		m_arrow->setFlipY(true);
 	}
 	else
@@ -540,10 +549,10 @@ void GameScene::ccTouchMoved(CCTouch *pTouch, CCEvent *pEvent)
 		character_head->setFlipX(false);
 
 		m_arrow->setAnchorPoint(ccp(0.73f, 0.65f));
-		m_arrow->setPosition(ccp(character_body->getPositionX() - 12, targetPos.y + 6));
+		m_arrow->setPosition(ccp(character_body->getPositionX() - 12, character_body->getPositionY() + 6));
 		m_arrow->setFlipY(false);
 	}
-	BallHintModel::theModel()->updatePosition(curPos, prePos, m_arrow->getPosition(), m_arrow->getContentSize().width);
+	BallHintModel::theModel()->updatePosition(curPos, prePos, targetPos, m_arrow->getContentSize().width);
 
 	if (m_shootDegree > 60 && m_shootDegree < 90)
 	{
@@ -683,7 +692,7 @@ void GameScene::updateCoins()
 {
 	int coinCount = UserInfo::getInstance()->getCoins();
 	std::string countStr = GameUtil::intToString(coinCount);
-	CCLabelAtlas *coinLabel = dynamic_cast<CCLabelAtlas*>(m_mainLayout->getChildById(5));
+	CCLabelAtlas *coinLabel = dynamic_cast<CCLabelAtlas*>(m_topLayout->getChildById(5));
 	coinLabel->setString(countStr.c_str());
 	updatePropsCount();
 }
@@ -692,7 +701,7 @@ void GameScene::updateScore()
 {
 	int score = SquareModel::theModel()->getCurrentScore() - 1;
 	std::string countStr = GameUtil::intToString(score);
-	CCLabelAtlas *scoreLabel = dynamic_cast<CCLabelAtlas*>(m_mainLayout->getChildById(3));
+	CCLabelAtlas *scoreLabel = dynamic_cast<CCLabelAtlas*>(m_topLayout->getChildById(3));
 	scoreLabel->setString(countStr.c_str());
 
 	int bestScore = UserInfo::getInstance()->getBestScore();
@@ -702,7 +711,7 @@ void GameScene::updateScore()
 		UserInfo::getInstance()->setBestScore(score);
 	}
 	std::string bestStr = GameUtil::intToString(bestScore);
-	CCLabelAtlas *bestScoreLabel = dynamic_cast<CCLabelAtlas*>(m_mainLayout->getChildById(13));
+	CCLabelAtlas *bestScoreLabel = dynamic_cast<CCLabelAtlas*>(m_topLayout->getChildById(13));
 	bestScoreLabel->setString(bestStr.c_str());
 }
 
