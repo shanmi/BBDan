@@ -13,6 +13,8 @@
 #include "ShopSkinLayer.h"
 #include "MarbleModel.h"
 #include "GameConfig.h"
+#include "LoginLayer.h"
+#include "LoginUtils.h"
 
 USING_NS_CC;
 
@@ -85,6 +87,13 @@ bool MainMenu::init()
 		GameController::getInstance()->setFirstInGame(false);
 		toLibao1(NULL);
 	}
+
+	/*bool hasLoginReward = LoginUtils::getInstance()->checkLoginReward();
+	if (hasLoginReward)
+	{
+	LoginLayer *loginLayer = LoginLayer::create();
+	addChild(loginLayer, KZOrder_LoginLayer, kTag_LoginLayer);
+	}*/
 
 	setKeypadEnabled(true);
 
@@ -160,7 +169,6 @@ void MainMenu::initLayout()
 	{
 		phoneTip->setVisible(false);
 	}
-	
 }
 
 void MainMenu::toStartGameOne(CCObject* pSender)

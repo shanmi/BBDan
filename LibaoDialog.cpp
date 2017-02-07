@@ -56,7 +56,19 @@ bool LibaoDialog::init()
 	auto colorLayer = CCLayerColor::create(ccc4(0, 0, 0, 80));
 	addChild(colorLayer);
 
-	m_mainLayout = UiLayout::create("layout/libao_dialog.xml");
+	switch (m_type)
+	{
+	case PAY_TYPE_TIME_LIBAO:
+		m_mainLayout = UiLayout::create("layout/libao_dialog1.xml");
+		break;
+	case PAY_TYPE_COIN_LIBAO:
+		m_mainLayout = UiLayout::create("layout/libao_dialog2.xml");
+		break;
+	case PAY_TYPE_FISH_LIBAO:
+		m_mainLayout = UiLayout::create("layout/libao_dialog.xml");
+		break;
+	}
+	
 	m_mainLayout->setMenuTouchPriority(kPriority_Libao - 1);
 	m_mainLayout->setAnchorPoint(ccp(0.5f, 0.5f));
 	m_mainLayout->setPosition(ccpMult(winSize, 0.5f));
@@ -86,33 +98,6 @@ void LibaoDialog::initLayout()
 	CCMenuItem *sureItem = dynamic_cast<CCMenuItem*>(m_mainLayout->getChildById(8));
 	sureItem->setTarget(this, menu_selector(LibaoDialog::buyLibao));
 	sureItem->setVisible(isBusinessMode);
-
-	CCSprite *libaoIcon = dynamic_cast<CCSprite*>(m_mainLayout->getChildById(4));
-	std::string libaoImg;
-	switch (m_type)
-	{
-	case PAY_TYPE_TIME_LIBAO:
-		if (isYijian)
-		{
-			libaoImg = "libao/zujiemian_libao_huoqudaoju.png";
-		}
-		else
-		{
-			libaoImg = "libao/zujiemian_libao_xianshidalibao.png";
-		}
-		break;
-	case PAY_TYPE_FISH_LIBAO:
-		libaoImg = "libao/zujiemian_libao_xinshoulibao.png";
-		break;
-	case PAY_TYPE_COIN_LIBAO:
-		libaoImg = "libao/zujiemian_libao_xinshoulibao.png";
-		break;
-	default:
-		libaoImg = "libao/zujiemian_libao_xianshidalibao.png";
-		break;
-	}
-	libaoIcon->initWithFile(libaoImg.c_str());
-
 
 	CCLabelTTF *buyTip = dynamic_cast<CCLabelTTF*>(m_mainLayout->getChildById(7));
 	if (isBusinessMode)

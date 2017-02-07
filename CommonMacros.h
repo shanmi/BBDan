@@ -12,7 +12,8 @@ enum TouchPriority
 	kPriority_Guide = -20,
 	kPriority_Pause = -30,
 	kPriority_Shop = -40,
-	kPriority_Libao = -50
+	kPriority_Login = -50,
+	kPriority_Libao = -60,
 };
 
 enum GameZOrder
@@ -26,6 +27,7 @@ enum GameZOrder
 	KZOrder_PauseLayer,
 	KZOrder_GameOver,
 	kZOrder_Shop,
+	KZOrder_LoginLayer,
 	KZOrder_LibaoLayer
 };
 
@@ -64,6 +66,7 @@ enum ViewTag
 	kTag_Pause,
 	kTag_Shop,
 	kTag_Libao,
+	kTag_LoginLayer,
 	kTag_GuideLayer,
 	kTag_GameOver,
 	kTag_Protect,
