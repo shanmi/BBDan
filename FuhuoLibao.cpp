@@ -57,6 +57,9 @@ bool FuhuoLibao::init()
 	m_mainLayout->setAnchorPoint(ccp(0.5f, 0.5f));
 	m_mainLayout->setPosition(ccpMult(winSize, 0.5f));
 	addChild(m_mainLayout);
+	m_mainLayout->setScale(0.0f);
+	auto action = CCScaleTo::create(0.2f, 1.0f);
+	m_mainLayout->runAction(action);
 
 	initLayout();
 

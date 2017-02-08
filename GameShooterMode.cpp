@@ -432,6 +432,14 @@ void GameShooterMode::initSquares()
 
 void GameShooterMode::addSquares()
 {
+	auto allsquares = SquareModel::theModel()->getSquares();
+	for (auto iter = allsquares.begin(); iter != allsquares.end(); ++iter)
+	{
+		auto square = *iter;
+		Index index = square->getIndex();
+		square->setIndex(index.x, index.y + 1);
+	}
+
 	auto squares = SquareModel::theModel()->createSquareList(false);
 	for (int i = 0; i < squares.size(); i++)
 	{

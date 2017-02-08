@@ -31,6 +31,8 @@ public:
 	void elimateSameColSquare(SquareNode *node);
 	void elimateAroundSquare(SquareNode *node);
 
+	void removeSameRowSquare(SquareNode *node);
+
 	void clearSquares();
 
 private:

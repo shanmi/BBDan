@@ -14,6 +14,7 @@ enum TouchPriority
 	kPriority_Shop = -40,
 	kPriority_Login = -50,
 	kPriority_Libao = -60,
+	kPriority_Clipping = -70,
 };
 
 enum GameZOrder

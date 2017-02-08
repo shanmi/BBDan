@@ -22,5 +22,6 @@
 #define ROCKET_TIME   10
 
 #define PLAYER_BLOOD_COUNT	3
+#define NEW_SHOOT_MODE 1
 
 #endif

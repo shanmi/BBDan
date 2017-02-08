@@ -19,6 +19,7 @@
 #include "MyPurchase.h"
 #include "HelpLayer.h"
 #include "GameConfig.h"
+#include "ClippingLayer.h"
 
 USING_NS_CC;
 
@@ -152,6 +153,11 @@ void GameScene::onPauseGame(CCObject *pSender)
 		removeChildByTag(kTag_Pause);
 		return;
 	}
+	if (getChildByTag(kTag_Libao))
+	{
+		removeChildByTag(kTag_Libao);
+		return;
+	}
 	if (getChildByTag(kTag_GameOver))
 	{
 		return;
@@ -249,10 +255,13 @@ void GameScene::onClearScreen(CCObject *pSender)
 	{
 		// show pay point
 		showLibaoDiaolg();
+		return;
 	}
 	if (isRoundOver)
 	{
-		if (count > 0)
+		ClippingLayer *clippingLayer = ClippingLayer::create();
+		addChild(clippingLayer, KZOrder_LibaoLayer, kTag_Libao);
+		/*if (count > 0)
 		{
 			UserInfo::getInstance()->addPropsCount(kProp_Clear, -1);
 		}
@@ -263,7 +272,7 @@ void GameScene::onClearScreen(CCObject *pSender)
 		updateCoins();
 		GameController::getInstance()->setRoundState(false);
 		SquareModel::theModel()->removeAllSquares();
-		oneRoundEnd();
+		oneRoundEnd();*/
 	}
 }
 
@@ -276,6 +285,7 @@ void GameScene::onFreezing(CCObject *pSender)
 	{
 		// show pay point
 		showLibaoDiaolg();
+		return;
 	}
 	if (!isFreezing)
 	{
@@ -305,7 +315,6 @@ void GameScene::onHelpPanel(CCObject *pSender)
 
 void GameScene::showLibaoDiaolg()
 {
-
 	bool isBusinessMode = MyPurchase::sharedPurchase()->isBusinessMode();
 	int isYijian = GameConfig::getInstance()->m_yijian;
 	if (isBusinessMode && isYijian)
@@ -320,7 +329,7 @@ void GameScene::showLibaoDiaolg()
 		libaoType = PAY_TYPE_COIN_LIBAO;
 	}
 	LibaoDialog *dialog = LibaoDialog::create(libaoType);
-	addChild(dialog, KZOrder_LibaoLayer);
+	addChild(dialog, KZOrder_LibaoLayer, kTag_Libao);
 }
 
 void GameScene::checkLibaoShow()
@@ -340,6 +349,10 @@ void GameScene::initGameLayout()
 	{
 		addChild(*iter, kZOrder_Layout);
 	}
+
+	m_touchCircle = CCSprite::create("game/start_touch_bg.png");
+	addChild(m_touchCircle, kZOrder_Layout);
+	m_touchCircle->setVisible(false);
 
 	m_touchPoint = CCSprite::create("game/start_touch_point.png");
 	addChild(m_touchPoint, kZOrder_Layout);
@@ -500,22 +513,19 @@ bool GameScene::ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent)
 		return false;
 	}
 	auto location = pTouch->getLocation();
+	m_touchCircle->setPosition(location);
 	m_touchPoint->setPosition(location);
-	m_touchPoint->setVisible(true);
-
-	return true;
-}
-
-void GameScene::ccTouchMoved(CCTouch *pTouch, CCEvent *pEvent)
-{
-	if (!m_touchPoint->isVisible())
-	{
-		return;
-	}
+#if(NEW_SHOOT_MODE == 1)
 	auto curPos = pTouch->getLocation();
-	auto prePos = m_touchPoint->getPosition();
+	auto prePos = m_touchCircle->getPosition();
+	auto targetPos = GameController::getInstance()->getTargetPos();
 
-	m_shootDegree = GameUtil::getDegreeTwoPoints(curPos, prePos);
+	m_shootDegree = GameUtil::getDegreeTwoPoints(targetPos, curPos /*prePos*/);
+	float radian = GameUtil::getRadian(m_shootDegree);
+	float newX = prePos.x - m_touchCircle->getContentSize().width * 0.5f * cos(radian);
+	float newY = prePos.y - m_touchCircle->getContentSize().width * 0.5f * sin(radian);
+	m_touchPoint->setPosition(ccp(newX, newY));
+
 	m_arrow->setRotation(180 - m_shootDegree);
 	if (m_shootDegree < 6 || m_shootDegree > 174)
 	{
@@ -527,8 +537,6 @@ void GameScene::ccTouchMoved(CCTouch *pTouch, CCEvent *pEvent)
 		m_arrow->setVisible(true);
 		BallHintModel::theModel()->setHintVisible(true);
 	}
-
-	auto targetPos = GameController::getInstance()->getTargetPos();
 
 	CCSprite *character_body = dynamic_cast<CCSprite*>(m_characterLayout->getChildById(9));
 	CCSprite *character_head = dynamic_cast<CCSprite*>(m_characterLayout->getChildById(10));
@@ -552,7 +560,94 @@ void GameScene::ccTouchMoved(CCTouch *pTouch, CCEvent *pEvent)
 		m_arrow->setPosition(ccp(character_body->getPositionX() - 12, character_body->getPositionY() + 6));
 		m_arrow->setFlipY(false);
 	}
+
+#if(NEW_SHOOT_MODE == 1)
+	BallHintModel::theModel()->updatePosition(targetPos, curPos, targetPos, m_arrow->getContentSize().width);
+#else
 	BallHintModel::theModel()->updatePosition(curPos, prePos, targetPos, m_arrow->getContentSize().width);
+#endif
+
+	if (m_shootDegree > 60 && m_shootDegree < 90)
+	{
+		character_head->setRotation(60 - m_shootDegree);
+	}
+	else if (m_shootDegree >= 90 && m_shootDegree < 120)
+	{
+		character_head->setRotation(120 - m_shootDegree);
+	}
+	else
+	{
+		character_head->setRotation(0);
+	}
+#else
+	m_touchCircle->setVisible(true);
+	m_touchPoint->setVisible(true);
+#endif
+
+	return true;
+}
+
+void GameScene::ccTouchMoved(CCTouch *pTouch, CCEvent *pEvent)
+{
+#if(NEW_SHOOT_MODE == 1)
+	
+#else
+	if (!m_touchPoint->isVisible())
+	{
+		return;
+	}
+#endif
+	
+	auto curPos = pTouch->getLocation();
+	auto prePos = m_touchCircle->getPosition();
+	auto targetPos = GameController::getInstance()->getTargetPos();
+
+	m_shootDegree = GameUtil::getDegreeTwoPoints(targetPos, curPos /*prePos*/);
+	float radian = GameUtil::getRadian(m_shootDegree);
+	float newX = prePos.x - m_touchCircle->getContentSize().width * 0.5f * cos(radian);
+	float newY = prePos.y - m_touchCircle->getContentSize().width * 0.5f * sin(radian);
+	m_touchPoint->setPosition(ccp(newX, newY));
+
+	m_arrow->setRotation(180 - m_shootDegree);
+	if (m_shootDegree < 6 || m_shootDegree > 174)
+	{
+		m_arrow->setVisible(false);
+		BallHintModel::theModel()->setHintVisible(false);
+	}
+	else
+	{
+		m_arrow->setVisible(true);
+		BallHintModel::theModel()->setHintVisible(true);
+	}
+
+	CCSprite *character_body = dynamic_cast<CCSprite*>(m_characterLayout->getChildById(9));
+	CCSprite *character_head = dynamic_cast<CCSprite*>(m_characterLayout->getChildById(10));
+	if (m_shootDegree < 90)
+	{
+		character_head->setPositionX(character_body->getPositionX() - 20);
+		character_body->setFlipX(true);
+		character_head->setFlipX(true);
+
+		m_arrow->setAnchorPoint(ccp(0.73f, 0.35f));
+		m_arrow->setPosition(ccp(character_body->getPositionX() + 10, character_body->getPositionY() + 6));
+		m_arrow->setFlipY(true);
+	}
+	else
+	{
+		character_head->setPositionX(character_body->getPositionX());
+		character_body->setFlipX(false);
+		character_head->setFlipX(false);
+
+		m_arrow->setAnchorPoint(ccp(0.73f, 0.65f));
+		m_arrow->setPosition(ccp(character_body->getPositionX() - 12, character_body->getPositionY() + 6));
+		m_arrow->setFlipY(false);
+	}
+
+#if(NEW_SHOOT_MODE == 1)
+	BallHintModel::theModel()->updatePosition(targetPos, curPos, targetPos, m_arrow->getContentSize().width);
+#else
+	BallHintModel::theModel()->updatePosition(curPos, prePos, targetPos, m_arrow->getContentSize().width);
+#endif
 
 	if (m_shootDegree > 60 && m_shootDegree < 90)
 	{
@@ -573,11 +668,13 @@ void GameScene::ccTouchEnded(CCTouch *pTouch, CCEvent *pEvent)
 	if (!m_arrow->isVisible())
 	{
 		m_touchPoint->setVisible(false);
+		m_touchCircle->setVisible(false);
 		return;
 	}
 
 	GameController::getInstance()->startOneRound();
 	m_touchPoint->setVisible(false);
+	m_touchCircle->setVisible(false);
 	CCSprite *character_head = dynamic_cast<CCSprite*>(m_characterLayout->getChildById(10));
 	character_head->setRotation(0);
 	BallHintModel::theModel()->setHintVisible(false);

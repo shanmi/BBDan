@@ -17,6 +17,7 @@ namespace GameUtil
 	std::string intToString(int value);
 
 	cocos2d::CCParticleExplosion *getExplodeEffect();
+	cocos2d::CCParticleExplosion *getRandomExplodeEffect();
 	cocos2d::CCMotionStreak *getMotionStreak();
 
 	std::string getBlockImage(int type, int score);

@@ -171,13 +171,11 @@ std::vector<int> SquareModel::getBallListType1()
 			}
 		}
 		int curSocre = SquareModel::theModel()->getCurrentScore();
-		if (curSocre <= 3 && (type == kType_Rebound || type == kType_EliminateRow || type == kType_EliminateCol || type == kType_EliminateCross))
+		if (curSocre <= 3 && (type == kType_Rebound || type == kType_EliminateRow || type == kType_EliminateCol || type == kType_EliminateCross || type == kType_AddCoin))
 		{
-			auto iter = find(types.begin(), types.end(), type);
-			while (type == kType_Rebound || type == kType_EliminateRow || type == kType_EliminateCol || type == kType_EliminateCross)
+			while (type == kType_Rebound || type == kType_EliminateRow || type == kType_EliminateCol || type == kType_EliminateCross || type == kType_AddCoin)
 			{
 				type = getBallType(probabilitys, count);
-				iter = find(types.begin(), types.end(), type);
 			}
 		}
 		types.push_back(type);
@@ -306,6 +304,21 @@ void SquareModel::elimateAroundSquare(SquareNode *node)
 		if (square->canRemoveByProps() && abs(index.x - squareIndex.x) <= 1 && abs(index.y - squareIndex.y) <= 1)
 		{
 			square->addScore(-square->getScore());
+		}
+	}
+}
+
+void SquareModel::removeSameRowSquare(SquareNode *node)
+{
+	Index index = node->getIndex();
+	auto squares = getSquares();
+	for (auto iter = squares.begin(); iter != squares.end(); ++iter)
+	{
+		auto square = (*iter);
+		Index squareIndex = square->getIndex();
+		if (square->canRemoveByProps() && index.y == squareIndex.y)
+		{
+			removeSquareNode(square);
 		}
 	}
 }

@@ -60,6 +60,9 @@ bool ShopCoinLayer::init()
 	m_mainLayout->setPosition(ccpMult(winSize, 0.5f));
 	m_mainLayout->setMenuTouchPriority(kPriority_Shop - 1);
 	addChild(m_mainLayout);
+	m_mainLayout->setScale(0.0f);
+	auto action = CCScaleTo::create(0.2f, 1.0f);
+	m_mainLayout->runAction(action);
 
 	initLayout();
 	//initCoinsLayout();

@@ -92,6 +92,60 @@ CCParticleExplosion *GameUtil::getExplodeEffect(){
 	return pEmitter;
 }
 
+CCParticleExplosion *GameUtil::getRandomExplodeEffect()
+{
+	int random = rand() % 8;
+	std::string image = "squares/fangkuai_hong1.png";
+	switch (random)
+	{
+	case 0:
+		image = "squares/fangkuai_hong1.png";
+		break;
+	case 1:
+		image = "squares/fangkuai_huang1.png";
+		break;
+	case 2:
+		image = "squares/fangkuai_lan1.png";
+		break;
+	case 3:
+		image = "squares/fangkuai_lv1.png";
+		break;
+	case 4:
+		image = "squares/fangkuai_qing1.png";
+		break;
+	case 5:
+		image = "squares/fangkuai_shitou1.png";
+		break;
+	case 6:
+		image = "squares/fangkuai_tuhuang1.png";
+		break;
+	case 7:
+		image = "squares/fangkuai_zhi1.png";
+		break;
+	}
+	CCParticleExplosion *pEmitter = CCParticleExplosion::create();
+	pEmitter->setTexture(CCTextureCache::sharedTextureCache()->addImage(image.c_str()));
+	pEmitter->setAutoRemoveOnFinish(true);
+
+	ccColor4F c4Var = { 0, 0, 0, 0.0 };
+	ccColor4F c4 = { 1, 1, 1, 1 };
+	pEmitter->setStartColor(c4);
+	pEmitter->setEndColor(c4);
+	pEmitter->setStartColorVar(c4Var);
+	pEmitter->setEndColorVar(c4Var);
+
+	pEmitter->setTotalParticles(10);
+
+	pEmitter->setRadialAccel(1);
+	pEmitter->setRadialAccelVar(5);
+
+	pEmitter->setSpeed(200);
+	pEmitter->setScale(1.2f);
+	pEmitter->setGravity(ccp(0, -200));
+
+	return pEmitter;
+}
+
 CCMotionStreak *GameUtil::getMotionStreak()
 {
 	auto streak = CCMotionStreak::create(0.1f, 3, 32, ccGREEN, "particle/streak.png");

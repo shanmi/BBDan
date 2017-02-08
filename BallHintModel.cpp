@@ -35,16 +35,16 @@ void BallHintModel::updatePosition(CCPoint pos1, CCPoint pos2, cocos2d::CCPoint 
 {
 	float degree = GameUtil::getDegreeTwoPoints(pos1, pos2);
 	float distance = ccpDistance(pos1, pos2);
-	//CCLog("distance=-============%f", distance);
+	CCLog("distance=-============%f", distance);
 
 	float radian = GameUtil::getRadian(degree);
 	float x = cos(radian);
 	float y = sin(radian);
 
 	float scale = distance / 120.0f + 1;
-	if (scale > 2)
+	if (scale > 3)
 	{
-		scale = 2;
+		scale = 3;
 	}
 	auto winSize = CCDirector::sharedDirector()->getWinSize();
 	for (int i = 0; i < m_ballHints.size(); i++)

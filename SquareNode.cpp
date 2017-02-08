@@ -145,7 +145,7 @@ bool SquareNode::canRemoveByProps()
 
 void SquareNode::runRemoveAction()
 {
-	auto explore = GameUtil::getExplodeEffect();
+	auto explore = GameUtil::getRandomExplodeEffect();
 	explore->setPosition(getPosition());
 	getParent()->addChild(explore);
 	removeFromParent();

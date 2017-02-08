@@ -62,6 +62,9 @@ bool ShopSkinLayer::init()
 	m_mainLayout->setPosition(ccpMult(winSize, 0.5f));
 	m_mainLayout->setMenuTouchPriority(kPriority_Shop - 3);
 	addChild(m_mainLayout);
+	m_mainLayout->setScale(0.0f);
+	auto action = CCScaleTo::create(0.2f, 1.0f);
+	m_mainLayout->runAction(action);
 
 	initLayout();
 	initSkinLayout();
@@ -128,6 +131,10 @@ void ShopSkinLayer::initSkinLayout()
 	m_pageView->setTag(Tag_BallPanel);
 	m_pageView->setCallbackListener(std::bind(&ShopSkinLayer::updatePage, this, std::placeholders::_1));
 	addChild(m_pageView);
+
+	m_pageView->setScale(0.0f);
+	auto action = CCScaleTo::create(0.2f, 1.0f);
+	m_pageView->runAction(action);
 }
 
 void ShopSkinLayer::closePanel(CCObject *pSender)

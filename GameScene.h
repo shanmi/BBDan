@@ -67,6 +67,7 @@ private:
 	UiLayout *m_topLayout;
 	UiLayout *m_bottomLayout;
 	cocos2d::CCSprite *m_touchPoint;
+	cocos2d::CCSprite *m_touchCircle;
 	cocos2d::CCSprite *m_arrow;
 	cocos2d::CCLabelAtlas *m_marbleCount;
 	float m_topLinePos;
