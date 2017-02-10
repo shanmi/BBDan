@@ -5,6 +5,11 @@
 #include "Box2dFactory.h"
 #include "CircleNode.h"
 #include "GameConfig.h"
+#include "cocos2d.h"
+#include "GameUtil.h"
+#include "MarbleModel.h"
+
+USING_NS_CC;
 
 SquareModel::SquareModel()
 :m_curScore(1)
@@ -301,6 +306,28 @@ void SquareModel::elimateAroundSquare(SquareNode *node)
 	{
 		auto &square = (*iter);
 		Index squareIndex = square->getIndex();
+		if (square != node && square->canRemoveByProps() && abs(index.x - squareIndex.x) <= 1 && abs(index.y - squareIndex.y) <= 1)
+		{
+			square->stopAllActions();
+			square->setRotation(0);
+			auto rotate = CCRotateBy::create(0.1f, 6);
+			auto rotateBack = rotate->reverse();
+			auto sequence = CCSequence::create(rotate, rotateBack, NULL);
+			square->runAction(sequence);
+			int damage = MarbleModel::theModel()->getMarbleAttr().damage;
+			int attactRate = GameController::getInstance()->getAttactRate();
+			square->addScore(-attactRate*damage);
+		}
+	}
+}
+
+void SquareModel::removeAroundSquare(SquareNode *node)
+{
+	Index index = node->getIndex();
+	for (auto iter = m_squares.begin(); iter != m_squares.end(); ++iter)
+	{
+		auto &square = (*iter);
+		Index squareIndex = square->getIndex();
 		if (square->canRemoveByProps() && abs(index.x - squareIndex.x) <= 1 && abs(index.y - squareIndex.y) <= 1)
 		{
 			square->addScore(-square->getScore());
@@ -320,6 +347,29 @@ void SquareModel::removeSameRowSquare(SquareNode *node)
 		{
 			removeSquareNode(square);
 		}
+	}
+}
+
+void SquareModel::exchangeSquarePosition()
+{
+	std::vector<SquareNode*> squares;
+	CCPointArray *points = CCPointArray::create(m_squares.size());
+	for (auto iter = m_squares.begin(); iter != m_squares.end(); ++iter)
+	{
+		auto square = *iter;
+		if (square->canRemoveByProps())
+		{
+			squares.push_back(square); 
+			points->addControlPoint(square->getPosition());
+		}
+	}
+	auto seq = GameUtil::buildRandomSequence(squares.size());
+	for (int i = 0; i < squares.size(); i++)
+	{
+		auto square = squares[i];
+		auto pos = points->getControlPointAtIndex(seq[i]);
+		CCMoveTo *moveTo = CCMoveTo::create(0.4f, pos);
+		square->runAction(CCEaseBackInOut::create(moveTo));
 	}
 }
 

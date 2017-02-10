@@ -172,6 +172,11 @@ void SquareNode::doCollisionAction()
 	int damage = MarbleModel::theModel()->getMarbleAttr().damage;
 	int attactRate = GameController::getInstance()->getAttactRate();
 	addScore(-attactRate*damage);
+	int skin = MarbleModel::theModel()->getMarbleAttr().skin;
+	if (skin == kMarble_Bomb)
+	{
+		SquareModel::theModel()->elimateAroundSquare(this);
+	}
 }
 
 void SquareNode::showBombAction()
@@ -179,9 +184,9 @@ void SquareNode::showBombAction()
 	int skin = MarbleModel::theModel()->getMarbleAttr().skin;
 	if (skin == kMarble_Bomb)
 	{
-		auto explore = GameUtil::getExplodeEffect();
+		auto explore = GameUtil::getBombEffect();
 		explore->setPosition(getPosition());
-		getParent()->addChild(explore);
+		getParent()->addChild(explore, kZOrder_Square + 1);
 	}
 }
 
@@ -300,6 +305,11 @@ void TriangleNode::doCollisionAction()
 	int damage = MarbleModel::theModel()->getMarbleAttr().damage;
 	int attactRate = GameController::getInstance()->getAttactRate();
 	addScore(-attactRate*damage);
+	int skin = MarbleModel::theModel()->getMarbleAttr().skin;
+	if (skin == kMarble_Bomb)
+	{
+		SquareModel::theModel()->elimateAroundSquare(this);
+	}
 }
 
 void TriangleNode::addScore(int score)
@@ -367,4 +377,9 @@ void BossEatMarbleNode::doCollisionAction()
 	int damage = MarbleModel::theModel()->getMarbleAttr().damage;
 	int attactRate = GameController::getInstance()->getAttactRate();
 	addScore(-attactRate*damage);
+}
+
+void BossEatMarbleNode::runRemoveAction()
+{
+	removeFromParent();
 }

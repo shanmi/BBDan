@@ -360,7 +360,8 @@ void GameScene::initGameLayout()
 
 	CCSprite *character_head = dynamic_cast<CCSprite*>(m_characterLayout->getChildById(10));
 	char temp[50] = { 0 };
-	sprintf(temp, ":%d", START_BALL_SIZE);
+	int attactRate = MarbleModel::theModel()->getAttactRate();
+	sprintf(temp, "%d:%d", attactRate, START_BALL_SIZE);
 	m_marbleCount = GameUtil::getImageNum(FONT_WHITE, temp);
 	m_marbleCount->setPosition(ccp(character_head->getContentSize().width / 2, character_head->getContentSize().height + m_marbleCount->getContentSize().height));
 	character_head->addChild(m_marbleCount);
@@ -386,7 +387,7 @@ void GameScene::initMarbles()
 		marble->setBody();
 		if (targetPos.x == 0 && targetPos.y == 0)
 		{
-			marble->setPosition(ccp(m_arrow->getPositionX(), m_bottomLinePos + marble->getContentSize().height / 2 + 4));
+			marble->setPosition(ccp(m_arrow->getPositionX(), m_bottomLinePos + marble->getContentSize().height / 2 + 10));
 		}
 		else
 		{
@@ -401,21 +402,7 @@ void GameScene::initMarbles()
 		{
 			marble->setVisible(false);
 		}
-		auto streak = GameUtil::getMotionStreak();
-		streak->setTag(kTag_Streak + i);
-		addChild(streak, kZOrder_Marble);
 		GameController::getInstance()->setTargetPos(marble->getPosition());
-	}
-	schedule(schedule_selector(GameScene::updateStreak));
-}
-
-void GameScene::updateStreak(float dt)
-{
-	auto marbles = MarbleModel::theModel()->getMarbles();
-	for (int i = 0; i < marbles.size(); i++)
-	{
-		auto node = getChildByTag(kTag_Streak + i);
-		node->setPosition(marbles[i]->getPosition());
 	}
 }
 
@@ -744,9 +731,6 @@ void GameScene::oneRoundEnd()
 		marble->setBody();
 		marble->setPosition(targetPos);
 		addChild(marble, kZOrder_Marble);
-		auto streak = GameUtil::getMotionStreak();
-		streak->setTag(kTag_Streak + marbles.size() + i);
-		addChild(streak, kZOrder_Marble);
 	}
 	GameController::getInstance()->updateMarblePos();
 	m_addMarbleCount = marbles.size() + addCount;
@@ -830,7 +814,8 @@ void GameScene::updateMarbleCount()
 	{
 		//m_addMarbleCount = MarbleModel::theModel()->getMarblesCount();1
 	}
-	sprintf(temp, ":%d", m_addMarbleCount);
+	int attactRate = MarbleModel::theModel()->getAttactRate();
+	sprintf(temp, "%d:%d", attactRate, m_addMarbleCount);
 	m_marbleCount->setString(temp);
 }
 

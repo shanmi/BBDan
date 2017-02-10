@@ -53,7 +53,6 @@ public:
 	void initMarbles();
 	void initSquares();
 	void addSquares();
-	void updateStreak(float dt);
 	void checkLibaoShow();
 	void showLibaoDiaolg();
 

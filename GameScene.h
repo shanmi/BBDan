@@ -54,7 +54,6 @@ public:
 	void initMarbles();
 	void initSquares();
 	void addSquares();
-	void updateStreak(float dt);
 
 	void checkFishGuide();
 	void showLibaoDiaolg();

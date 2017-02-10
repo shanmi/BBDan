@@ -33,12 +33,15 @@ public:
 	int getReboundTimes(){ return m_reboundTimes; }
 
 	void initWithFile(const char* imagePath);
+	void updateStreak(float delta);
+	void addMotionStreak();
 
 private:
 	MarbleNode(MarbleAttr attr);
 
 private:
 	cocos2d::CCSprite *m_playerBall;
+	cocos2d::CCMotionStreak *m_streak;
 	MarbleAttr m_attr;
 	b2Body *m_body;
 	bool m_bIsMoving;

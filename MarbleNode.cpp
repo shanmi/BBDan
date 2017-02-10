@@ -11,6 +11,7 @@ USING_NS_CC;
 
 MarbleNode::MarbleNode(MarbleAttr attr)
 : m_attr(attr)
+, m_streak(NULL)
 , m_body(NULL)
 , m_bIsMoving(false)
 , m_bTrueStop(false)
@@ -45,6 +46,8 @@ bool MarbleNode::init()
 	setTag(kTag_Marble);
 	setContentSize(size);
 	setAnchorPoint(ccp(0.5f, 0.5f));
+
+	schedule(schedule_selector(MarbleNode::updateStreak));
 
 	return true;
 }
@@ -137,4 +140,33 @@ void MarbleNode::moveToTargetPos()
 	/*actions->addAction(move);
 	actions->addAction(callback);
 	actions->runActions();*/
+}
+
+void MarbleNode::addMotionStreak()
+{
+	m_streak = CCMotionStreak::create(0.1f, 3, 32, ccGREEN, "particle/streak.png");
+	m_streak->setAnchorPoint(ccp(0.5f, 0.5f));
+	CCActionInterval *colorAction = CCRepeatForever::create(CCSequence::create(
+		CCTintTo::create(0.2f, 255, 0, 0),
+		CCTintTo::create(0.2f, 0, 255, 0),
+		CCTintTo::create(0.2f, 0, 0, 255),
+		CCTintTo::create(0.2f, 0, 255, 255),
+		CCTintTo::create(0.2f, 255, 255, 0),
+		CCTintTo::create(0.2f, 255, 0, 255),
+		CCTintTo::create(0.2f, 255, 255, 255),
+		NULL));
+	m_streak->runAction(colorAction);
+}
+
+void MarbleNode::updateStreak(float delta)
+{
+	if (m_streak == NULL && getParent() != NULL)
+	{
+		addMotionStreak();
+		getParent()->addChild(m_streak);
+	}
+	if (m_streak)
+	{
+		m_streak->setPosition(getPosition());
+	}
 }

@@ -62,11 +62,6 @@ bool HelloWorld::init()
 			//addChild(node);
 		}
 	}
-	/*auto m_emitter = new CCParticleSystemQuad();
-	std::string filename = "SpookyPeas.plist";
-	m_emitter->initWithFile(filename.c_str());
-	addChild(m_emitter, 10);*/
-
 
 	/*auto m_emitter = CCParticleGalaxy::create();
 	addChild(m_emitter, 10);
@@ -117,10 +112,17 @@ void HelloWorld::menuCloseCallback(CCObject* pSender)
 
 bool HelloWorld::ccTouchBegan(cocos2d::CCTouch *pTouch, cocos2d::CCEvent *pEvent)
 {
-	CCPoint position = pTouch->getLocation();
+	/*CCPoint position = pTouch->getLocation();
 	auto pEmitter = GameUtil::getExplodeEffect();
 	pEmitter->setPosition(position);
-	addChild(pEmitter);
+	addChild(pEmitter);*/
+
+	CCPoint position = pTouch->getLocation();
+	auto m_emitter = new CCParticleSystemQuad();
+	std::string filename = "explore.plist";
+	m_emitter->initWithFile(filename.c_str());
+	m_emitter->setPosition(position);
+	addChild(m_emitter, 10);
 
 	return true;
 }

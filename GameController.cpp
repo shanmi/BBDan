@@ -53,6 +53,12 @@ bool GameController::isCounterFull()
 	return false;
 }
 
+int GameController::getAttactRate()
+{ 
+	int marbleRate = MarbleModel::theModel()->getAttactRate();
+	return m_attactRate * marbleRate;
+}
+
 void GameController::checkSquares(bool isRoundEnd /* = false */)
 {
 	auto squares = SquareModel::theModel()->getSquares();

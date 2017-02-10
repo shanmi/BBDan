@@ -146,6 +146,15 @@ CCParticleExplosion *GameUtil::getRandomExplodeEffect()
 	return pEmitter;
 }
 
+cocos2d::CCParticleSystemQuad *GameUtil::getBombEffect()
+{
+	auto emitter = CCParticleSystemQuad::create("explore.plist");
+	emitter->setAutoRemoveOnFinish(true);
+	std::string filename = "explore.plist";
+	//emitter->initWithFile(filename.c_str());
+	return emitter;
+}
+
 CCMotionStreak *GameUtil::getMotionStreak()
 {
 	auto streak = CCMotionStreak::create(0.1f, 3, 32, ccGREEN, "particle/streak.png");
@@ -280,6 +289,8 @@ int GameUtil::saveGameInfo(){
 		putInt(xorEncDecInt(targetPos.y), file);
 		auto marbles = MarbleModel::theModel()->getMarbles();
 		putInt(xorEncDecInt(marbles.size()), file);
+		auto attactRate = MarbleModel::theModel()->getAttactRate();
+		putInt(xorEncDecInt(attactRate), file);
 		int curScore = SquareModel::theModel()->getCurrentScore();
 		putInt(xorEncDecInt(curScore), file);
 		auto squares = SquareModel::theModel()->getSquares();
@@ -325,6 +336,9 @@ int GameUtil::loadGameInfo(){
 		int marbleCount = xorEncDecInt(temp);
 		MarbleModel::theModel()->setMarblesCount(marbleCount);
 		getInt(temp, file);
+		int attactRate = xorEncDecInt(temp);
+		MarbleModel::theModel()->setAttactRate(attactRate);
+		getInt(temp, file);
 		int curScore = xorEncDecInt(temp);
 		SquareModel::theModel()->setCurrentScore(curScore);
 		getInt(temp, file);
@@ -367,4 +381,25 @@ int GameUtil::clearGameInfo()
 	MarbleModel::theModel()->setMarblesCount(0);
 	string path = CCFileUtils::sharedFileUtils()->getWritablePath() + GAME_DATA;
 	return remove(path.c_str());
+}
+
+//生成 [0 , length-1] 的随机序列
+vector<int> GameUtil::buildRandomSequence(int length)
+{
+	vector<int> seq;
+	for (int i = 0; i < length; ++i)
+	{
+		seq.push_back(i);
+	}
+	int index = 0;
+	int tmp = 0;
+	for (int i = length - 1; i > 0; i--) {
+		index = (int(CCRANDOM_0_1() * 100)) % i;
+
+		tmp = seq[i];
+		seq[i] = seq[index];
+		seq[index] = tmp;
+	}
+
+	return seq;
 }

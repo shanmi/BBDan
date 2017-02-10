@@ -54,7 +54,7 @@ public:
 
 	void setDoubleAttact(){ m_attactRate = ATTACT_RATE * 2; }
 	void resetAttactRate(){ m_attactRate = ATTACT_RATE; }
-	int getAttactRate(){ return m_attactRate; }
+	int getAttactRate();
 
 	bool checkCoinsEnought();
 	void createPropByMarble(MarbleNode *marble);

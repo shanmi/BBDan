@@ -34,6 +34,8 @@ MarbleModel::MarbleModel()
 	}
 
 	m_marblesCount = 0;
+	m_attactRate = 1;
+	m_tempAddCount = 0;
 }
 MarbleModel *MarbleModel::theModel()
 {
@@ -64,7 +66,7 @@ void MarbleModel::removeMarble(MarbleNode *node)
 
 void MarbleModel::setMarbleAttr(MarbleAttr attr)
 {
-	m_attr = attr; 
+	m_attr = attr;
 	UserInfo::getInstance()->setCurMarbleType(m_attr.skin);
 }
 
@@ -80,8 +82,31 @@ bool MarbleModel::haveMarbleMoving()
 	return false;
 }
 
+void MarbleModel::addMarblesCount()
+{
+	m_tempAddCount++;
+	if (m_tempAddCount >= m_attactRate)
+	{
+		m_marblesCount++;
+		m_tempAddCount = 0;
+	}
+
+	if (m_marblesCount >= 100)
+	{
+		m_marblesCount = m_marblesCount / 2;
+		m_attactRate++;
+	}
+}
+
 int MarbleModel::checkMarblesCount()
 {
+	if (m_marblesCount == (m_marbles.size() + 1) / 2)
+	{
+		for (int i = 0; i<m_marblesCount; i++)
+		{
+			removeMarble(m_marbles[i]);
+		}
+	}
 	int curCount = m_marbles.size();
 	if (m_marblesCount > curCount)
 	{

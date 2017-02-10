@@ -353,19 +353,7 @@ void GameShooterMode::initPhysicBorder()
 
 void GameShooterMode::initMarbles()
 {
-	schedule(schedule_selector(GameShooterMode::updateStreak));
-
 	addMarble(0);
-}
-
-void GameShooterMode::updateStreak(float dt)
-{
-	/*auto marbles = MarbleModel::theModel()->getMarbles();
-	for (int i = 0; i < marbles.size(); i++)
-	{
-	auto node = getChildByTag(kTag_Streak + i);
-	node->setPosition(marbles[i]->getPosition());
-	}*/
 }
 
 void GameShooterMode::addMarble(float dt)
@@ -399,10 +387,6 @@ void GameShooterMode::addMarble(float dt)
 		auto attr = MarbleModel::theModel()->getMarbleAttr();
 		auto action1 = CCDelayTime::create(0.2f / attr.speed);
 		actions->addAction(action1);
-
-		auto streak = GameUtil::getMotionStreak();
-		streak->setTag(kTag_Streak + marbles.size());
-		addChild(streak);
 	}
 	auto callback = CCFunctionAction::create([=]()
 	{

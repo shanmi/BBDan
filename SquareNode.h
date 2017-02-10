@@ -91,6 +91,7 @@ public:
 	virtual bool init();
 	virtual void setBody();
 	virtual void doCollisionAction();
+	virtual void runRemoveAction();
 };
 
 #endif

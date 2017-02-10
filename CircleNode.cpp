@@ -507,9 +507,13 @@ void CircleRocketNode::setBody()
 
 void CircleRocketNode::runRemoveAction()
 {
-	auto explore = GameUtil::getRandomExplodeEffect();
+	auto emitter = GameUtil::getBombEffect();
+	emitter->setPosition(getPosition());
+	getParent()->addChild(emitter, kZOrder_Square + 1);
+
+	/*auto explore = GameUtil::getRandomExplodeEffect();
 	explore->setPosition(getPosition());
-	getParent()->addChild(explore);
+	getParent()->addChild(explore);*/
 	removeFromParent();
 }
 
@@ -518,5 +522,5 @@ void CircleRocketNode::doCollisionAction()
 	int attactRate = GameController::getInstance()->getAttactRate();
 	addScore(-attactRate); //delete
 
-	SquareModel::theModel()->elimateAroundSquare(this);
+	SquareModel::theModel()->removeAroundSquare(this);
 }

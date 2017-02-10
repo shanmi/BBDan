@@ -43,7 +43,7 @@ struct AcrossdMarle : public MarbleAttr
 
 struct BombMarle : public MarbleAttr
 {
-	BombMarle() : MarbleAttr(kMarble_Bomb, 1.0f, 3){}
+	BombMarle() : MarbleAttr(kMarble_Bomb, 1.0f, 1){}
 };
 
 #endif

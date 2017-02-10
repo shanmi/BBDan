@@ -18,6 +18,7 @@ namespace GameUtil
 
 	cocos2d::CCParticleExplosion *getExplodeEffect();
 	cocos2d::CCParticleExplosion *getRandomExplodeEffect();
+	cocos2d::CCParticleSystemQuad *getBombEffect();
 	cocos2d::CCMotionStreak *getMotionStreak();
 
 	std::string getBlockImage(int type, int score);
@@ -36,6 +37,8 @@ namespace GameUtil
 	int saveGameInfo();
 	int loadGameInfo();
 	int clearGameInfo();
+
+	std::vector<int> buildRandomSequence(int length);
 }
 
 #endif

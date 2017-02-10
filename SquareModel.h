@@ -31,7 +31,9 @@ public:
 	void elimateSameColSquare(SquareNode *node);
 	void elimateAroundSquare(SquareNode *node);
 
+	void removeAroundSquare(SquareNode *node);
 	void removeSameRowSquare(SquareNode *node);
+	void exchangeSquarePosition();
 
 	void clearSquares();
 
