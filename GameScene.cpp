@@ -717,13 +717,13 @@ void GameScene::oneRoundEnd()
 	}
 	else
 	{
+		SquareModel::theModel()->exchangeSquarePosition();
 		addSquares();
 		SquareModel::theModel()->squareMoveDown();
 	}
-
 	//check marbles
-	auto marbles = MarbleModel::theModel()->getMarbles();
 	int addCount = MarbleModel::theModel()->checkMarblesCount();
+	auto marbles = MarbleModel::theModel()->getMarbles();
 	auto targetPos = GameController::getInstance()->getTargetPos();
 	for (int i = 0; i < addCount; i++)
 	{

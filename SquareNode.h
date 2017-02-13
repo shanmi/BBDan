@@ -15,6 +15,13 @@ struct Index
 		this->x = x;
 		this->y = y;
 	}
+	inline bool Index::operator==(const Index &index) const
+	{
+
+		if (this->x == index.x && this->y == index.y)
+			return true;
+		return false;
+	}
 };
 
 struct CommonAction

@@ -102,12 +102,56 @@ void SquareNode::moveDown(bool isLastOne /* = false */)
 	{
 		GameController::getInstance()->setRoundState(true);
 		GameController::getInstance()->checkGameOver();
+		GameUtil::saveGameInfo();
 	});
 	actions->addAction(delay);
 	actions->addAction(move);
 	if (isLastOne)
 	{
 		actions->addAction(callback);
+	}
+
+	if (m_squareType == kType_Square || m_squareType == kType_Triangle)
+	{
+		auto callback2 = CCFunctionAction::create([=]()
+		{
+			int curScore = m_score;
+			Index newIndex = Index(m_index.x + 1, m_index.y);
+			auto neighbour = SquareModel::theModel()->getSquareByIndex(newIndex);
+			int curLevel = SquareModel::theModel()->getCurrentScore();
+			if (!neighbour && newIndex.x < BALL_COL_SIZE && curScore / 2 > 0 && curLevel >= 100)
+			{
+				addScore(-(curScore - m_score / 2));
+				auto shake = CCShaky3D::create(0.4f, ccp(2, 2), 2, 10);
+				runAction(shake);
+
+				SquareNode *square = NULL;
+				if (m_squareType == kType_Square)
+				{
+					square = SquareModel::theModel()->createSquareNode(kType_Square);
+				}
+				else if (m_squareType == kType_Triangle && curLevel >= 120)
+				{
+					square = SquareModel::theModel()->createSquareNode(kType_BossEatMarble);
+				}
+
+				if (square)
+				{
+					square->setBody();
+					square->setIndex(newIndex);
+					square->setScore(curScore - m_score);
+					square->setPosition(getPosition());
+					getParent()->addChild(square);
+
+					square->setScale(0);
+					auto scaleTo = CCScaleTo::create(0.5f, 1.0f);
+					auto moveTo = CCMoveTo::create(0.5f, ccp(getPositionX() + getContentSize().width + SQUARE_SPACING, getPositionY()));
+					auto action = CCSpawn::create(scaleTo, moveTo, NULL);
+					square->runAction(action);
+				}
+			}
+		});
+		actions->addAction(callback2);
 	}
 	actions->runActions();
 }

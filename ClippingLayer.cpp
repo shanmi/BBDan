@@ -3,6 +3,7 @@
 #include "UserInfo.h"
 #include "Config.h"
 #include "GameController.h"
+#include "GameUtil.h"
 
 USING_NS_CC;
 
@@ -75,6 +76,7 @@ bool ClippingLayer::ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent)
 			}
 			GameController::getInstance()->updateCoins();
 			removeFromParent();
+			GameUtil::saveGameInfo();
 			break;
 		}
 	}

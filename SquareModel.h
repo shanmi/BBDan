@@ -21,6 +21,7 @@ public:
 	void setCurrentScore(int score){ m_curScore = score; }
 
 	std::vector<SquareNode*> getSquares(){ return m_squares; }
+	SquareNode *getSquareByIndex(Index index);
 	void removeAllSquares();
 	void setSquareFreezing(bool isFreezing);
 	bool isFreezing(){ return m_bIsFreezing; }

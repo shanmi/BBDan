@@ -85,21 +85,21 @@ bool MarbleModel::haveMarbleMoving()
 void MarbleModel::addMarblesCount()
 {
 	m_tempAddCount++;
+}
+
+int MarbleModel::checkMarblesCount()
+{
 	if (m_tempAddCount >= m_attactRate)
 	{
-		m_marblesCount++;
-		m_tempAddCount = 0;
+		m_marblesCount += m_tempAddCount / m_attactRate;
+		m_tempAddCount = m_tempAddCount % m_attactRate;
 	}
-
 	if (m_marblesCount >= 100)
 	{
 		m_marblesCount = m_marblesCount / 2;
 		m_attactRate++;
 	}
-}
 
-int MarbleModel::checkMarblesCount()
-{
 	if (m_marblesCount == (m_marbles.size() + 1) / 2)
 	{
 		for (int i = 0; i<m_marblesCount; i++)

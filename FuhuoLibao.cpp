@@ -118,4 +118,5 @@ void FuhuoLibao::updateCoins()
 {
 	removeFromParent();
 	SquareModel::theModel()->removeBelowSquares();
+	GameUtil::saveGameInfo();
 }

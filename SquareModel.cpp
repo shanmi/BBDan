@@ -93,6 +93,19 @@ void SquareModel::removeSquareNode(SquareNode *node)
 	node->runRemoveAction();
 }
 
+SquareNode *SquareModel::getSquareByIndex(Index index)
+{
+	for (auto iter = m_squares.begin(); iter != m_squares.end(); iter++)
+	{
+		auto square = *iter;
+		Index tempIndex = square->getIndex();
+		if (tempIndex == index)
+		{
+			return square;
+		}
+	}
+}
+
 void SquareModel::removeAllSquares()
 {
 	for (auto iter = m_squares.begin(); iter != m_squares.end(); ++iter)
@@ -352,7 +365,13 @@ void SquareModel::removeSameRowSquare(SquareNode *node)
 
 void SquareModel::exchangeSquarePosition()
 {
+	int curLevel = SquareModel::theModel()->getCurrentScore();
+	if (curLevel < 50)
+	{
+		return;
+	}
 	std::vector<SquareNode*> squares;
+	std::vector<Index> indexs;
 	CCPointArray *points = CCPointArray::create(m_squares.size());
 	for (auto iter = m_squares.begin(); iter != m_squares.end(); ++iter)
 	{
@@ -360,6 +379,7 @@ void SquareModel::exchangeSquarePosition()
 		if (square->canRemoveByProps())
 		{
 			squares.push_back(square); 
+			indexs.push_back(square->getIndex());
 			points->addControlPoint(square->getPosition());
 		}
 	}
@@ -367,6 +387,8 @@ void SquareModel::exchangeSquarePosition()
 	for (int i = 0; i < squares.size(); i++)
 	{
 		auto square = squares[i];
+		auto index = indexs.at(seq[i]);
+		square->setIndex(index);
 		auto pos = points->getControlPointAtIndex(seq[i]);
 		CCMoveTo *moveTo = CCMoveTo::create(0.4f, pos);
 		square->runAction(CCEaseBackInOut::create(moveTo));
