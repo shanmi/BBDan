@@ -15,7 +15,6 @@
 #include "GameConfig.h"
 #include "LoginLayer.h"
 #include "LoginUtils.h"
-#include "DarknessLayer.h"
 
 USING_NS_CC;
 
@@ -95,9 +94,6 @@ bool MainMenu::init()
 	LoginLayer *loginLayer = LoginLayer::create();
 	addChild(loginLayer, KZOrder_LoginLayer, kTag_LoginLayer);
 	}*/
-
-	DarknessLayer *layer = DarknessLayer::create();
-	addChild(layer, 100);
 
 	setKeypadEnabled(true);
 

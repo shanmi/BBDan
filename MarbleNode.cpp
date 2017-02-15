@@ -146,15 +146,42 @@ void MarbleNode::addMotionStreak()
 {
 	m_streak = CCMotionStreak::create(0.1f, 3, 32, ccGREEN, "particle/streak.png");
 	m_streak->setAnchorPoint(ccp(0.5f, 0.5f));
-	CCActionInterval *colorAction = CCRepeatForever::create(CCSequence::create(
-		CCTintTo::create(0.2f, 255, 0, 0),
-		CCTintTo::create(0.2f, 0, 255, 0),
-		CCTintTo::create(0.2f, 0, 0, 255),
-		CCTintTo::create(0.2f, 0, 255, 255),
-		CCTintTo::create(0.2f, 255, 255, 0),
-		CCTintTo::create(0.2f, 255, 0, 255),
-		CCTintTo::create(0.2f, 255, 255, 255),
-		NULL));
+	CCActionInterval *colorAction;
+	switch (m_attr.skin)
+	{
+	case kMarble_Normal:
+		colorAction = CCRepeatForever::create(CCSequence::create(
+			CCTintTo::create(0.2f, 255, 255, 255),
+			NULL));
+		break;
+	case kMarble_Dispersed:
+		colorAction = CCRepeatForever::create(CCSequence::create(
+			CCTintTo::create(0.2f, 255, 0, 0),
+			CCTintTo::create(0.2f, 0, 255, 0),
+			CCTintTo::create(0.2f, 0, 0, 255),
+			CCTintTo::create(0.2f, 0, 255, 255),
+			CCTintTo::create(0.2f, 255, 255, 0),
+			CCTintTo::create(0.2f, 255, 0, 255),
+			CCTintTo::create(0.2f, 255, 255, 255),
+			NULL));
+		break;
+	case kMarble_Biger:
+		colorAction = CCRepeatForever::create(CCSequence::create(
+			CCTintTo::create(0.2f, 248, 233, 91),
+			CCTintTo::create(0.2f, 252, 230, 151),
+			NULL));
+		break;
+	case kMarble_Faster:
+		colorAction = CCRepeatForever::create(CCSequence::create(
+			CCTintTo::create(0.2f, 68, 233, 236),
+			NULL));
+		break;
+	case kMarble_Bomb:
+		colorAction = CCRepeatForever::create(CCSequence::create(
+			CCTintTo::create(0.2f, 255, 255, 0),
+			NULL));
+		break;
+	}
 	m_streak->runAction(colorAction);
 }
 

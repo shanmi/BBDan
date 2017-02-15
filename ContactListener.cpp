@@ -59,21 +59,13 @@ void ContactListener::BeginContact(b2Contact* contact)
 			auto targetPos = GameController::getInstance()->getTargetPos();
 			if (square->getPositionY() - square->getContentSize().height < targetPos.y)
 			{
-				return;
+				//return;
 			}
 			square->doCollisionAction();
 			if (square->getSquareType() == kType_BossEatMarble)
 			{
 				marble->stop();
 				GameController::getInstance()->addCounter();
-				if (GameController::getInstance()->getCounter() == 1)
-				{
-					marble->setVisible(false);
-				}
-				else
-				{
-					marble->setVisible(false);
-				}
 			}
 			else if (square->getSquareType() == kType_Rebound)
 			{
@@ -85,30 +77,6 @@ void ContactListener::BeginContact(b2Contact* contact)
 				MarbleModel::theModel()->reboundMarbles();
 			}
 
-			if (square->canRemoveByProps())
-			{
-				SoundMgr::theMgr()->playEffect(Effect_Pop);
-			}
-			else if (square->getSquareType() == kType_AddMarble)
-			{
-				SoundMgr::theMgr()->playEffect(Effect_Pop1);
-			}
-			else if (square->getSquareType() == kType_AddCoin)
-			{
-				SoundMgr::theMgr()->playEffect(Effect_Coin);
-			}
-			else if (square->getSquareType() == kType_Rebound)
-			{
-				SoundMgr::theMgr()->playEffect(Effect_Pop2);
-			}
-			else if (square->getSquareType() == kType_EliminateRow || square->getSquareType() == kType_EliminateCol)
-			{
-				SoundMgr::theMgr()->playEffect(Effect_Lazer);
-			}
-			else
-			{
-				SoundMgr::theMgr()->playEffect(Effect_Pop3);
-			}
 		}
 	}
 	else

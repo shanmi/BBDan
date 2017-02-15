@@ -10,6 +10,7 @@
 #include "ActionSequence.h"
 #include "CCFunctionAction.h"
 #include "GameUtil.h"
+#include "SoundMgr.h"
 USING_NS_CC;
 
 CircleAddMarbleNode *CircleAddMarbleNode::create()
@@ -47,6 +48,7 @@ void CircleAddMarbleNode::runRemoveAction()
 
 void CircleAddMarbleNode::doCollisionAction()
 {
+	SoundMgr::theMgr()->playEffect(Effect_Pop1);
 	int attactRate = GameController::getInstance()->getAttactRate();
 	addScore(-attactRate);// delete
 
@@ -91,14 +93,15 @@ void CircleEliRowNode::runRemoveAction()
 
 void CircleEliRowNode::doCollisionAction()
 {
+	SoundMgr::theMgr()->playEffect(Effect_Lazer);
+
 	int kColorHintSize = 15;
 	auto parent = getParent();
 	auto size = parent->getContentSize();
-	auto colorRow = CCLayerColor::create(ccc4(255, 255, 0, 255));
+	auto colorRow = CCLayerColor::create(ccc4(255, 255, 0, 120));
 	colorRow->setContentSize(ccp(size.width, kColorHintSize));
 	parent->addChild(colorRow);
 	colorRow->setPositionY(getPositionY() - kColorHintSize / 2);
-	colorRow->stopAllActions();
 	auto actions = ActionSequence::create(colorRow);
 	auto marbles = MarbleModel::theModel()->getMarbles();
 	auto action1 = CCBlink::create(0.1f, 1);
@@ -154,16 +157,17 @@ void CircleEliColNode::runRemoveAction()
 
 void CircleEliColNode::doCollisionAction()
 {
+	SoundMgr::theMgr()->playEffect(Effect_Lazer);
+
 	int kColorHintSize = 15;
 	auto parent = getParent();
 	auto size = parent->getContentSize();
-	auto colorCol = CCLayerColor::create(ccc4(255, 255, 0, 255));
+	auto colorCol = CCLayerColor::create(ccc4(255, 255, 0, 120));
 	colorCol->ignoreAnchorPointForPosition(false);
 	colorCol->setAnchorPoint(ccp(0.5f, 0.5f));
 	colorCol->setContentSize(ccp(kColorHintSize, size.height*0.7f));
 	parent->addChild(colorCol);
-	colorCol->setPosition(ccp(getPositionX() - kColorHintSize / 2, size.height * 0.51f));
-	colorCol->stopAllActions();
+	colorCol->setPosition(ccp(getPositionX(), size.height * 0.51f));
 	auto actions = ActionSequence::create(colorCol);
 	auto marbles = MarbleModel::theModel()->getMarbles();
 	auto action1 = CCBlink::create(0.1f, 1);
@@ -218,15 +222,17 @@ void CircleEliCrossNode::runRemoveAction()
 
 void CircleEliCrossNode::doCollisionAction()
 {
+	SoundMgr::theMgr()->playEffect(Effect_Lazer);
+
 	int kColorHintSize = 15;
 	auto parent = getParent();
 	auto size = parent->getContentSize();
-	auto colorCol = CCLayerColor::create(ccc4(255, 255, 0, 255));
+	auto colorCol = CCLayerColor::create(ccc4(255, 255, 0, 120));
 	colorCol->ignoreAnchorPointForPosition(false);
 	colorCol->setAnchorPoint(ccp(0.5f, 0.5f));
 	colorCol->setContentSize(ccp(kColorHintSize, size.height*0.7f));
 	parent->addChild(colorCol);
-	colorCol->setPosition(ccp(getPositionX() - kColorHintSize / 2, size.height * 0.51f));
+	colorCol->setPosition(ccp(getPositionX(), size.height * 0.51f));
 	auto actions = ActionSequence::create(colorCol);
 	auto marbles = MarbleModel::theModel()->getMarbles();
 	auto action1 = CCBlink::create(0.1f, 1);
@@ -238,7 +244,7 @@ void CircleEliCrossNode::doCollisionAction()
 	actions->addAction(action2);
 	actions->runActions();
 
-	auto colorRow = CCLayerColor::create(ccc4(255, 255, 0, 255));
+	auto colorRow = CCLayerColor::create(ccc4(255, 255, 0, 120));
 	colorRow->setContentSize(ccp(size.width, kColorHintSize));
 	parent->addChild(colorRow);
 	colorRow->setPositionY(getPositionY() - kColorHintSize / 2);
@@ -296,6 +302,7 @@ void CircleReboundNode::runRemoveAction()
 
 void CircleReboundNode::doCollisionAction()
 {
+	SoundMgr::theMgr()->playEffect(Effect_Pop2);
 	int attactRate = GameController::getInstance()->getAttactRate();
 	addScore(-attactRate);// delete
 
@@ -343,6 +350,7 @@ void CircleAddCoinNode::runRemoveAction()
 
 void CircleAddCoinNode::doCollisionAction()
 {
+	SoundMgr::theMgr()->playEffect(Effect_Coin);
 	int attactRate = GameController::getInstance()->getAttactRate();
 	addScore(-attactRate); //delete
 
@@ -507,6 +515,8 @@ void CircleRocketNode::setBody()
 
 void CircleRocketNode::runRemoveAction()
 {
+	SoundMgr::theMgr()->playEffect(Effect_Pop3);
+
 	auto emitter = GameUtil::getBombEffect();
 	emitter->setPosition(getPosition());
 	getParent()->addChild(emitter, kZOrder_Square + 1);

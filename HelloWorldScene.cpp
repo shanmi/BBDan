@@ -117,12 +117,17 @@ bool HelloWorld::ccTouchBegan(cocos2d::CCTouch *pTouch, cocos2d::CCEvent *pEvent
 	pEmitter->setPosition(position);
 	addChild(pEmitter);*/
 
-	CCPoint position = pTouch->getLocation();
+	/*CCPoint position = pTouch->getLocation();
 	auto m_emitter = new CCParticleSystemQuad();
 	std::string filename = "explore.plist";
 	m_emitter->initWithFile(filename.c_str());
 	m_emitter->setPosition(position);
-	addChild(m_emitter, 10);
+	addChild(m_emitter, 10);*/
+
+	CCPoint position = pTouch->getLocation();
+	auto effect = GameUtil::getAchievementEffect(1);
+	effect->setPosition(position);
+	addChild(effect);
 
 	return true;
 }

@@ -119,9 +119,16 @@ bool MarbleModel::isMarblesNerverStop()
 {
 	for (auto iter = m_marbles.begin(); iter != m_marbles.end(); ++iter)
 	{
+		auto marble = *iter;
+		auto body = marble->getBody();
+		auto speed = body->GetLinearVelocity();
 		if ((*iter)->getReboundTimes() >= REBOUND_TIMES)
 		{
-			return true;
+			CCLOG("fabs(speed.x) === %f,  fabs(speed.y) === %f", fabs(speed.x), fabs(speed.y));
+			if (fabs(speed.x) > 1 && fabs(speed.y) < 1)
+			{
+				return true;
+			}
 		}
 	}
 	return false;

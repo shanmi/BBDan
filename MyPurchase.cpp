@@ -345,7 +345,7 @@ int MyPurchase::isBusinessMode(){
 	}
 	return carrietType;
 #endif
-	return 1;
+	return 0;
 }
 
 std::string MyPurchase::getUserId()

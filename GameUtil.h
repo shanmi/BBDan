@@ -26,6 +26,8 @@ namespace GameUtil
 	cocos2d::CCAction *getScaleAction();
 	cocos2d::CCAction *getBlinkAction();
 	cocos2d::CCAction *getFadeInOutAction();
+	cocos2d::CCSprite *getAchievementEffect(int type);
+
 	cocos2d::CCLabelAtlas *getImageNum(std::string fontPath, int num);
 	cocos2d::CCLabelAtlas *getImageNum(std::string fontPath, std::string numStr);
 

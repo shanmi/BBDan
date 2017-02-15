@@ -15,7 +15,7 @@ struct Index
 		this->x = x;
 		this->y = y;
 	}
-	inline bool Index::operator==(const Index &index) const
+	inline bool operator==(const Index &index) const
 	{
 
 		if (this->x == index.x && this->y == index.y)

@@ -238,6 +238,23 @@ CCAction *GameUtil::getFadeInOutAction()
 	return action;
 }
 
+CCSprite *GameUtil::getAchievementEffect(int type)
+{
+	char temp[30] = { 0 };
+	sprintf(temp, "combo/combo_%d.png", type);
+	auto effect = CCSprite::create(temp);
+	auto winSize = CCDirector::sharedDirector()->getWinSize();
+	auto move1 = CCMoveBy::create(0.6f, ccp(winSize.width / 2, 0));
+	auto ease1 = CCEaseSineInOut::create(move1);
+	auto delay = CCDelayTime::create(0.2f);
+	auto move2 = CCMoveBy::create(0.4f, ccp(winSize.width / 2, 0));;
+	auto ease2 = CCEaseSineOut::create(move2);
+	auto callback = CCCallFunc::create(effect, callfunc_selector(CCNode::removeFromParent));
+	auto sequence = CCSequence::create(ease1, delay, ease2, callback, NULL);
+	effect->runAction(sequence);
+	return effect;
+}
+
 CCLabelAtlas *GameUtil::getImageNum(std::string fontPath, int num)
 {
 	int kLength = 11;

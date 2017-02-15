@@ -20,6 +20,7 @@
 #include "HelpLayer.h"
 #include "GameConfig.h"
 #include "ClippingLayer.h"
+#include "DarknessLayer.h"
 
 USING_NS_CC;
 
@@ -365,6 +366,9 @@ void GameScene::initGameLayout()
 	m_marbleCount = GameUtil::getImageNum(FONT_WHITE, temp);
 	m_marbleCount->setPosition(ccp(character_head->getContentSize().width / 2, character_head->getContentSize().height + m_marbleCount->getContentSize().height));
 	character_head->addChild(m_marbleCount);
+
+	/*DarknessLayer *layer = DarknessLayer::create();
+	addChild(layer, kZOrder_Darkness);*/
 }
 
 void GameScene::initPhysicBorder()
@@ -484,6 +488,15 @@ void GameScene::update(float dt)
 				//m_addMarbleCount++;
 				marble->moveToTargetPos();
 			}
+		}
+
+		if (m_arrow->boundingBox().containsPoint(marble->getPosition()))
+		{
+			marble->setVisible(false);
+		}
+		else
+		{
+			marble->setVisible(true);
 		}
 	}
 

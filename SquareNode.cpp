@@ -7,6 +7,7 @@
 #include "Config.h"
 #include "MarbleModel.h"
 #include "SquareModel.h"
+#include "SoundMgr.h"
 
 USING_NS_CC;
 
@@ -211,6 +212,7 @@ void SquareNode::setBody()
 
 void SquareNode::doCollisionAction()
 {
+	SoundMgr::theMgr()->playEffect(Effect_Pop);
 	showBombAction();
 
 	int damage = MarbleModel::theModel()->getMarbleAttr().damage;
@@ -344,6 +346,7 @@ void TriangleNode::setBody()
 
 void TriangleNode::doCollisionAction()
 {
+	SoundMgr::theMgr()->playEffect(Effect_Pop);
 	showBombAction();
 
 	int damage = MarbleModel::theModel()->getMarbleAttr().damage;
@@ -416,6 +419,7 @@ void BossEatMarbleNode::setBody()
 
 void BossEatMarbleNode::doCollisionAction()
 {
+	SoundMgr::theMgr()->playEffect(Effect_Pop);
 	showBombAction();
 
 	int damage = MarbleModel::theModel()->getMarbleAttr().damage;

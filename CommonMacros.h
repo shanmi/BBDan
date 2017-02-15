@@ -22,6 +22,7 @@ enum GameZOrder
 	kZOrder_Main,
 	kZOrder_Square,
 	kZOrder_Marble,
+	kZOrder_Darkness,
 	kZOrder_Character,
 	kZOrder_Layout,
 	KZOrder_GuideLayer,
