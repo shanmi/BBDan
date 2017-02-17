@@ -65,7 +65,7 @@ void ContactListener::BeginContact(b2Contact* contact)
 			if (square->getSquareType() == kType_BossEatMarble)
 			{
 				auto attr = MarbleModel::theModel()->getMarbleAttr();
-				if (!attr.skin == kMarble_Faster)
+				if (attr.skin != kMarble_Faster)
 				{
 					marble->stop();
 					GameController::getInstance()->addCounter();
