@@ -262,6 +262,14 @@ int PageView::moveToRight()
 	return pageIndex;
 }
 
+void PageView::moveToPage(int index)
+{
+	float moveX = -m_size.width * index;
+	auto targetPos = ccp(moveX, m_container->getPositionY());
+	m_container->setPosition(targetPos);
+	pageIndex = index;
+}
+
 void PageView::movePageEnd()
 {
 	m_isMoving = false;

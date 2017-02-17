@@ -57,26 +57,58 @@ void ContactListener::BeginContact(b2Contact* contact)
 		{
 			auto square = dynamic_cast<SquareNode*>(node);
 			auto targetPos = GameController::getInstance()->getTargetPos();
-			if (square->getPositionY() - square->getContentSize().height < targetPos.y)
+			if (square->getPositionY() - square->getContentSize().height < targetPos.y && square->getSquareType() != kType_Rebound)
 			{
-				//return;
+				return;
 			}
 			square->doCollisionAction();
 			if (square->getSquareType() == kType_BossEatMarble)
 			{
-				marble->stop();
-				GameController::getInstance()->addCounter();
+				auto attr = MarbleModel::theModel()->getMarbleAttr();
+				if (!attr.skin == kMarble_Faster)
+				{
+					marble->stop();
+					GameController::getInstance()->addCounter();
+				}
 			}
 			else if (square->getSquareType() == kType_Rebound)
 			{
 				float degree = rand() % 60 + 60;
 				marble->shoot(degree);
 			}
-			if (square->getSquareType() != kType_EliminateRow && square->getSquareType() != kType_EliminateCol)
+			if (square->getSquareType() != kType_EliminateRow && square->getSquareType() != kType_EliminateCol
+				&& square->getSquareType() != kType_EliminateCross && square->getSquareType() != kType_Iron)
 			{
 				MarbleModel::theModel()->reboundMarbles();
 			}
-
+			//if (square->getSquareType() == kType_Iron) //铁块反弹一定角度
+			//{
+			//	CCLog("square=================%d", square->getScore());
+			//}
+			//当弹珠在垂直方向不断打击方块的情况
+			auto body = marble->getBody();
+			auto velocity = body->GetLinearVelocity();
+			if (fabs(velocity.x) < 0.1 && velocity.y < -1 &&
+				marble->getPositionX() > square->getPositionX() - square->getContentSize().width / 2 - marble->getContentSize().width &&
+				marble->getPositionX() < square->getPositionX() + square->getContentSize().width / 2 + marble->getContentSize().width)
+			{
+				square->addScore(-square->getScore() / 2); //普通方块加快消除
+				if (square->getSquareType() == kType_Iron) //铁块反弹一定角度
+				{
+					marble->shoot(45);
+				}
+			}
+			//当弹珠在水平方向不断打击方块的情况
+			if (fabs(velocity.y) < 0.1 && fabs(velocity.x) > 1 &&
+				marble->getPositionY() > square->getPositionY() - square->getContentSize().height / 2 - marble->getContentSize().height &&
+				marble->getPositionY() < square->getPositionY() + square->getContentSize().height / 2 + marble->getContentSize().height)
+			{
+				square->addScore(-square->getScore() / 2); //普通方块加快消除
+				if (square->getSquareType() == kType_Iron) //铁块反弹一定角度
+				{
+					marble->shoot(45);
+				}
+			}
 		}
 	}
 	else
@@ -103,7 +135,7 @@ void ContactListener::BeginContact(b2Contact* contact)
 
 void ContactListener::EndContact(b2Contact* contact)
 {
-	
+
 }
 
 

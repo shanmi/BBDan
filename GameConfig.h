@@ -35,6 +35,13 @@ public:
 	int m_probability2[20][3];
 
 	int m_showLibaoLevel;
+	int m_showPropsLevel;
+	int m_showFireLevel;
+	int m_reorderLevel;
+	int m_splitSquareLevel;
+	int m_addFireLevel;
+	int m_gravityLevel;
+	int m_showIronLevel;
 
 	int m_yijian;
 private:

@@ -14,6 +14,7 @@ public:
 	void removeMarble(MarbleNode *node);
 	void setMarbleAttr(MarbleAttr attr);
 	MarbleAttr getMarbleAttr(){ return m_attr; }
+	MarbleAttr getMarbleAttrByType(int type);
 	std::vector<MarbleNode *> getMarbles(){ return m_marbles; }
 	bool haveMarbleMoving();
 

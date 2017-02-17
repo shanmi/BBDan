@@ -28,6 +28,8 @@ public:
 	virtual void ccTouchMoved(cocos2d::CCTouch *pTouch, cocos2d::CCEvent *pEvent);
 	virtual void ccTouchEnded(cocos2d::CCTouch *pTouch, cocos2d::CCEvent *pEvent);
 
+	virtual void didAccelerate(cocos2d::CCAcceleration* pAccelerationValue);
+
 public:
 	void oneRoundEnd();
 	void updateMarbles();
@@ -37,7 +39,9 @@ public:
 	void updateMarbleCount();
 	void addSquareNode(SquareNode *node);
 	void showGameOver();
-
+	void showAddCoinEffect(SquareNode *node);
+	void showAddMarbleEffect(SquareNode *node);
+	void updateMarbleType(int type);
 public:
 
 	void onDoubleAttact(cocos2d::CCObject *pSender);
@@ -45,6 +49,7 @@ public:
 	void onFreezing(cocos2d::CCObject *pSender);
 	void onPauseGame(cocos2d::CCObject *pSender);
 	void onHelpPanel(cocos2d::CCObject *pSender);
+	void onMarbleChange(cocos2d::CCObject *pSender);
 	void initMainLayout();
 	void initCharacterLayout();
 	void initTopLayout();
@@ -59,6 +64,9 @@ public:
 	void showLibaoDiaolg();
 	void checkLibaoShow();
 
+	void characterMove(float offsetX);
+	void onTouchCallback();
+
 private:
 	b2World *m_world;
 	UiLayout *m_mainLayout;
@@ -69,6 +77,7 @@ private:
 	cocos2d::CCSprite *m_touchCircle;
 	cocos2d::CCSprite *m_arrow;
 	cocos2d::CCLabelAtlas *m_marbleCount;
+	cocos2d::CCPoint m_touchPos;
 	float m_topLinePos;
 	float m_bottomLinePos;
 	float m_shootDegree;

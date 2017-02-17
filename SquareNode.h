@@ -57,6 +57,8 @@ public:
 	int getSquareType(){ return m_squareType; }
 	b2Body *getBody(){ return m_body; }
 
+	std::string getImage() { return m_image; }
+
 	void setFreezing(bool isFreezing);
 
 	void moveDown(bool isLastOne = false);
@@ -65,11 +67,13 @@ public:
 	bool canRemoveByProps();
 	void showBombAction();
 	void setPerfectScale();
+	bool isSameColor(SquareNode *node);
 
 protected:
 	b2Body *m_body;
-	cocos2d::CCSprite *m_image;
+	cocos2d::CCSprite *m_imageSprite;
 	cocos2d::CCLabelAtlas *m_scoreLabel;
+	std::string m_image;
 	int m_squareType;
 	int m_score;
 	Index m_index;
@@ -95,6 +99,17 @@ class BossEatMarbleNode : public SquareNode
 public:
 	BossEatMarbleNode() : SquareNode(){ m_squareType = kType_BossEatMarble; }
 	static BossEatMarbleNode *create();
+	virtual bool init();
+	virtual void setBody();
+	virtual void doCollisionAction();
+	virtual void runRemoveAction();
+};
+
+class IronNode : public SquareNode
+{
+public:
+	IronNode() : SquareNode(){ m_squareType = kType_Iron; }
+	static IronNode *create();
 	virtual bool init();
 	virtual void setBody();
 	virtual void doCollisionAction();

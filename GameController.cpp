@@ -4,6 +4,7 @@
 #include "UserInfo.h"
 #include "BallHintModel.h"
 #include "MainMenu.h"
+#include "GameUtil.h"
 USING_NS_CC;
 
 GameController::GameController()
@@ -69,6 +70,13 @@ void GameController::checkSquares(bool isRoundEnd /* = false */)
 		{
 			if (square->shouldRemoveDirectly() || isRoundEnd)
 			{
+				int count = SquareModel::theModel()->getRemainSqaure();
+				if (count == 1)
+				{
+					int random = rand() % 3 + 1;
+					auto effect = GameUtil::getAchievementEffect(random);
+					square->getParent()->addChild(effect, kZOrder_Effect);
+				}
 				SquareModel::theModel()->removeSquareNode(square);
 			}
 		}
@@ -90,6 +98,23 @@ void GameController::updateMarblePos()
 	}
 }
 
+bool GameController::isGameOver()
+{
+	auto squares = SquareModel::theModel()->getSquares();
+	for (auto iter = squares.begin(); iter != squares.end(); ++iter)
+	{
+		auto &square = (*iter);
+		if (square->getPositionY() - square->getContentSize().height < m_targetPos.y)
+		{
+			if (square->canRemoveByProps())
+			{
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
 bool GameController::checkGameOver()
 {
 	auto squares = SquareModel::theModel()->getSquares();
@@ -98,7 +123,7 @@ bool GameController::checkGameOver()
 		auto &square = (*iter);
 		if (square->getPositionY() - square->getContentSize().height < m_targetPos.y)
 		{
-			if (square->getSquareType() == kType_Square || square->getSquareType() == kType_Triangle)
+			if (square->canRemoveByProps())
 			{
 				showGameOver();
 				return true;

@@ -28,17 +28,18 @@ bool CircleAddMarbleNode::init()
 	auto size = sizeSprite->getContentSize();
 	setContentSize(size);
 
-	m_image = CCSprite::create("squares/fangkuai_+.png");
-	addChild(m_image);
+	m_image = "squares/fangkuai_+.png";
+	m_imageSprite = CCSprite::create(m_image.c_str());
+	addChild(m_imageSprite);
 	auto fanIn = CCFadeIn::create(0.6f);
-	m_image->runAction(fanIn);
+	m_imageSprite->runAction(fanIn);
 
 	return true;
 }
 
 void CircleAddMarbleNode::setBody()
 {
-	m_body = Box2dFactory::getInstance()->createCircle(this, m_image->getContentSize(), true);
+	m_body = Box2dFactory::getInstance()->createCircle(this, m_imageSprite->getContentSize(), true);
 }
 
 void CircleAddMarbleNode::runRemoveAction()
@@ -52,7 +53,7 @@ void CircleAddMarbleNode::doCollisionAction()
 	int attactRate = GameController::getInstance()->getAttactRate();
 	addScore(-attactRate);// delete
 
-	doScaleAction();
+	GameController::getInstance()->showAddMarbleEffect(this);
 	MarbleModel::theModel()->addMarblesCount();
 	GameController::getInstance()->updateMarbles();
 }
@@ -73,17 +74,18 @@ bool CircleEliRowNode::init()
 	auto size = sizeSprite->getContentSize();
 	setContentSize(size);
 
-	m_image = CCSprite::create("squares/fangkuai_hengxiao.png");
-	addChild(m_image);
+	m_image = "squares/fangkuai_hengxiao.png";
+	m_imageSprite = CCSprite::create(m_image.c_str());
+	addChild(m_imageSprite);
 	auto fanIn = CCFadeIn::create(0.6f);
-	m_image->runAction(fanIn);
+	m_imageSprite->runAction(fanIn);
 
 	return true;
 }
 
 void CircleEliRowNode::setBody()
 {
-	m_body = Box2dFactory::getInstance()->createCircle(this, m_image->getContentSize(), true);
+	m_body = Box2dFactory::getInstance()->createCircle(this, m_imageSprite->getContentSize(), true);
 }
 
 void CircleEliRowNode::runRemoveAction()
@@ -98,9 +100,9 @@ void CircleEliRowNode::doCollisionAction()
 	int kColorHintSize = 15;
 	auto parent = getParent();
 	auto size = parent->getContentSize();
-	auto colorRow = CCLayerColor::create(ccc4(255, 255, 0, 120));
+	auto colorRow = CCLayerColor::create(ccc4(248, 213, 121, 255));
 	colorRow->setContentSize(ccp(size.width, kColorHintSize));
-	parent->addChild(colorRow);
+	parent->addChild(colorRow, kZOrder_EliEffect);
 	colorRow->setPositionY(getPositionY() - kColorHintSize / 2);
 	auto actions = ActionSequence::create(colorRow);
 	auto marbles = MarbleModel::theModel()->getMarbles();
@@ -137,17 +139,18 @@ bool CircleEliColNode::init()
 	auto size = sizeSprite->getContentSize();
 	setContentSize(size);
 
-	m_image = CCSprite::create("squares/fangkuai_suxiao.png");
-	addChild(m_image);
+	m_image = "squares/fangkuai_suxiao.png";
+	m_imageSprite = CCSprite::create(m_image.c_str());
+	addChild(m_imageSprite);
 	auto fanIn = CCFadeIn::create(0.6f);
-	m_image->runAction(fanIn);
+	m_imageSprite->runAction(fanIn);
 
 	return true;
 }
 
 void CircleEliColNode::setBody()
 {
-	m_body = Box2dFactory::getInstance()->createCircle(this, m_image->getContentSize(), true);
+	m_body = Box2dFactory::getInstance()->createCircle(this, m_imageSprite->getContentSize(), true);
 }
 
 void CircleEliColNode::runRemoveAction()
@@ -162,11 +165,11 @@ void CircleEliColNode::doCollisionAction()
 	int kColorHintSize = 15;
 	auto parent = getParent();
 	auto size = parent->getContentSize();
-	auto colorCol = CCLayerColor::create(ccc4(255, 255, 0, 120));
+	auto colorCol = CCLayerColor::create(ccc4(83, 180, 255, 225));
 	colorCol->ignoreAnchorPointForPosition(false);
 	colorCol->setAnchorPoint(ccp(0.5f, 0.5f));
 	colorCol->setContentSize(ccp(kColorHintSize, size.height*0.7f));
-	parent->addChild(colorCol);
+	parent->addChild(colorCol, kZOrder_EliEffect);
 	colorCol->setPosition(ccp(getPositionX(), size.height * 0.51f));
 	auto actions = ActionSequence::create(colorCol);
 	auto marbles = MarbleModel::theModel()->getMarbles();
@@ -202,17 +205,18 @@ bool CircleEliCrossNode::init()
 	auto size = sizeSprite->getContentSize();
 	setContentSize(size);
 
-	m_image = CCSprite::create("squares/fangkuai_sizixiao.png");
-	addChild(m_image);
+	m_image = "squares/fangkuai_sizixiao.png";
+	m_imageSprite = CCSprite::create(m_image.c_str());
+	addChild(m_imageSprite);
 	auto fanIn = CCFadeIn::create(0.6f);
-	m_image->runAction(fanIn);
+	m_imageSprite->runAction(fanIn);
 
 	return true;
 }
 
 void CircleEliCrossNode::setBody()
 {
-	m_body = Box2dFactory::getInstance()->createCircle(this, m_image->getContentSize(), true);
+	m_body = Box2dFactory::getInstance()->createCircle(this, m_imageSprite->getContentSize(), true);
 }
 
 void CircleEliCrossNode::runRemoveAction()
@@ -227,11 +231,11 @@ void CircleEliCrossNode::doCollisionAction()
 	int kColorHintSize = 15;
 	auto parent = getParent();
 	auto size = parent->getContentSize();
-	auto colorCol = CCLayerColor::create(ccc4(255, 255, 0, 120));
+	auto colorCol = CCLayerColor::create(ccc4(88, 202, 57, 255));
 	colorCol->ignoreAnchorPointForPosition(false);
 	colorCol->setAnchorPoint(ccp(0.5f, 0.5f));
 	colorCol->setContentSize(ccp(kColorHintSize, size.height*0.7f));
-	parent->addChild(colorCol);
+	parent->addChild(colorCol, kZOrder_EliEffect);
 	colorCol->setPosition(ccp(getPositionX(), size.height * 0.51f));
 	auto actions = ActionSequence::create(colorCol);
 	auto marbles = MarbleModel::theModel()->getMarbles();
@@ -244,9 +248,9 @@ void CircleEliCrossNode::doCollisionAction()
 	actions->addAction(action2);
 	actions->runActions();
 
-	auto colorRow = CCLayerColor::create(ccc4(255, 255, 0, 120));
+	auto colorRow = CCLayerColor::create(ccc4(88, 202, 57, 255));
 	colorRow->setContentSize(ccp(size.width, kColorHintSize));
-	parent->addChild(colorRow);
+	parent->addChild(colorRow, kZOrder_EliEffect);
 	colorRow->setPositionY(getPositionY() - kColorHintSize / 2);
 	actions = ActionSequence::create(colorRow);
 	auto action3 = CCBlink::create(0.1f, 1);
@@ -282,17 +286,18 @@ bool CircleReboundNode::init()
 	auto size = sizeSprite->getContentSize();
 	setContentSize(size);
 
-	m_image = CCSprite::create("squares/fangkuai_suiji.png");
-	addChild(m_image);
+	m_image = "squares/fangkuai_suiji.png";
+	m_imageSprite = CCSprite::create(m_image.c_str());
+	addChild(m_imageSprite);
 	auto fanIn = CCFadeIn::create(0.6f);
-	m_image->runAction(fanIn);
+	m_imageSprite->runAction(fanIn);
 
 	return true;
 }
 
 void CircleReboundNode::setBody()
 {
-	m_body = Box2dFactory::getInstance()->createCircle(this, m_image->getContentSize(), true);
+	m_body = Box2dFactory::getInstance()->createCircle(this, m_imageSprite->getContentSize(), true);
 }
 
 void CircleReboundNode::runRemoveAction()
@@ -326,21 +331,22 @@ bool CircleAddCoinNode::init()
 	auto size = sizeSprite->getContentSize();
 	setContentSize(size);
 
-	m_image = CCSprite::create("squares/fangkuai_zhuanshi.png");
-	addChild(m_image);
+	m_image = "squares/fangkuai_zhuanshi.png";
+	m_imageSprite = CCSprite::create(m_image.c_str());
+	addChild(m_imageSprite);
 	auto fanIn = CCFadeIn::create(0.6f);
-	m_image->runAction(fanIn);
+	m_imageSprite->runAction(fanIn);
 
 	auto *flip3d = CCOrbitCamera::create(2, -45, 0, 90, 180, 0, 0);
 	auto repeat = CCRepeatForever::create(flip3d);
-	//m_image->runAction(repeat);
+	//m_imageSprite->runAction(repeat);
 
 	return true;
 }
 
 void CircleAddCoinNode::setBody()
 {
-	m_body = Box2dFactory::getInstance()->createCircle(this, m_image->getContentSize(), true);
+	m_body = Box2dFactory::getInstance()->createCircle(this, m_imageSprite->getContentSize(), true);
 }
 
 void CircleAddCoinNode::runRemoveAction()
@@ -355,6 +361,7 @@ void CircleAddCoinNode::doCollisionAction()
 	addScore(-attactRate); //delete
 
 	UserInfo::getInstance()->addCoins(ADD_COINS);
+	GameController::getInstance()->showAddCoinEffect(this);
 	GameController::getInstance()->updateCoins();
 }
 
@@ -374,17 +381,18 @@ bool CircleProtectNode::init()
 	auto size = sizeSprite->getContentSize();
 	setContentSize(size);
 
-	m_image = CCSprite::create("squares/fangkuai_baohuzhao.png");
-	addChild(m_image);
+	m_image = "squares/fangkuai_baohuzhao.png";
+	m_imageSprite = CCSprite::create(m_image.c_str());
+	addChild(m_imageSprite);
 	auto fanIn = CCFadeIn::create(0.6f);
-	m_image->runAction(fanIn);
+	m_imageSprite->runAction(fanIn);
 
 	return true;
 }
 
 void CircleProtectNode::setBody()
 {
-	m_body = Box2dFactory::getInstance()->createCircle(this, m_image->getContentSize(), true);
+	m_body = Box2dFactory::getInstance()->createCircle(this, m_imageSprite->getContentSize(), true);
 }
 
 void CircleProtectNode::runRemoveAction()
@@ -416,17 +424,18 @@ bool CircleShotgunsNode::init()
 	auto size = sizeSprite->getContentSize();
 	setContentSize(size);
 
-	m_image = CCSprite::create("squares/fangkuai_sandanqiang.png");
-	addChild(m_image);
+	m_image = "squares/fangkuai_sandanqiang.png";
+	m_imageSprite = CCSprite::create(m_image.c_str());
+	addChild(m_imageSprite);
 	auto fanIn = CCFadeIn::create(0.6f);
-	m_image->runAction(fanIn);
+	m_imageSprite->runAction(fanIn);
 
 	return true;
 }
 
 void CircleShotgunsNode::setBody()
 {
-	m_body = Box2dFactory::getInstance()->createCircle(this, m_image->getContentSize(), true);
+	m_body = Box2dFactory::getInstance()->createCircle(this, m_imageSprite->getContentSize(), true);
 }
 
 void CircleShotgunsNode::runRemoveAction()
@@ -458,17 +467,18 @@ bool CircleBloodNode::init()
 	auto size = sizeSprite->getContentSize();
 	setContentSize(size);
 
-	m_image = CCSprite::create("squares/fangkuai_xueliangbao.png");
-	addChild(m_image);
+	m_image = "squares/fangkuai_xueliangbao.png";
+	m_imageSprite = CCSprite::create(m_image.c_str());
+	addChild(m_imageSprite);
 	auto fanIn = CCFadeIn::create(0.6f);
-	m_image->runAction(fanIn);
+	m_imageSprite->runAction(fanIn);
 
 	return true;
 }
 
 void CircleBloodNode::setBody()
 {
-	m_body = Box2dFactory::getInstance()->createCircle(this, m_image->getContentSize(), true);
+	m_body = Box2dFactory::getInstance()->createCircle(this, m_imageSprite->getContentSize(), true);
 }
 
 void CircleBloodNode::runRemoveAction()
@@ -500,17 +510,18 @@ bool CircleRocketNode::init()
 	auto size = sizeSprite->getContentSize();
 	setContentSize(size);
 
-	m_image = CCSprite::create("squares/fangkuai_huojianpao.png");
-	addChild(m_image);
+	m_image = "squares/fangkuai_huojianpao.png";
+	m_imageSprite = CCSprite::create(m_image.c_str());
+	addChild(m_imageSprite);
 	auto fanIn = CCFadeIn::create(0.6f);
-	m_image->runAction(fanIn);
+	m_imageSprite->runAction(fanIn);
 
 	return true;
 }
 
 void CircleRocketNode::setBody()
 {
-	m_body = Box2dFactory::getInstance()->createCircle(this, m_image->getContentSize(), true);
+	m_body = Box2dFactory::getInstance()->createCircle(this, m_imageSprite->getContentSize(), true);
 }
 
 void CircleRocketNode::runRemoveAction()

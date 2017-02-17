@@ -81,19 +81,19 @@ bool MainMenu::init()
 
 	initLayout();
 
+	bool hasLoginReward = LoginUtils::getInstance()->checkLoginReward();
+	if (hasLoginReward)
+	{
+		LoginLayer *loginLayer = LoginLayer::create();
+		addChild(loginLayer, KZOrder_LoginLayer, kTag_LoginLayer);
+	}
+
 	bool isFirstIn = GameController::getInstance()->isFirshInGame();
-	if (isFirstIn)
+	if (!hasLoginReward && isFirstIn)
 	{
 		GameController::getInstance()->setFirstInGame(false);
 		toLibao1(NULL);
 	}
-
-	/*bool hasLoginReward = LoginUtils::getInstance()->checkLoginReward();
-	if (hasLoginReward)
-	{
-	LoginLayer *loginLayer = LoginLayer::create();
-	addChild(loginLayer, KZOrder_LoginLayer, kTag_LoginLayer);
-	}*/
 
 	setKeypadEnabled(true);
 
@@ -115,7 +115,7 @@ void MainMenu::initLayout()
 
 	CCMenuItem *startGameOne = dynamic_cast<CCMenuItem*>(m_mainLayout->getChildById(2));
 	startGameOne->setTarget(this, menu_selector(MainMenu::toStartGameOne));
-	auto action2 = GameUtil::getScaleAction();
+	auto action2 = GameUtil::getRepeatScaleAction();
 	startGameOne->runAction(action2);
 
 	CCMenuItem *startGameTwo = dynamic_cast<CCMenuItem*>(m_mainLayout->getChildById(3));
@@ -136,12 +136,12 @@ void MainMenu::initLayout()
 
 	CCMenuItem *libao1 = dynamic_cast<CCMenuItem*>(m_mainLayout->getChildById(9));
 	libao1->setTarget(this, menu_selector(MainMenu::toLibao1));
-	auto action3 = GameUtil::getScaleAction();
+	auto action3 = GameUtil::getRepeatScaleAction();
 	libao1->runAction(action3);
 
 	CCMenuItem *libao2 = dynamic_cast<CCMenuItem*>(m_mainLayout->getChildById(10));
 	libao2->setTarget(this, menu_selector(MainMenu::toLibao2));
-	auto action4 = GameUtil::getScaleAction();
+	auto action4 = GameUtil::getRepeatScaleAction();
 	libao2->runAction(action4);
 
 	CCMenuItem *toMusicOff = dynamic_cast<CCMenuItem*>(m_mainLayout->getChildById(4));

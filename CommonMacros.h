@@ -20,11 +20,13 @@ enum TouchPriority
 enum GameZOrder
 {
 	kZOrder_Main,
+	kZOrder_EliEffect,
 	kZOrder_Square,
 	kZOrder_Marble,
 	kZOrder_Darkness,
 	kZOrder_Character,
 	kZOrder_Layout,
+	kZOrder_Effect,
 	KZOrder_GuideLayer,
 	KZOrder_PauseLayer,
 	KZOrder_GameOver,
@@ -45,6 +47,7 @@ enum SquareType
 	kType_EliminateCol,
 	kType_EliminateCross,
 	kType_BossEatMarble,
+	kType_Iron,
 	kType_Protect,
 	kType_Shotguns,
 	kType_Blood,

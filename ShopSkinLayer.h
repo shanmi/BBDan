@@ -11,9 +11,9 @@ class ShopSkinLayer
 	, public INotifyView
 {
 public:
-	virtual bool init();
+	virtual bool init(int marbleType);
 	static cocos2d::CCScene* scene();
-	CREATE_FUNC(ShopSkinLayer);
+	static ShopSkinLayer *create(int marbleType = kMarble_Normal);
 
 	void onEnter();
 	void onExit();
@@ -28,9 +28,13 @@ public:
 	void toLeftPanel(cocos2d::CCObject *pSender);
 	void toRightPanel(cocos2d::CCObject *pSender);
 	void updatePage(int pageIndex);
+	void moveToPageIndex(int pageIndex);
 
 	void payMarbleItem(cocos2d::CCObject *pSender);
 	void useMarbleItem(cocos2d::CCObject *pSender);
+
+private:
+	ShopSkinLayer(){}
 
 private:
 	UiLayout *m_mainLayout;

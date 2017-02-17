@@ -16,6 +16,7 @@ public:
 	void setCallbackListener(std::function <void(int)> callback){ m_callback = callback; }
 	int moveToLeft();
 	int moveToRight();
+	void moveToPage(int index);
 
 protected:
 	PageView(const cocos2d::CCSize &size);

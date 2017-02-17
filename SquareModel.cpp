@@ -56,6 +56,9 @@ SquareNode *SquareModel::createSquareNode(int type, int shap /* = -1 */)
 	case kType_BossEatMarble:
 		node = BossEatMarbleNode::create();
 		break;
+	case kType_Iron:
+		node = IronNode::create();
+		break;
 	case kType_Protect:
 		node = CircleProtectNode::create();
 		break;
@@ -72,7 +75,8 @@ SquareNode *SquareModel::createSquareNode(int type, int shap /* = -1 */)
 		node = nullptr;
 		break;
 	default:
-		assert(false && "not exit square type!");
+		CCLog("type==================%d", type); node = nullptr;
+		//assert(false && "not exit square type!");
 		break;
 	}
 	if (node != nullptr)
@@ -104,6 +108,7 @@ SquareNode *SquareModel::getSquareByIndex(Index index)
 			return square;
 		}
 	}
+	return NULL;
 }
 
 void SquareModel::removeAllSquares()
@@ -179,7 +184,8 @@ std::vector<int> SquareModel::getBallListType1()
 	for (int i = 0; i < BALL_COL_SIZE; i++)
 	{
 		int type = getBallType(probabilitys, count);
-		if (type == kType_AddMarble || type == kType_AddCoin || type == kType_Rebound || type == kType_EliminateRow || type == kType_EliminateCol || type == kType_EliminateCross || type == kType_BossEatMarble)
+		if (type == kType_AddMarble || type == kType_AddCoin || type == kType_Rebound || type == kType_EliminateRow || 
+			type == kType_EliminateCol || type == kType_EliminateCross || type == kType_BossEatMarble)
 		{
 			auto iter = find(types.begin(), types.end(), type);
 			while (iter != types.end())
@@ -188,10 +194,27 @@ std::vector<int> SquareModel::getBallListType1()
 				iter = find(types.begin(), types.end(), type);
 			}
 		}
-		int curSocre = SquareModel::theModel()->getCurrentScore();
-		if (curSocre <= 3 && (type == kType_Rebound || type == kType_EliminateRow || type == kType_EliminateCol || type == kType_EliminateCross || type == kType_AddCoin))
+		int curLevel = SquareModel::theModel()->getCurrentScore();
+		int m_showPropsLevel = GameConfig::getInstance()->m_showPropsLevel;
+		if (curLevel < m_showPropsLevel)
 		{
 			while (type == kType_Rebound || type == kType_EliminateRow || type == kType_EliminateCol || type == kType_EliminateCross || type == kType_AddCoin)
+			{
+				type = getBallType(probabilitys, count);
+			}
+		}
+		int showFireLevel = GameConfig::getInstance()->m_showFireLevel;
+		if (curLevel < showFireLevel)
+		{
+			while (type == kType_BossEatMarble)
+			{
+				type = getBallType(probabilitys, count);
+			}
+		}
+		int showIronLevel = GameConfig::getInstance()->m_showIronLevel;
+		if (curLevel < showFireLevel)
+		{
+			while (type == kType_Iron)
 			{
 				type = getBallType(probabilitys, count);
 			}
@@ -366,7 +389,7 @@ void SquareModel::removeSameRowSquare(SquareNode *node)
 void SquareModel::exchangeSquarePosition()
 {
 	int curLevel = SquareModel::theModel()->getCurrentScore();
-	if (curLevel < 50)
+	if (curLevel < GameConfig::getInstance()->m_reorderLevel)
 	{
 		return;
 	}
@@ -376,7 +399,7 @@ void SquareModel::exchangeSquarePosition()
 	for (auto iter = m_squares.begin(); iter != m_squares.end(); ++iter)
 	{
 		auto square = *iter;
-		if (square->canRemoveByProps())
+		if (square->canRemoveByProps() && square->getScore() > 0)
 		{
 			squares.push_back(square); 
 			indexs.push_back(square->getIndex());
@@ -408,4 +431,18 @@ void SquareModel::clearSquares()
 {
 	m_squares.clear();
 	m_curScore = 1;
+}
+
+int SquareModel::getRemainSqaure()
+{
+	int count = 0;
+	for (auto iter = m_squares.begin(); iter != m_squares.end(); ++iter)
+	{
+		auto square = *iter;
+		if (square->getSquareType() == kType_Square || square->getSquareType() == kType_Triangle)
+		{
+			count++;
+		}
+	}
+	return count;
 }

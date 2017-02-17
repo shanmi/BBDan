@@ -47,7 +47,15 @@ CCScene* ShopSkinLayer::scene()
 	return scene;
 }
 
-bool ShopSkinLayer::init()
+ShopSkinLayer *ShopSkinLayer::create(int marbleType /* = kMarble_Normal */)
+{
+	ShopSkinLayer *layer = new ShopSkinLayer();
+	layer->init(marbleType);
+	layer->autorelease();
+	return layer;
+}
+
+bool ShopSkinLayer::init(int marbleType)
 {
 	if (!CCLayer::init()){
 		return false;
@@ -69,6 +77,7 @@ bool ShopSkinLayer::init()
 	initLayout();
 	initSkinLayout();
 	updateCoins();
+	moveToPageIndex(marbleType);
 
 	return true;
 }
@@ -200,6 +209,12 @@ void ShopSkinLayer::updatePage(int pageIndex)
 	ballPrice->setVisible(!isUnlock);
 }
 
+void ShopSkinLayer::moveToPageIndex(int pageIndex)
+{
+	m_pageView->moveToPage(pageIndex);
+	updatePage(pageIndex);
+}
+
 void ShopSkinLayer::payMarbleItem(CCObject *pSender)
 {
 	int diamondCount = UserInfo::getInstance()->getCoins();
@@ -241,6 +256,7 @@ void ShopSkinLayer::useMarbleItem(CCObject *pSender)
 	removeFromParent();
 	MarbleModel::theModel()->setMarbleAttr(attr);
 	GameController::getInstance()->updateMarbles();
+	GameController::getInstance()->updateMarbleType(m_pageIndex);
 }
 
 void ShopSkinLayer::updateCoins()

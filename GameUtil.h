@@ -17,13 +17,15 @@ namespace GameUtil
 	std::string intToString(int value);
 
 	cocos2d::CCParticleExplosion *getExplodeEffect();
+	cocos2d::CCParticleExplosion *getExplodeEffect(std::string image);
 	cocos2d::CCParticleExplosion *getRandomExplodeEffect();
 	cocos2d::CCParticleSystemQuad *getBombEffect();
 	cocos2d::CCMotionStreak *getMotionStreak();
 
 	std::string getBlockImage(int type, int score);
 
-	cocos2d::CCAction *getScaleAction();
+	cocos2d::CCAction *getRepeatScaleAction();
+	cocos2d::CCAction *getOnceScaleAction();
 	cocos2d::CCAction *getBlinkAction();
 	cocos2d::CCAction *getFadeInOutAction();
 	cocos2d::CCSprite *getAchievementEffect(int type);

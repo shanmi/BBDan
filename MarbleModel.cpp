@@ -8,30 +8,7 @@
 MarbleModel::MarbleModel()
 {
 	int type = UserInfo::getInstance()->getCurMarbleType();
-	switch (type)
-	{
-	case kMarble_Normal:
-		m_attr = NormalMarle();
-		break;
-	case kMarble_Faster:
-		m_attr = FasterMarle();
-		break;
-	case kMarble_Biger:
-		m_attr = BiggerMarle();
-		break;
-	case kMarble_Dispersed:
-		m_attr = DispersedMarle();
-		break;
-	case kMarble_Bomb:
-		m_attr = BombMarle();
-		break;
-	case kMarble_Across:
-		m_attr = AcrossdMarle();
-		break;
-	default:
-		m_attr = NormalMarle();
-		break;
-	}
+	m_attr = getMarbleAttrByType(type);
 
 	m_marblesCount = 0;
 	m_attactRate = 1;
@@ -68,6 +45,36 @@ void MarbleModel::setMarbleAttr(MarbleAttr attr)
 {
 	m_attr = attr;
 	UserInfo::getInstance()->setCurMarbleType(m_attr.skin);
+}
+
+MarbleAttr MarbleModel::getMarbleAttrByType(int type)
+{
+	MarbleAttr attr;
+	switch (type)
+	{
+	case kMarble_Normal:
+		attr = NormalMarle();
+		break;
+	case kMarble_Faster:
+		attr = FasterMarle();
+		break;
+	case kMarble_Biger:
+		attr = BiggerMarle();
+		break;
+	case kMarble_Dispersed:
+		attr = DispersedMarle();
+		break;
+	case kMarble_Bomb:
+		attr = BombMarle();
+		break;
+	case kMarble_Across:
+		attr = AcrossdMarle();
+		break;
+	default:
+		attr = NormalMarle();
+		break;
+	}
+	return attr;
 }
 
 bool MarbleModel::haveMarbleMoving()
@@ -121,11 +128,11 @@ bool MarbleModel::isMarblesNerverStop()
 	{
 		auto marble = *iter;
 		auto body = marble->getBody();
-		auto speed = body->GetLinearVelocity();
+		auto velocity = body->GetLinearVelocity();
 		if ((*iter)->getReboundTimes() >= REBOUND_TIMES)
 		{
-			CCLOG("fabs(speed.x) === %f,  fabs(speed.y) === %f", fabs(speed.x), fabs(speed.y));
-			if (fabs(speed.x) > 1 && fabs(speed.y) < 1)
+			CCLOG("fabs(velocity.x) === %f,  fabs(velocity.y) === %f", fabs(velocity.x), fabs(velocity.y));
+			if (fabs(velocity.x) > 1 && fabs(velocity.y) < 1)
 			{
 				return true;
 			}
@@ -145,5 +152,10 @@ void MarbleModel::reboundMarbles()
 
 void MarbleModel::clearMarbles()
 {
+	for (auto iter = m_marbles.begin(); iter != m_marbles.end(); ++iter)
+	{
+		auto &marble = *iter;
+		marble->removeFromParent();
+	}
 	m_marbles.clear();
 }

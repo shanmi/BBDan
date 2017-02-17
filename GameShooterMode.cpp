@@ -206,7 +206,7 @@ void GameShooterMode::initBottomLayout()
 
 	CCMenuItem *helpBtn = dynamic_cast<CCMenuItem*>(m_bottomLayout->getChildById(9));
 	//helpBtn->setTarget(this, menu_selector(GameShooterMode::onHelpPanel));
-	auto action = GameUtil::getScaleAction();
+	auto action = GameUtil::getRepeatScaleAction();
 	helpBtn->runAction(action);
 
 }

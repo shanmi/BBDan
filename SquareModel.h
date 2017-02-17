@@ -37,6 +37,7 @@ public:
 	void exchangeSquarePosition();
 
 	void clearSquares();
+	int getRemainSqaure();
 
 private:
 	SquareModel();

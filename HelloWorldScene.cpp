@@ -119,7 +119,7 @@ bool HelloWorld::ccTouchBegan(cocos2d::CCTouch *pTouch, cocos2d::CCEvent *pEvent
 
 	/*CCPoint position = pTouch->getLocation();
 	auto m_emitter = new CCParticleSystemQuad();
-	std::string filename = "explore.plist";
+	std::string filename = "particle/explore.plist";
 	m_emitter->initWithFile(filename.c_str());
 	m_emitter->setPosition(position);
 	addChild(m_emitter, 10);*/

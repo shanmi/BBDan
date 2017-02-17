@@ -17,6 +17,9 @@ struct INotifyView
 	virtual void useProtectEffect(){}
 	virtual void useShotGunsEffect(){}
 	virtual void getBloodEffect(){}
+	virtual void showAddCoinEffect(SquareNode *node){}
+	virtual void showAddMarbleEffect(SquareNode *node){}
+	virtual void updateMarbleType(int type){}
 };
 
 class GameController
@@ -36,6 +39,9 @@ public:
 	void useProtectEffect() { NOTIFY_VIEWS(useProtectEffect); }
 	void useShotGunsEffect() { NOTIFY_VIEWS(useShotGunsEffect); }
 	void getBloodEffect(){ addBloodCount(1); NOTIFY_VIEWS(getBloodEffect); }
+	void showAddCoinEffect(SquareNode *node){ NOTIFY_VIEWS(showAddCoinEffect, node); }
+	void showAddMarbleEffect(SquareNode *node){ NOTIFY_VIEWS(showAddMarbleEffect, node); }
+	void updateMarbleType(int type){ NOTIFY_VIEWS(updateMarbleType, type); }
 public:
 	void startOneRound();
 
@@ -50,6 +56,7 @@ public:
 	void setRoundState(bool isOver) { m_bIsRoundOver = isOver; }
 	void checkSquares(bool isRoundEnd = false);
 	void updateMarblePos();
+	bool isGameOver();
 	bool checkGameOver();
 
 	void setDoubleAttact(){ m_attactRate = ATTACT_RATE * 2; }

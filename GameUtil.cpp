@@ -92,6 +92,32 @@ CCParticleExplosion *GameUtil::getExplodeEffect(){
 	return pEmitter;
 }
 
+CCParticleExplosion *GameUtil::getExplodeEffect(std::string image)
+{
+	CCParticleExplosion *pEmitter = CCParticleExplosion::create();
+	pEmitter->setTexture(CCTextureCache::sharedTextureCache()->addImage(image.c_str()));
+	pEmitter->setAutoRemoveOnFinish(true);
+
+	ccColor4F c4Var = { 0, 0, 0, 0.0 };
+	ccColor4F c4 = { 1, 1, 1, 1 };
+	pEmitter->setStartColor(c4);
+	pEmitter->setEndColor(c4);
+	pEmitter->setStartColorVar(c4Var);
+	pEmitter->setEndColorVar(c4Var);
+
+	pEmitter->setTotalParticles(10);
+
+	pEmitter->setRadialAccel(1);
+	pEmitter->setRadialAccelVar(5);
+
+	pEmitter->setSpeed(200);
+	pEmitter->setScale(1.2f);
+	pEmitter->setGravity(ccp(0, -200));
+
+	return pEmitter;
+}
+
+
 CCParticleExplosion *GameUtil::getRandomExplodeEffect()
 {
 	int random = rand() % 8;
@@ -123,34 +149,16 @@ CCParticleExplosion *GameUtil::getRandomExplodeEffect()
 		image = "squares/fangkuai_zhi1.png";
 		break;
 	}
-	CCParticleExplosion *pEmitter = CCParticleExplosion::create();
-	pEmitter->setTexture(CCTextureCache::sharedTextureCache()->addImage(image.c_str()));
-	pEmitter->setAutoRemoveOnFinish(true);
+	auto emitter = getExplodeEffect(image);
 
-	ccColor4F c4Var = { 0, 0, 0, 0.0 };
-	ccColor4F c4 = { 1, 1, 1, 1 };
-	pEmitter->setStartColor(c4);
-	pEmitter->setEndColor(c4);
-	pEmitter->setStartColorVar(c4Var);
-	pEmitter->setEndColorVar(c4Var);
-
-	pEmitter->setTotalParticles(10);
-
-	pEmitter->setRadialAccel(1);
-	pEmitter->setRadialAccelVar(5);
-
-	pEmitter->setSpeed(200);
-	pEmitter->setScale(1.2f);
-	pEmitter->setGravity(ccp(0, -200));
-
-	return pEmitter;
+	return emitter;
 }
 
 cocos2d::CCParticleSystemQuad *GameUtil::getBombEffect()
 {
-	auto emitter = CCParticleSystemQuad::create("explore.plist");
+	auto emitter = CCParticleSystemQuad::create("particle/explore.plist");
 	emitter->setAutoRemoveOnFinish(true);
-	std::string filename = "explore.plist";
+	std::string filename = "particle/explore.plist";
 	//emitter->initWithFile(filename.c_str());
 	return emitter;
 }
@@ -213,13 +221,21 @@ std::string GameUtil::getBlockImage(int type, int score)
 	return temp;
 }
 
-CCAction *GameUtil::getScaleAction()
+CCAction *GameUtil::getRepeatScaleAction()
 {
 	auto scaleby = CCScaleBy::create(0.6f, 1.1f);
 	auto reverse = scaleby->reverse();
 	auto sequence = CCSequence::create(scaleby, reverse, NULL);
 	auto action = CCRepeatForever::create(sequence);
 	return action;
+}
+
+CCAction *GameUtil::getOnceScaleAction()
+{
+	auto scaleby = CCScaleBy::create(0.5f, 1.2f);
+	auto reverse = scaleby->reverse();
+	auto sequence = CCSequence::create(scaleby, reverse, NULL);
+	return sequence;
 }
 
 CCAction *GameUtil::getBlinkAction()
@@ -244,10 +260,11 @@ CCSprite *GameUtil::getAchievementEffect(int type)
 	sprintf(temp, "combo/combo_%d.png", type);
 	auto effect = CCSprite::create(temp);
 	auto winSize = CCDirector::sharedDirector()->getWinSize();
-	auto move1 = CCMoveBy::create(0.6f, ccp(winSize.width / 2, 0));
+	effect->setPosition(ccp(-effect->getContentSize().width, winSize.height *0.6f));
+	auto move1 = CCMoveBy::create(0.7f, ccp(winSize.width / 2 + effect->getContentSize().width, 0));
 	auto ease1 = CCEaseSineInOut::create(move1);
-	auto delay = CCDelayTime::create(0.2f);
-	auto move2 = CCMoveBy::create(0.4f, ccp(winSize.width / 2, 0));;
+	auto delay = CCDelayTime::create(0.3f);
+	auto move2 = CCMoveBy::create(0.5f, ccp(winSize.width / 2 + effect->getContentSize().width, 0));;
 	auto ease2 = CCEaseSineOut::create(move2);
 	auto callback = CCCallFunc::create(effect, callfunc_selector(CCNode::removeFromParent));
 	auto sequence = CCSequence::create(ease1, delay, ease2, callback, NULL);

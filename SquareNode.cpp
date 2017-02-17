@@ -8,6 +8,7 @@
 #include "MarbleModel.h"
 #include "SquareModel.h"
 #include "SoundMgr.h"
+#include "GameConfig.h"
 
 USING_NS_CC;
 
@@ -38,13 +39,13 @@ bool SquareNode::init()
 			m_score = m_score * 2;
 		}
 	}
-	auto image = GameUtil::getBlockImage(kBlock_Square, m_score);
-	m_image = CCSprite::create(image.c_str());
-	addChild(m_image);
+	m_image = GameUtil::getBlockImage(kBlock_Square, m_score);
+	m_imageSprite = CCSprite::create(m_image.c_str());
+	addChild(m_imageSprite);
 	auto fanIn = CCFadeIn::create(0.6f);
-	m_image->runAction(fanIn);
+	m_imageSprite->runAction(fanIn);
 
-	auto size = m_image->getContentSize();
+	auto size = m_imageSprite->getContentSize();
 	setContentSize(ccp(64, 64));
 
 	m_scoreLabel = GameUtil::getImageNum(FONT_WHITE, m_score);
@@ -73,8 +74,8 @@ void SquareNode::addScore(int score)
 	if (m_scoreLabel)
 	{
 		m_scoreLabel->setString(scoreStr.c_str());
-		auto image = GameUtil::getBlockImage(kBlock_Square, m_score);
-		m_image->initWithFile(image.c_str());
+		m_image = GameUtil::getBlockImage(kBlock_Square, m_score);
+		m_imageSprite->initWithFile(m_image.c_str());
 		setPerfectScale();
 	}
 }
@@ -94,12 +95,26 @@ void SquareNode::setPerfectScale()
 	}
 }
 
+bool SquareNode::isSameColor(SquareNode *node)
+{
+	if (!node || node->getSquareType() != kType_Square)
+	{
+		return false;
+	}
+	auto image = node->getImage();
+	if (m_image == image)
+	{
+		return true;
+	}
+	return false;
+}
+
 void SquareNode::moveDown(bool isLastOne /* = false */)
 {
 	auto actions = ActionSequence::create(this);
 	auto delay = CCFadeIn::create(0.6f);
 	auto move = CCMoveBy::create(1.0f, ccp(0, -getContentSize().height - SQUARE_SPACING));
-	auto callback = CCFunctionAction::create([=]()
+	auto callback1 = CCFunctionAction::create([=]()
 	{
 		GameController::getInstance()->setRoundState(true);
 		GameController::getInstance()->checkGameOver();
@@ -109,9 +124,8 @@ void SquareNode::moveDown(bool isLastOne /* = false */)
 	actions->addAction(move);
 	if (isLastOne)
 	{
-		actions->addAction(callback);
+		actions->addAction(callback1);
 	}
-
 	if (m_squareType == kType_Square || m_squareType == kType_Triangle)
 	{
 		auto callback2 = CCFunctionAction::create([=]()
@@ -120,24 +134,25 @@ void SquareNode::moveDown(bool isLastOne /* = false */)
 			Index newIndex = Index(m_index.x + 1, m_index.y);
 			auto neighbour = SquareModel::theModel()->getSquareByIndex(newIndex);
 			int curLevel = SquareModel::theModel()->getCurrentScore();
-			if (!neighbour && newIndex.x < BALL_COL_SIZE && curScore / 2 > 0 && curLevel >= 100)
+			int addFireLevel = GameConfig::getInstance()->m_addFireLevel;
+			int splitSquareLevel = GameConfig::getInstance()->m_splitSquareLevel;
+			if (!neighbour && newIndex.x < BALL_COL_SIZE && curScore / 2 > 0 && (curLevel >= splitSquareLevel || curLevel >= addFireLevel))
 			{
-				addScore(-(curScore - m_score / 2));
-				auto shake = CCShaky3D::create(0.4f, ccp(2, 2), 2, 10);
-				runAction(shake);
-
 				SquareNode *square = NULL;
-				if (m_squareType == kType_Square)
+				if (m_squareType == kType_Square && curLevel >= splitSquareLevel)
 				{
 					square = SquareModel::theModel()->createSquareNode(kType_Square);
 				}
-				else if (m_squareType == kType_Triangle && curLevel >= 120)
+				else if (m_squareType == kType_Triangle && curLevel >= addFireLevel)
 				{
 					square = SquareModel::theModel()->createSquareNode(kType_BossEatMarble);
 				}
-
 				if (square)
 				{
+					addScore(-(curScore - m_score / 2));
+					auto shake = CCShaky3D::create(0.4f, ccp(2, 2), 2, 10);
+					runAction(shake);
+
 					square->setBody();
 					square->setIndex(newIndex);
 					square->setScore(curScore - m_score);
@@ -153,12 +168,38 @@ void SquareNode::moveDown(bool isLastOne /* = false */)
 			}
 		});
 		actions->addAction(callback2);
+		/*auto callback3 = CCFunctionAction::create([=]()
+		{
+			int curScore = m_score;
+			Index newIndex = Index(m_index.x, m_index.y - 1);
+			auto neighbour = SquareModel::theModel()->getSquareByIndex(newIndex);
+			int curLevel = SquareModel::theModel()->getCurrentScore();
+			int addIronLevel = GameConfig::getInstance()->m_addIronLevel;
+			bool isSame = isSameColor(neighbour);
+			if (neighbour && isSame && curLevel >= addIronLevel)
+			{
+				addScore(neighbour->getScore());
+				auto actions = ActionSequence::create(neighbour);
+				auto scaleTo = CCScaleTo::create(0.5f, 0.0f);
+				auto moveTo = CCMoveTo::create(0.5f, getPosition());
+				auto action = CCSpawn::create(scaleTo, moveTo, NULL);
+				auto callback = CCFunctionAction::create([=]()
+				{
+					SquareModel::theModel()->removeSquareNode(neighbour);
+				});
+				actions->addAction(action);
+				actions->addAction(callback);
+				actions->runActions();
+			}
+		});
+		actions->addAction(callback3);*/
 	}
 	actions->runActions();
 }
 
 bool SquareNode::shouldRemoveDirectly()
 {
+	MarbleAttr attr;
 	switch (m_squareType)
 	{
 	case kType_Square:
@@ -166,6 +207,13 @@ bool SquareNode::shouldRemoveDirectly()
 	case kType_AddMarble:
 	case kType_AddCoin:
 		return true;
+		break;
+	case kType_Iron:
+		attr = MarbleModel::theModel()->getMarbleAttr();
+		if (attr.skin == kMarble_Dispersed)
+		{
+			return true;
+		}
 		break;
 	default:
 		break;
@@ -180,6 +228,7 @@ bool SquareNode::canRemoveByProps()
 	case kType_Square:
 	case kType_Triangle:
 	case kType_BossEatMarble:
+	case kType_Iron:
 		return true;
 		break;
 	default:
@@ -276,13 +325,13 @@ bool TriangleNode::init(int shap /* = -1 */)
 	}
 	char temp[50] = { 0 };
 	sprintf(temp, "half_%d.png", shap);
-	auto image = GameUtil::getBlockImage(kBlock_Triangle, m_score);
-	m_image = CCSprite::create(image.c_str());
-	addChild(m_image);
+	m_image = GameUtil::getBlockImage(kBlock_Triangle, m_score);
+	m_imageSprite = CCSprite::create(m_image.c_str());
+	addChild(m_imageSprite);
 	auto fanIn = CCFadeIn::create(0.6f);
-	m_image->runAction(fanIn);
+	m_imageSprite->runAction(fanIn);
 
-	auto size = m_image->getContentSize();
+	auto size = m_imageSprite->getContentSize();
 	setContentSize(ccp(64, 64));
 
 	m_scoreLabel = GameUtil::getImageNum(FONT_WHITE, m_score);
@@ -290,19 +339,19 @@ bool TriangleNode::init(int shap /* = -1 */)
 	{
 	case 0:
 		m_scoreLabel->setPosition(ccp(-size.width*0.15f, -size.height*0.2f));
-		m_image->setRotation(-90);
+		m_imageSprite->setRotation(-90);
 		break;
 	case 1:
 		m_scoreLabel->setPosition(ccp(-size.width*0.15f, size.height*0.15f));
-		m_image->setRotation(0);
+		m_imageSprite->setRotation(0);
 		break;
 	case 2:
 		m_scoreLabel->setPosition(ccp(size.width*0.15f, size.height*0.15f));
-		m_image->setRotation(90);
+		m_imageSprite->setRotation(90);
 		break;
 	case 3:
 		m_scoreLabel->setPosition(ccp(size.width*0.15f, -size.height*0.2f));
-		m_image->setRotation(180);
+		m_imageSprite->setRotation(180);
 		break;
 	}
 	addChild(m_scoreLabel);
@@ -366,8 +415,8 @@ void TriangleNode::addScore(int score)
 	if (m_scoreLabel)
 	{
 		m_scoreLabel->setString(scoreStr.c_str());
-		auto image = GameUtil::getBlockImage(kBlock_Triangle, m_score);
-		m_image->initWithFile(image.c_str());
+		m_image = GameUtil::getBlockImage(kBlock_Triangle, m_score);
+		m_imageSprite->initWithFile(m_image.c_str());
 		setPerfectScale();
 	}
 }
@@ -386,10 +435,10 @@ bool BossEatMarbleNode::init()
 {
 	m_score = 1;// SquareModel::theModel()->getCurrentScore();
 
-	/*m_image = CCSprite::create("boss_0.png");
-	addChild(m_image);
+	/*m_imageSprite = CCSprite::create("boss_0.png");
+	addChild(m_imageSprite);
 	auto fanIn = CCFadeIn::create(0.6f);
-	m_image->runAction(fanIn);*/
+	m_imageSprite->runAction(fanIn);*/
 
 	CCParticleSun* sun = CCParticleSun::create();
 	sun->setStartSize(60);
@@ -399,8 +448,8 @@ bool BossEatMarbleNode::init()
 	sun->setTexture(CCTextureCache::sharedTextureCache()->addImage("particle/fire.png"));
 	addChild(sun);
 
-	m_image = CCSprite::create("squares/fangkuai_hengxiao.png");
-	auto size = m_image->getContentSize();
+	m_imageSprite = CCSprite::create("squares/fangkuai_hengxiao.png");
+	auto size = m_imageSprite->getContentSize();
 	setContentSize(ccp(64, 64));
 
 	/*auto color = ccc3(255, 255 - (m_score * 13) % 256, (m_score * 7) % 256);
@@ -414,7 +463,7 @@ bool BossEatMarbleNode::init()
 
 void BossEatMarbleNode::setBody()
 {
-	m_body = Box2dFactory::getInstance()->createCircle(this, m_image->getContentSize(), false);
+	m_body = Box2dFactory::getInstance()->createCircle(this, m_imageSprite->getContentSize(), true);
 }
 
 void BossEatMarbleNode::doCollisionAction()
@@ -429,5 +478,53 @@ void BossEatMarbleNode::doCollisionAction()
 
 void BossEatMarbleNode::runRemoveAction()
 {
+	removeFromParent();
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////////
+IronNode *IronNode::create()
+{
+	IronNode *node = new IronNode();
+	node->autorelease();
+	node->init();
+	return node;
+}
+
+bool IronNode::init()
+{
+	m_score = 1;// SquareModel::theModel()->getCurrentScore();
+
+	m_imageSprite = CCSprite::create("squares/fangkuai_tie.png");
+	addChild(m_imageSprite);
+	auto fanIn = CCFadeIn::create(0.6f);
+	m_imageSprite->runAction(fanIn);
+
+	auto size = m_imageSprite->getContentSize();
+	setContentSize(size);
+
+	return true;
+}
+
+void IronNode::setBody()
+{
+	m_body = Box2dFactory::getInstance()->createSquare(this);
+}
+
+void IronNode::doCollisionAction()
+{
+	SoundMgr::theMgr()->playEffect(Effect_Pop);
+	showBombAction();
+
+	int damage = MarbleModel::theModel()->getMarbleAttr().damage;
+	int attactRate = GameController::getInstance()->getAttactRate();
+	addScore(-attactRate*damage);
+}
+
+void IronNode::runRemoveAction()
+{
+	auto explore = GameUtil::getExplodeEffect("squares/fangkuai_tie.png");
+	explore->setPosition(getPosition());
+	getParent()->addChild(explore, kZOrder_Square + 1);
 	removeFromParent();
 }

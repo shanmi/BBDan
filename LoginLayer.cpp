@@ -49,9 +49,17 @@ bool LoginLayer::init(){
 		if (i < days)
 		{
 			CCSprite *pAlready = CCSprite::create("login/login_get.png");
+			if (i == 6)
+			{
+				pAlready = CCSprite::create("login/login_get2.png");
+			}
 			CCSprite * panel = dynamic_cast<CCSprite *>((m_mainLayout->getChildById(4 + i)));
-			pAlready->setPosition(panel->getPosition());
+			pAlready->setPosition(ccp(panel->getPositionX(), panel->getPositionY()+10));
 			m_mainLayout->addChild(pAlready, panel->getZOrder() + 1);
+			if (i < days - 1)
+			{
+				panel->setColor(ccc3(60, 60, 60));
+			}
 			if (LoginUtils::getInstance()->checkLoginReward() && i == (days - 1)){
 				pAlready->setVisible(false);
 				pAlready->setScale(3.0f);
@@ -61,6 +69,7 @@ bool LoginLayer::init(){
 				auto callback = CCFunctionAction::create([=]()
 				{
 					pAlready->setVisible(true);
+					panel->setColor(ccc3(60, 60, 60));
 					getLoginReward();
 					LoginUtils::getInstance()->setTargetDays();
 				});

@@ -9,6 +9,13 @@ GameConfig::GameConfig()
 :m_nDiamondCount(0)
 , m_nMarbleCount(0)
 , m_showLibaoLevel(20)
+, m_showPropsLevel(3)
+, m_showFireLevel(20)
+, m_reorderLevel(40)
+, m_splitSquareLevel(60)
+, m_addFireLevel(80)
+, m_gravityLevel(120)
+, m_showIronLevel(160)
 , m_yijian(0)
 {
 	/*memset(m_nDiamond, 0, sizeof(int)* 10 * 5);
@@ -98,6 +105,48 @@ void GameConfig::preloadData()
 			m_showLibaoLevel = root[key].GetInt();
 		}
 
+		key = "showPropsLevel";
+		if (!root[key].IsNull())
+		{
+			m_showPropsLevel = root[key].GetInt();
+		}
+
+		key = "showFireLevel";
+		if (!root[key].IsNull())
+		{
+			m_showFireLevel = root[key].GetInt();
+		}
+
+		key = "reorderLevel";
+		if (!root[key].IsNull())
+		{
+			m_reorderLevel = root[key].GetInt();
+		}
+
+		key = "splitSquareLevel";
+		if (!root[key].IsNull())
+		{
+			m_splitSquareLevel = root[key].GetInt();
+		}
+
+		key = "addFireLevel";
+		if (!root[key].IsNull())
+		{
+			m_addFireLevel = root[key].GetInt();
+		}
+
+		key = "gravityLevel";
+		if (!root[key].IsNull())
+		{
+			m_gravityLevel = root[key].GetInt();
+		}
+
+		key = "showIronLevel";
+		if (!root[key].IsNull())
+		{
+			m_showIronLevel = root[key].GetInt();
+		}
+		
 		key = "yijian";
 		if (!root[key].IsNull())
 		{
