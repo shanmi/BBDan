@@ -6,6 +6,9 @@
 #include "SquareModel.h"
 #include "GameConfig.h"
 #include "GameUtil.h"
+#include "UserInfo.h"
+#include "LibaoDialog.h"
+#include "MarbleModel.h"
 
 USING_NS_CC;
 
@@ -99,12 +102,26 @@ void FuhuoLibao::initLayout()
 void FuhuoLibao::closePanel(CCObject *pSender)
 {
 	removeFromParent();
+	MarbleModel::theModel()->setAttactRate(ATTACT_RATE);
 	GameUtil::clearGameInfo();
 	GameController::getInstance()->backToMainMenu();
 }
 
 void FuhuoLibao::buyLibao(CCObject *pSender)
 {
+#if(BBDAN_SHENBAO == 1)
+	int curCoin = UserInfo::getInstance()->getCoins();
+	int fuhuoCostCoin = GameConfig::getInstance()->m_fuhuoCostCoin;
+	if (curCoin >= fuhuoCostCoin)
+	{
+		GameController::getInstance()->updateCoins();
+	}
+	else
+	{
+		LibaoDialog *dialog = LibaoDialog::create(PAY_TYPE_COIN_LIBAO);
+		addChild(dialog, KZOrder_LibaoLayer, kTag_Libao);
+	}
+#else
 	MyPurchase::sharedPurchase()->payForProducts(PAY_TYPE_FUHUO_LIBAO);
 	bool isBusinessMode = MyPurchase::sharedPurchase()->isBusinessMode();
 	int isYijian = GameConfig::getInstance()->m_yijian;
@@ -112,6 +129,7 @@ void FuhuoLibao::buyLibao(CCObject *pSender)
 	{
 		removeFromParent();
 	}
+#endif
 }
 
 void FuhuoLibao::updateCoins()
@@ -119,4 +137,9 @@ void FuhuoLibao::updateCoins()
 	removeFromParent();
 	SquareModel::theModel()->removeBelowSquares();
 	GameUtil::saveGameInfo();
+#if(BBDAN_SHENBAO == 1)
+	int fuhuoCostCoin = GameConfig::getInstance()->m_fuhuoCostCoin;
+	UserInfo::getInstance()->addCoins(-fuhuoCostCoin);
+	GameController::getInstance()->updateCoins(); 
+#endif
 }

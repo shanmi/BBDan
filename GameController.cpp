@@ -56,8 +56,9 @@ bool GameController::isCounterFull()
 
 int GameController::getAttactRate()
 { 
+	auto marbleDamage = MarbleModel::theModel()->getMarbleAttr().damage;
 	int marbleRate = MarbleModel::theModel()->getAttactRate();
-	return m_attactRate * marbleRate;
+	return m_attactRate * marbleRate * marbleDamage;
 }
 
 void GameController::checkSquares(bool isRoundEnd /* = false */)
@@ -134,16 +135,6 @@ bool GameController::checkGameOver()
 	return false;
 }
 
-bool GameController::checkCoinsEnought()
-{
-	int coinCount = UserInfo::getInstance()->getCoins();
-	if (coinCount >= DOUBLE_ATTACT_COST_COIN)
-	{
-		return true;
-	}
-	return false;
-}
-
 void GameController::createPropByMarble(MarbleNode *marble)
 {
 	MarbleModel::theModel()->reboundMarbles();
@@ -162,7 +153,7 @@ void GameController::createPropByMarble(MarbleNode *marble)
 	for (auto iter = squares.begin(); iter != squares.end(); ++iter)
 	{
 		auto square = (*iter);
-		if (square->getSquareType() != kType_EliminateRow && square->getSquareType() != kType_EliminateCol && square->getSquareType() != kType_Rebound)
+		if (square->getSquareType() != kType_Rebound)
 		{
 			auto rect = square->boundingBox();
 			if (rect.containsPoint(ccp(posX, posY)))

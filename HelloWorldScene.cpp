@@ -43,15 +43,6 @@ bool HelloWorld::init()
     // add a label shows "Hello World"
     // create and initialize a label
     
-    CCLabelTTF* pLabel = CCLabelTTF::create("12345", "fonts/SF Square Root.ttf", 34);
-    
-    // position the label on the center of the screen
-    pLabel->setPosition(ccp(origin.x + visibleSize.width/2,
-                            origin.y + visibleSize.height - pLabel->getContentSize().height));
-
-    // add the label as a child to this layer
-    this->addChild(pLabel, 1);
-
 	for (int n = 0; n < 1; n++)
 	{
 		auto squares = SquareModel::theModel()->createSquareList();

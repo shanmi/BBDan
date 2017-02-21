@@ -43,6 +43,7 @@ public:
 	virtual void setPosition(const cocos2d::CCPoint &position);
 
 	virtual void setBody();
+	virtual void removeBody();
 	virtual void doCollisionAction();
 	virtual void runRemoveAction();
 public:

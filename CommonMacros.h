@@ -1,7 +1,6 @@
 #ifndef __COMMONMACROS_H__
 #define __COMMONMACROS_H__
 
-#define LABEL_FONT "fonts/SF Square Head Bold.ttf"
 #define FONT_WHITE "numbers/number1.png"
 #define FONT_YELLOW "numbers/number2.png"
 

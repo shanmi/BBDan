@@ -198,25 +198,25 @@ std::vector<int> SquareModel::getBallListType1()
 		int m_showPropsLevel = GameConfig::getInstance()->m_showPropsLevel;
 		if (curLevel < m_showPropsLevel)
 		{
-			while (type == kType_Rebound || type == kType_EliminateRow || type == kType_EliminateCol || type == kType_EliminateCross || type == kType_AddCoin)
+			if (type == kType_Rebound || type == kType_EliminateRow || type == kType_EliminateCol || type == kType_EliminateCross || type == kType_AddCoin)
 			{
-				type = getBallType(probabilitys, count);
+				type = kType_Square;
 			}
 		}
 		int showFireLevel = GameConfig::getInstance()->m_showFireLevel;
 		if (curLevel < showFireLevel)
 		{
-			while (type == kType_BossEatMarble)
+			if (type == kType_BossEatMarble)
 			{
-				type = getBallType(probabilitys, count);
+				type = kType_Triangle;
 			}
 		}
 		int showIronLevel = GameConfig::getInstance()->m_showIronLevel;
-		if (curLevel < showFireLevel)
+		if (curLevel < showIronLevel)
 		{
-			while (type == kType_Iron)
+			if (type == kType_Iron)
 			{
-				type = getBallType(probabilitys, count);
+				type = kType_Triangle;
 			}
 		}
 		types.push_back(type);
@@ -350,9 +350,8 @@ void SquareModel::elimateAroundSquare(SquareNode *node)
 			auto rotateBack = rotate->reverse();
 			auto sequence = CCSequence::create(rotate, rotateBack, NULL);
 			square->runAction(sequence);
-			int damage = MarbleModel::theModel()->getMarbleAttr().damage;
 			int attactRate = GameController::getInstance()->getAttactRate();
-			square->addScore(-attactRate*damage);
+			square->addScore(-attactRate);
 		}
 	}
 }

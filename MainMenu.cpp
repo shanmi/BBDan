@@ -70,6 +70,7 @@ bool MainMenu::init()
 	{
 		return false;
 	}
+	SoundMgr::theMgr()->playBackground();
 
 	auto winSize = CCDirector::sharedDirector()->getWinSize();
 
@@ -120,11 +121,11 @@ void MainMenu::initLayout()
 
 	CCMenuItem *startGameTwo = dynamic_cast<CCMenuItem*>(m_mainLayout->getChildById(3));
 	startGameTwo->setTarget(this, menu_selector(MainMenu::toStartGameTwo));
-	//startGameTwo->setVisible(false);
+	startGameTwo->setVisible(false);
 
 	CCMenuItem *toShop = dynamic_cast<CCMenuItem*>(m_mainLayout->getChildById(5));
 	toShop->setTarget(this, menu_selector(MainMenu::toShopLayer));
-	toShop->setVisible(false);
+	//toShop->setVisible(false);
 
 	CCMenuItem *toSkin = dynamic_cast<CCMenuItem*>(m_mainLayout->getChildById(6));
 	toSkin->setTarget(this, menu_selector(MainMenu::toSkinLayer));

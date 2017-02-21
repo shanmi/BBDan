@@ -122,10 +122,13 @@ bool GameScene::init()
 	initPhysicBorder();
 
 	initMarbles();
+	int type = MarbleModel::theModel()->getMarbleAttr().skin;
+	updateMarbleType(type);
+
 	initSquares();
 	updateMarbleCount();
 
-	checkFishGuide();
+	//checkFishGuide();
 
 	updateCoins();
 	updateScore();
@@ -194,7 +197,7 @@ void GameScene::initTopLayout()
 	pauseItem->setTarget(this, menu_selector(GameScene::onPauseGame));
 
 	CCMenuItem *helpBtn = dynamic_cast<CCMenuItem*>(m_topLayout->getChildById(9));
-	//helpBtn->setTarget(this, menu_selector(GameScene::onHelpPanel));
+	helpBtn->setTarget(this, menu_selector(GameScene::onHelpPanel));
 	auto action = GameUtil::getRepeatScaleAction();
 	helpBtn->runAction(action);
 }
@@ -227,8 +230,9 @@ void GameScene::initBottomLayout()
 void GameScene::onDoubleAttact(CCObject *pSender)
 {
 	int count = UserInfo::getInstance()->getPropsCount(kProp_DoubleAttact);
-	bool ifCoinEnought = GameController::getInstance()->checkCoinsEnought();
-	if (!ifCoinEnought && count <= 0)
+	int coinCount = UserInfo::getInstance()->getCoins();
+	int doubleAttactCost = GameConfig::getInstance()->m_doubleAttactCost;
+	if (coinCount >= doubleAttactCost && count <= 0)
 	{
 		// show pay point
 		showLibaoDiaolg();
@@ -242,7 +246,7 @@ void GameScene::onDoubleAttact(CCObject *pSender)
 		}
 		else
 		{
-			UserInfo::getInstance()->addCoins(-DOUBLE_ATTACT_COST_COIN);
+			UserInfo::getInstance()->addCoins(-doubleAttactCost);
 		}
 		updateCoins();
 		m_bIsDoubleAttact = true;
@@ -266,8 +270,9 @@ void GameScene::onClearScreen(CCObject *pSender)
 {
 	int count = UserInfo::getInstance()->getPropsCount(kProp_Clear);
 	bool isRoundOver = GameController::getInstance()->isRoundOver();
-	bool ifCoinEnought = GameController::getInstance()->checkCoinsEnought();
-	if (!ifCoinEnought && count <= 0)
+	int coinCount = UserInfo::getInstance()->getCoins();
+	int hammerCost = GameConfig::getInstance()->m_hammerCost;
+	if (coinCount >= hammerCost && count <= 0)
 	{
 		// show pay point
 		showLibaoDiaolg();
@@ -296,8 +301,9 @@ void GameScene::onFreezing(CCObject *pSender)
 {
 	bool isFreezing = SquareModel::theModel()->isFreezing();
 	int count = UserInfo::getInstance()->getPropsCount(kProp_Freezing);
-	bool ifCoinEnought = GameController::getInstance()->checkCoinsEnought();
-	if (!ifCoinEnought && count <= 0)
+	int coinCount = UserInfo::getInstance()->getCoins();
+	int freezingCost = GameConfig::getInstance()->m_freezingCost;
+	if (coinCount >= freezingCost && count <= 0)
 	{
 		// show pay point
 		showLibaoDiaolg();
@@ -311,7 +317,7 @@ void GameScene::onFreezing(CCObject *pSender)
 		}
 		else
 		{
-			UserInfo::getInstance()->addCoins(-DOUBLE_ATTACT_COST_COIN);
+			UserInfo::getInstance()->addCoins(-freezingCost);
 		}
 		updateCoins();
 		SquareModel::theModel()->setSquareFreezing(true);
@@ -504,9 +510,18 @@ void GameScene::update(float dt)
 	m_world->ClearForces();
 
 	auto marbles = MarbleModel::theModel()->getMarbles();
+	int marbleCount = MarbleModel::theModel()->getMarblesCount();
 	for (auto iter = marbles.begin(); iter != marbles.end(); ++iter)
 	{
-		auto &marble = (*iter);
+		auto marble = (*iter);
+		if (m_arrow->boundingBox().containsPoint(marble->getPosition()))
+		{
+			marble->setVisible(false);
+		}
+		else
+		{
+			marble->setVisible(true);
+		}
 		auto body = marble->getBody();
 		MarbleNode *ball = (MarbleNode*)(body->GetUserData());
 		if (ball->isMoving())
@@ -527,15 +542,7 @@ void GameScene::update(float dt)
 				marble->moveToTargetPos();
 			}
 		}
-
-		if (m_arrow->boundingBox().containsPoint(marble->getPosition()))
-		{
-			marble->setVisible(false);
-		}
-		else
-		{
-			marble->setVisible(true);
-		}
+		
 	}
 
 	//check squares by not check tool
@@ -701,9 +708,9 @@ void GameScene::onTouchCallback()
 
 void GameScene::didAccelerate(CCAcceleration* pAccelerationValue)
 {
-	int addFireLevel = GameConfig::getInstance()->m_addFireLevel;
+	int gravityLevel = GameConfig::getInstance()->m_gravityLevel;
 	int curLevel = SquareModel::theModel()->getCurrentScore();
-	if (curLevel < addFireLevel)
+	if (curLevel < gravityLevel)
 	{
 		return;
 	}
@@ -894,8 +901,19 @@ void GameScene::updateMarbleType(int type)
 	MarbleModel::theModel()->setMarbleAttr(attr);
 	MarbleModel::theModel()->clearMarbles();
 	initMarbles();
-	CCMenuItem *ballBtn = dynamic_cast<CCMenuItem*>(m_bottomLayout->getChildById(type + 9));
-	ballBtn->setColor(ccc3(255, 255, 255));
+	for (int i = kMarble_Faster; i <= kMarble_Bomb; i++)
+	{
+		CCMenuItem *ballBtn = dynamic_cast<CCMenuItem*>(m_bottomLayout->getChildById(i + 9));
+		ballBtn->stopAllActions();
+		ballBtn->setScale(1.0f);
+		if (type == i)
+		{
+			ballBtn->setColor(ccc3(255, 255, 255));
+			auto action = GameUtil::getRepeatScaleAction();
+			ballBtn->runAction(action);
+		}
+	}
+	updateMarbleCount();
 }
 
 void GameScene::checkFishGuide()

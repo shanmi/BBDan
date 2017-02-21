@@ -38,8 +38,8 @@ bool LoginLayer::init(){
 	m_mainLayout->setScale(0.9f);
 	addChild(m_mainLayout);
 
-	CCMenuItem * closeBtn = dynamic_cast<CCMenuItem *>((m_mainLayout->getChildById(2)));
-	closeBtn->setTarget(this, menu_selector(LoginLayer::closePannel));
+	/*CCMenuItem * closeBtn = dynamic_cast<CCMenuItem *>((m_mainLayout->getChildById(2)));
+	closeBtn->setTarget(this, menu_selector(LoginLayer::closePannel));*/
 
 	CCMenuItem * closeItem = dynamic_cast<CCMenuItem *>((m_mainLayout->getChildById(3)));
 	closeItem->setTarget(this, menu_selector(LoginLayer::closePannel));
@@ -111,6 +111,7 @@ void LoginLayer::getLoginReward()
 		UserInfo::getInstance()->addPropsCount(kProp_Clear, 2);
 		UserInfo::getInstance()->addPropsCount(kProp_DoubleAttact, 2);
 		UserInfo::getInstance()->addPropsCount(kProp_Freezing, 2);
+		UserInfo::getInstance()->unlockMarble(kMarble_Dispersed);
 		break;
 	}
 }

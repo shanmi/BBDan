@@ -96,9 +96,11 @@ void MarbleModel::addMarblesCount()
 
 int MarbleModel::checkMarblesCount()
 {
+	int newAddCount = 0;
 	if (m_tempAddCount >= m_attactRate)
 	{
-		m_marblesCount += m_tempAddCount / m_attactRate;
+		newAddCount = m_tempAddCount / m_attactRate;
+		m_marblesCount += newAddCount;
 		m_tempAddCount = m_tempAddCount % m_attactRate;
 	}
 	if (m_marblesCount >= 100)
@@ -107,9 +109,9 @@ int MarbleModel::checkMarblesCount()
 		m_attactRate++;
 	}
 
-	if (m_marblesCount == (m_marbles.size() + 1) / 2)
+	if (m_marblesCount == (m_marbles.size() + newAddCount) / 2)
 	{
-		for (int i = 0; i<m_marblesCount; i++)
+		for (int i = 0; i<m_marblesCount-1; i++)
 		{
 			removeMarble(m_marbles[i]);
 		}
@@ -131,7 +133,6 @@ bool MarbleModel::isMarblesNerverStop()
 		auto velocity = body->GetLinearVelocity();
 		if ((*iter)->getReboundTimes() >= REBOUND_TIMES)
 		{
-			CCLOG("fabs(velocity.x) === %f,  fabs(velocity.y) === %f", fabs(velocity.x), fabs(velocity.y));
 			if (fabs(velocity.x) > 1 && fabs(velocity.y) < 1)
 			{
 				return true;
@@ -154,8 +155,8 @@ void MarbleModel::clearMarbles()
 {
 	for (auto iter = m_marbles.begin(); iter != m_marbles.end(); ++iter)
 	{
-		auto &marble = *iter;
-		marble->removeFromParent();
+		auto marble = *iter;
+		marble->runRemoveAction();
 	}
 	m_marbles.clear();
 }

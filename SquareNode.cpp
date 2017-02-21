@@ -170,27 +170,27 @@ void SquareNode::moveDown(bool isLastOne /* = false */)
 		actions->addAction(callback2);
 		/*auto callback3 = CCFunctionAction::create([=]()
 		{
-			int curScore = m_score;
-			Index newIndex = Index(m_index.x, m_index.y - 1);
-			auto neighbour = SquareModel::theModel()->getSquareByIndex(newIndex);
-			int curLevel = SquareModel::theModel()->getCurrentScore();
-			int addIronLevel = GameConfig::getInstance()->m_addIronLevel;
-			bool isSame = isSameColor(neighbour);
-			if (neighbour && isSame && curLevel >= addIronLevel)
-			{
-				addScore(neighbour->getScore());
-				auto actions = ActionSequence::create(neighbour);
-				auto scaleTo = CCScaleTo::create(0.5f, 0.0f);
-				auto moveTo = CCMoveTo::create(0.5f, getPosition());
-				auto action = CCSpawn::create(scaleTo, moveTo, NULL);
-				auto callback = CCFunctionAction::create([=]()
-				{
-					SquareModel::theModel()->removeSquareNode(neighbour);
-				});
-				actions->addAction(action);
-				actions->addAction(callback);
-				actions->runActions();
-			}
+		int curScore = m_score;
+		Index newIndex = Index(m_index.x, m_index.y - 1);
+		auto neighbour = SquareModel::theModel()->getSquareByIndex(newIndex);
+		int curLevel = SquareModel::theModel()->getCurrentScore();
+		int addIronLevel = GameConfig::getInstance()->m_addIronLevel;
+		bool isSame = isSameColor(neighbour);
+		if (neighbour && isSame && curLevel >= addIronLevel)
+		{
+		addScore(neighbour->getScore());
+		auto actions = ActionSequence::create(neighbour);
+		auto scaleTo = CCScaleTo::create(0.5f, 0.0f);
+		auto moveTo = CCMoveTo::create(0.5f, getPosition());
+		auto action = CCSpawn::create(scaleTo, moveTo, NULL);
+		auto callback = CCFunctionAction::create([=]()
+		{
+		SquareModel::theModel()->removeSquareNode(neighbour);
+		});
+		actions->addAction(action);
+		actions->addAction(callback);
+		actions->runActions();
+		}
 		});
 		actions->addAction(callback3);*/
 	}
@@ -242,6 +242,7 @@ void SquareNode::runRemoveAction()
 	auto explore = GameUtil::getRandomExplodeEffect();
 	explore->setPosition(getPosition());
 	getParent()->addChild(explore);
+	removeBody();
 	removeFromParent();
 }
 
@@ -259,14 +260,21 @@ void SquareNode::setBody()
 	m_body = Box2dFactory::getInstance()->createSquare(this);
 }
 
+void SquareNode::removeBody()
+{
+	if (m_body)
+	{
+		//Box2dFactory::getInstance()->removeBody(m_body);
+	}
+}
+
 void SquareNode::doCollisionAction()
 {
 	SoundMgr::theMgr()->playEffect(Effect_Pop);
 	showBombAction();
 
-	int damage = MarbleModel::theModel()->getMarbleAttr().damage;
 	int attactRate = GameController::getInstance()->getAttactRate();
-	addScore(-attactRate*damage);
+	addScore(-attactRate);
 	int skin = MarbleModel::theModel()->getMarbleAttr().skin;
 	if (skin == kMarble_Bomb)
 	{
@@ -398,9 +406,8 @@ void TriangleNode::doCollisionAction()
 	SoundMgr::theMgr()->playEffect(Effect_Pop);
 	showBombAction();
 
-	int damage = MarbleModel::theModel()->getMarbleAttr().damage;
 	int attactRate = GameController::getInstance()->getAttactRate();
-	addScore(-attactRate*damage);
+	addScore(-attactRate);
 	int skin = MarbleModel::theModel()->getMarbleAttr().skin;
 	if (skin == kMarble_Bomb)
 	{
@@ -452,12 +459,6 @@ bool BossEatMarbleNode::init()
 	auto size = m_imageSprite->getContentSize();
 	setContentSize(ccp(64, 64));
 
-	/*auto color = ccc3(255, 255 - (m_score * 13) % 256, (m_score * 7) % 256);
-	std::string scoreStr = GameUtil::intToString(m_score);
-	m_scoreLabel = CCLabelTTF::create(scoreStr.c_str(), "fonts/SF Square Root.ttf", 34);
-	m_scoreLabel->setColor(color);
-	addChild(m_scoreLabel);*/
-
 	return true;
 }
 
@@ -471,13 +472,13 @@ void BossEatMarbleNode::doCollisionAction()
 	SoundMgr::theMgr()->playEffect(Effect_Pop);
 	showBombAction();
 
-	int damage = MarbleModel::theModel()->getMarbleAttr().damage;
 	int attactRate = GameController::getInstance()->getAttactRate();
-	addScore(-attactRate*damage);
+	addScore(-attactRate);
 }
 
 void BossEatMarbleNode::runRemoveAction()
 {
+	removeBody();
 	removeFromParent();
 }
 
@@ -516,9 +517,8 @@ void IronNode::doCollisionAction()
 	SoundMgr::theMgr()->playEffect(Effect_Pop);
 	showBombAction();
 
-	int damage = MarbleModel::theModel()->getMarbleAttr().damage;
 	int attactRate = GameController::getInstance()->getAttactRate();
-	addScore(-attactRate*damage);
+	addScore(-attactRate);
 }
 
 void IronNode::runRemoveAction()
@@ -526,5 +526,6 @@ void IronNode::runRemoveAction()
 	auto explore = GameUtil::getExplodeEffect("squares/fangkuai_tie.png");
 	explore->setPosition(getPosition());
 	getParent()->addChild(explore, kZOrder_Square + 1);
+	removeBody();
 	removeFromParent();
 }

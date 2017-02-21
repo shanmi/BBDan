@@ -63,7 +63,6 @@ public:
 	void resetAttactRate(){ m_attactRate = ATTACT_RATE; }
 	int getAttactRate();
 
-	bool checkCoinsEnought();
 	void createPropByMarble(MarbleNode *marble);
 
 	void backToMainMenu();

@@ -62,6 +62,14 @@ void MarbleNode::setBody()
 	m_body = Box2dFactory::getInstance()->createMarble(this);
 }
 
+void MarbleNode::removeBody()
+{
+	if (m_body)
+	{
+		Box2dFactory::getInstance()->removeBody(m_body);
+	}
+}
+
 void MarbleNode::setPosition(const CCPoint &position)
 {
 	CCNode::setPosition(position);
@@ -196,4 +204,15 @@ void MarbleNode::updateStreak(float delta)
 	{
 		m_streak->setPosition(getPosition());
 	}
+}
+
+void MarbleNode::runRemoveAction()
+{
+	unschedule(schedule_selector(MarbleNode::updateStreak));
+	if (m_streak)
+	{
+		m_streak->removeFromParent();
+	}
+	removeBody();
+	removeFromParent();
 }

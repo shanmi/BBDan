@@ -17,6 +17,7 @@ public:
 public:
 	void setBody();
 	b2Body *getBody(){ return m_body; }
+	void removeBody();
 
 	void shoot(float degree);
 	void shooterShoot(float degree);
@@ -35,6 +36,8 @@ public:
 	void initWithFile(const char* imagePath);
 	void updateStreak(float delta);
 	void addMotionStreak();
+
+	void runRemoveAction();
 
 private:
 	MarbleNode(MarbleAttr attr);

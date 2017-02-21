@@ -1,7 +1,7 @@
 #ifndef __SOUND_MGR_H__
 #define __SOUND_MGR_H__
 
-#define Background_Music	"sounds/background_music.ogg"
+#define Background_Music	"sounds/music.ogg"
 #define Effect_Pop			"sounds/pop.ogg"	
 #define Effect_Pop1			"sounds/pop1.ogg"
 #define Effect_Pop2			"sounds/pop2.ogg"

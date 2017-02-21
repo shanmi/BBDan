@@ -44,6 +44,7 @@ void CircleAddMarbleNode::setBody()
 
 void CircleAddMarbleNode::runRemoveAction()
 {
+	removeBody();
 	removeFromParent();
 }
 
@@ -90,6 +91,7 @@ void CircleEliRowNode::setBody()
 
 void CircleEliRowNode::runRemoveAction()
 {
+	removeBody();
 	removeFromParent();
 }
 
@@ -155,6 +157,7 @@ void CircleEliColNode::setBody()
 
 void CircleEliColNode::runRemoveAction()
 {
+	removeBody();
 	removeFromParent();
 }
 
@@ -221,6 +224,7 @@ void CircleEliCrossNode::setBody()
 
 void CircleEliCrossNode::runRemoveAction()
 {
+	removeBody();
 	removeFromParent();
 }
 
@@ -302,6 +306,7 @@ void CircleReboundNode::setBody()
 
 void CircleReboundNode::runRemoveAction()
 {
+	removeBody();
 	removeFromParent();
 }
 
@@ -351,6 +356,7 @@ void CircleAddCoinNode::setBody()
 
 void CircleAddCoinNode::runRemoveAction()
 {
+	removeBody();
 	removeFromParent();
 }
 
@@ -397,6 +403,7 @@ void CircleProtectNode::setBody()
 
 void CircleProtectNode::runRemoveAction()
 {
+	removeBody();
 	removeFromParent();
 }
 
@@ -440,6 +447,7 @@ void CircleShotgunsNode::setBody()
 
 void CircleShotgunsNode::runRemoveAction()
 {
+	removeBody();
 	removeFromParent();
 }
 
@@ -483,6 +491,7 @@ void CircleBloodNode::setBody()
 
 void CircleBloodNode::runRemoveAction()
 {
+	removeBody();
 	removeFromParent();
 }
 
@@ -535,6 +544,7 @@ void CircleRocketNode::runRemoveAction()
 	/*auto explore = GameUtil::getRandomExplodeEffect();
 	explore->setPosition(getPosition());
 	getParent()->addChild(explore);*/
+	removeBody();
 	removeFromParent();
 }
 

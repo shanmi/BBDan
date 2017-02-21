@@ -62,9 +62,9 @@ void ContactListener::BeginContact(b2Contact* contact)
 				return;
 			}
 			square->doCollisionAction();
+			auto attr = MarbleModel::theModel()->getMarbleAttr();
 			if (square->getSquareType() == kType_BossEatMarble)
 			{
-				auto attr = MarbleModel::theModel()->getMarbleAttr();
 				if (attr.skin != kMarble_Faster)
 				{
 					marble->stop();
@@ -76,8 +76,7 @@ void ContactListener::BeginContact(b2Contact* contact)
 				float degree = rand() % 60 + 60;
 				marble->shoot(degree);
 			}
-			if (square->getSquareType() != kType_EliminateRow && square->getSquareType() != kType_EliminateCol
-				&& square->getSquareType() != kType_EliminateCross && square->getSquareType() != kType_Iron)
+			if (square->getSquareType() == kType_Square || square->getSquareType() == kType_Triangle)
 			{
 				MarbleModel::theModel()->reboundMarbles();
 			}

@@ -4,6 +4,7 @@
 #include "Config.h"
 #include "GameController.h"
 #include "GameUtil.h"
+#include "GameConfig.h"
 
 USING_NS_CC;
 
@@ -72,7 +73,8 @@ bool ClippingLayer::ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent)
 			}
 			else
 			{
-				UserInfo::getInstance()->addCoins(-DOUBLE_ATTACT_COST_COIN);
+				int hammerCost = GameConfig::getInstance()->m_hammerCost;
+				UserInfo::getInstance()->addCoins(-hammerCost);
 			}
 			GameController::getInstance()->updateCoins();
 			removeFromParent();

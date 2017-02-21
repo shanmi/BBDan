@@ -214,8 +214,9 @@ void GameShooterMode::initBottomLayout()
 void GameShooterMode::onDoubleAttact(CCObject *pSender)
 {
 	int count = UserInfo::getInstance()->getPropsCount(kProp_DoubleAttact);
-	bool ifCoinEnought = GameController::getInstance()->checkCoinsEnought();
-	if (!ifCoinEnought && count <= 0)
+	int coinCount = UserInfo::getInstance()->getCoins();
+	int doubleAttactCost = GameConfig::getInstance()->m_doubleAttactCost;
+	if (coinCount >= doubleAttactCost  && count <= 0)
 	{
 		// show pay point
 		showLibaoDiaolg();
@@ -229,7 +230,7 @@ void GameShooterMode::onDoubleAttact(CCObject *pSender)
 		}
 		else
 		{
-			UserInfo::getInstance()->addCoins(-DOUBLE_ATTACT_COST_COIN);
+			UserInfo::getInstance()->addCoins(-doubleAttactCost);
 		}
 		updateCoins();
 		m_bIsDoubleAttact = true;
@@ -251,8 +252,9 @@ void GameShooterMode::onDoubleAttact(CCObject *pSender)
 void GameShooterMode::onClearScreen(CCObject *pSender)
 {
 	int count = UserInfo::getInstance()->getPropsCount(kProp_Clear);
-	bool ifCoinEnought = GameController::getInstance()->checkCoinsEnought();
-	if (!ifCoinEnought && count <= 0)
+	int coinCount = UserInfo::getInstance()->getCoins();
+	int hammerCost = GameConfig::getInstance()->m_hammerCost;
+	if (coinCount >= hammerCost && count <= 0)
 	{
 		// show pay point
 		showLibaoDiaolg();
@@ -263,7 +265,7 @@ void GameShooterMode::onClearScreen(CCObject *pSender)
 	}
 	else
 	{
-		UserInfo::getInstance()->addCoins(-DOUBLE_ATTACT_COST_COIN);
+		UserInfo::getInstance()->addCoins(-hammerCost);
 	}
 	updateCoins();
 	GameController::getInstance()->setRoundState(false);
@@ -275,8 +277,9 @@ void GameShooterMode::onFreezing(CCObject *pSender)
 {
 	bool isFreezing = SquareModel::theModel()->isFreezing();
 	int count = UserInfo::getInstance()->getPropsCount(kProp_Freezing);
-	bool ifCoinEnought = GameController::getInstance()->checkCoinsEnought();
-	if (!ifCoinEnought && count <= 0)
+	int coinCount = UserInfo::getInstance()->getCoins();
+	int freezingCost = GameConfig::getInstance()->m_freezingCost;
+	if (coinCount >= freezingCost  && count <= 0)
 	{
 		// show pay point
 		showLibaoDiaolg();
@@ -289,7 +292,7 @@ void GameShooterMode::onFreezing(CCObject *pSender)
 		}
 		else
 		{
-			UserInfo::getInstance()->addCoins(-DOUBLE_ATTACT_COST_COIN);
+			UserInfo::getInstance()->addCoins(-freezingCost);
 		}
 		updateCoins();
 		SquareModel::theModel()->setSquareFreezing(true);

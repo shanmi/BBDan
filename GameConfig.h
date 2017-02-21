@@ -34,6 +34,12 @@ public:
 	int m_probabilityCount2;
 	int m_probability2[20][3];
 
+	int m_fuhuoCostCoin;
+
+	int m_doubleAttactCost;
+	int m_hammerCost;
+	int m_freezingCost;
+
 	int m_showLibaoLevel;
 	int m_showPropsLevel;
 	int m_showFireLevel;

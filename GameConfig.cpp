@@ -8,6 +8,10 @@ using namespace rapidjson;
 GameConfig::GameConfig()
 :m_nDiamondCount(0)
 , m_nMarbleCount(0)
+, m_fuhuoCostCoin(10)
+, m_doubleAttactCost(5)
+, m_hammerCost(5)
+, m_freezingCost(5)
 , m_showLibaoLevel(20)
 , m_showPropsLevel(3)
 , m_showFireLevel(20)
@@ -99,7 +103,31 @@ void GameConfig::preloadData()
 			}
 		}
 
-		auto key = "showLibaoLevel";
+		auto key = "fuhuoCostCoin";
+		if (!root[key].IsNull())
+		{
+			m_fuhuoCostCoin = root[key].GetInt();
+		}
+
+		key = "doubleAttactCost";
+		if (!root[key].IsNull())
+		{
+			m_doubleAttactCost = root[key].GetInt();
+		}
+
+		key = "hammerCost";
+		if (!root[key].IsNull())
+		{
+			m_hammerCost = root[key].GetInt();
+		}
+
+		key = "freezingCost";
+		if (!root[key].IsNull())
+		{
+			m_freezingCost = root[key].GetInt();
+		}
+
+		key = "showLibaoLevel";
 		if (!root[key].IsNull())
 		{
 			m_showLibaoLevel = root[key].GetInt();
