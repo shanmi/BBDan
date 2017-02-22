@@ -28,7 +28,7 @@ struct FasterMarle : public MarbleAttr
 
 struct BiggerMarle : public MarbleAttr
 {
-	BiggerMarle() : MarbleAttr(kMarble_Biger, 1.0f, 2){}
+	BiggerMarle() : MarbleAttr(kMarble_Bigger, 1.0f, 2){}
 };
 
 struct DispersedMarle : public MarbleAttr

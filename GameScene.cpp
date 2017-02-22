@@ -22,6 +22,7 @@
 #include "ClippingLayer.h"
 #include "DarknessLayer.h"
 #include "ShopSkinLayer.h"
+#include "LuckyLayer.h"
 
 USING_NS_CC;
 
@@ -199,7 +200,47 @@ void GameScene::initTopLayout()
 	CCMenuItem *helpBtn = dynamic_cast<CCMenuItem*>(m_topLayout->getChildById(9));
 	helpBtn->setTarget(this, menu_selector(GameScene::onHelpPanel));
 	auto action = GameUtil::getRepeatScaleAction();
-	helpBtn->runAction(action);
+	//helpBtn->runAction(action);
+
+	bool advertiseMode = GameConfig::getInstance()->m_bAdvertiseMode;
+	if (advertiseMode)
+	{
+		UiLayout *layout = UiLayout::create("layout/game_top.xml");
+		CCSprite *start = dynamic_cast<CCSprite*>(layout->getChildById(15));
+		float startPos = start->getPositionX();
+
+		CCSprite *progress_bg = dynamic_cast<CCSprite*>(m_topLayout->getChildById(14));
+		CCSprite *logo = dynamic_cast<CCSprite*>(m_topLayout->getChildById(15));
+		CCSprite *target = dynamic_cast<CCSprite*>(m_topLayout->getChildById(16));
+		CCSprite *arrow = dynamic_cast<CCSprite*>(m_topLayout->getChildById(18));
+
+		auto moveBy = CCMoveBy::create(0.5f, ccp(0, 30));
+		auto moveBy2 = CCMoveBy::create(0.5f, ccp(0, 0));
+		auto sequence = CCSequence::create(moveBy, moveBy2, NULL);
+		auto repeat = CCRepeatForever::create(sequence);
+		arrow->runAction(repeat);
+
+		int curLevel = SquareModel::theModel()->getCurrentScore();
+		int targetLevel = GameUtil::getTargetLevel();
+		int lastLevel = GameUtil::getLastLevel();
+
+		float rate = (target->getPositionX() - startPos) / (targetLevel - lastLevel);
+		float gotoPos = startPos + rate * (curLevel - lastLevel);
+		gotoPos = 100 * gotoPos / layout->getContentSize().width;
+
+		m_progressTimer = CCProgressTimer::create(CCSprite::create("game/youxijiemian_jindutiao_jindu.png"));
+		m_progressTimer->setType(kCCProgressTimerTypeBar);
+		m_progressTimer->setMidpoint(ccp(0, 1));
+		m_progressTimer->setBarChangeRate(ccp(1, 0));
+		m_progressTimer->runAction(CCProgressFromTo::create(1, 0, gotoPos));
+		m_progressTimer->setPosition(ccp(progress_bg->getContentSize().width / 2, progress_bg->getContentSize().height / 2));
+		progress_bg->addChild(m_progressTimer);
+
+		auto topPanel = CCSprite::create("game/youxijiemian_jindutiao_biankuang.png");
+		topPanel->setPosition(ccp(progress_bg->getContentSize().width / 2, progress_bg->getContentSize().height / 2));
+		progress_bg->addChild(topPanel);
+	}
+
 }
 
 void GameScene::initBottomLayout()
@@ -513,7 +554,17 @@ void GameScene::update(float dt)
 	int marbleCount = MarbleModel::theModel()->getMarblesCount();
 	for (auto iter = marbles.begin(); iter != marbles.end(); ++iter)
 	{
+		if (m_addMarbleCount == 50 && m_addMarbleCount < marbles.size())
+		{
+			return;
+		}
+		
 		auto marble = (*iter);
+		if (!marble)
+		{
+			marbles.erase(iter);
+			return;
+		}
 		if (m_arrow->boundingBox().containsPoint(marble->getPosition()))
 		{
 			marble->setVisible(false);
@@ -823,6 +874,7 @@ void GameScene::updateScore()
 		auto action2 = GameUtil::getOnceScaleAction();
 		bestScoreLabel->runAction(action2);
 	}
+	updateProgress();
 }
 
 void GameScene::updatePropsCount()
@@ -970,3 +1022,42 @@ void GameScene::characterMove(float offsetX)
 	onTouchCallback();
 }
 
+void GameScene::updateProgress()
+{
+	UiLayout *layout = UiLayout::create("layout/game_top.xml");
+	CCSprite *start = dynamic_cast<CCSprite*>(layout->getChildById(15));
+	float startPos = start->getPositionX();
+
+	CCSprite *progress_bg = dynamic_cast<CCSprite*>(m_topLayout->getChildById(14));
+	CCSprite *logo = dynamic_cast<CCSprite*>(m_topLayout->getChildById(15));
+	CCSprite *target = dynamic_cast<CCSprite*>(m_topLayout->getChildById(16));
+	CCLabelAtlas *targetLabel = dynamic_cast<CCLabelAtlas*>(m_topLayout->getChildById(17));
+	CCSprite *arrow = dynamic_cast<CCSprite*>(m_topLayout->getChildById(18));
+
+	int curLevel = SquareModel::theModel()->getCurrentScore() - 1;
+	int targetLevel = GameUtil::getTargetLevel();
+	int lastLevel = GameUtil::getLastLevel();
+	float gotoPos;
+	if (targetLevel == lastLevel)
+	{
+		gotoPos = target->getPositionX();
+		LuckyLayer *luckyLayer = LuckyLayer::create();
+		addChild(luckyLayer, KZOrder_LuckyLayer);
+	}
+	else
+	{
+		float rate = (target->getPositionX() - startPos) / (targetLevel - lastLevel);
+		gotoPos = startPos + rate * (curLevel - lastLevel);
+	}
+
+	auto moveTo = CCMoveTo::create(1, ccp(gotoPos, logo->getPositionY()));
+	logo->runAction(moveTo);
+	moveTo = CCMoveTo::create(1, ccp(gotoPos, logo->getPositionY()));
+	arrow->runAction(moveTo);
+
+	float percentage = 100 * gotoPos / layout->getContentSize().width;
+	float curPercentage = m_progressTimer->getPercentage();
+	m_progressTimer->runAction(CCProgressFromTo::create(1, curPercentage, percentage));
+
+	targetLabel->setString(GameUtil::intToString(targetLevel).c_str());
+}

@@ -35,10 +35,11 @@ void MarbleModel::removeMarble(MarbleNode *node)
 	auto iter = find(m_marbles.begin(), m_marbles.end(), node);
 	if (iter != m_marbles.end())
 	{
+		auto marble = *iter;
 		m_marbles.erase(iter);
+		Box2dFactory::getInstance()->removeBody(marble->getBody());
+		marble->removeFromParent();
 	}
-	Box2dFactory::getInstance()->removeBody(node->getBody());
-	node->removeFromParent();
 }
 
 void MarbleModel::setMarbleAttr(MarbleAttr attr)
@@ -58,7 +59,7 @@ MarbleAttr MarbleModel::getMarbleAttrByType(int type)
 	case kMarble_Faster:
 		attr = FasterMarle();
 		break;
-	case kMarble_Biger:
+	case kMarble_Bigger:
 		attr = BiggerMarle();
 		break;
 	case kMarble_Dispersed:
@@ -111,7 +112,7 @@ int MarbleModel::checkMarblesCount()
 
 	if (m_marblesCount == (m_marbles.size() + newAddCount) / 2)
 	{
-		for (int i = 0; i<m_marblesCount-1; i++)
+		for (int i = 0; i<m_marblesCount - newAddCount; i++)
 		{
 			removeMarble(m_marbles[i]);
 		}

@@ -34,6 +34,12 @@ public:
 	int m_probabilityCount2;
 	int m_probability2[20][3];
 
+	int m_luckyprobCount;
+	int m_luckyprob[10][2];
+
+	int m_luckyLevelCount;
+	int m_luckyLevel[20];
+
 	int m_fuhuoCostCoin;
 
 	int m_doubleAttactCost;
@@ -49,6 +55,7 @@ public:
 	int m_gravityLevel;
 	int m_showIronLevel;
 
+	bool m_bAdvertiseMode;
 	int m_yijian;
 private:
 	GameConfig();

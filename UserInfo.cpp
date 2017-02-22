@@ -68,7 +68,7 @@ void UserInfo::unlockMarble(int type)
 void UserInfo::unlockAllMarble()
 {
 	unlockMarble(kMarble_Faster);
-	unlockMarble(kMarble_Biger);
+	unlockMarble(kMarble_Bigger);
 	unlockMarble(kMarble_Dispersed);
 	unlockMarble(kMarble_Across);
 	unlockMarble(kMarble_Bomb);
@@ -110,4 +110,20 @@ int UserInfo::getPropsCount(int type)
 	char temp[50] = { 0 };
 	sprintf(temp, "%s-%d", GAME_PROP_COUNT, type);
 	return CCUserDefaultEx::sharedUserDefault()->getIntegerForKey(temp, 0);
+}
+
+bool UserInfo::hasGetLuckyLevel(int level)
+{
+	char temp[50] = { 0 };
+	sprintf(temp, "%s-%d", GAME_LUCKY_LEVEL, level);
+	return CCUserDefaultEx::sharedUserDefault()->getBoolForKey(temp, false);
+}
+
+void UserInfo::setLuckyLevel(int level)
+{
+	char temp[50] = { 0 };
+	sprintf(temp, "%s-%d", GAME_LUCKY_LEVEL, level);
+	CCUserDefaultEx::sharedUserDefault()->setBoolForKey(temp, true);
+	CCUserDefaultEx::sharedUserDefault()->flush();
+
 }

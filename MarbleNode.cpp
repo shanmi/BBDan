@@ -90,6 +90,14 @@ void MarbleNode::shoot(float degree)
 		if (iter != marbles.begin())
 		{
 			degree = rand() % 40 - 20 + degree;
+			if (degree < 6)
+			{
+				degree = 6;
+			}
+			else if (degree > 174)
+			{
+				degree = 174;
+			}
 		}
 	}
 	m_bTrueStop = false;
@@ -173,7 +181,7 @@ void MarbleNode::addMotionStreak()
 			CCTintTo::create(0.2f, 255, 255, 255),
 			NULL));
 		break;
-	case kMarble_Biger:
+	case kMarble_Bigger:
 		colorAction = CCRepeatForever::create(CCSequence::create(
 			CCTintTo::create(0.2f, 248, 233, 91),
 			CCTintTo::create(0.2f, 252, 230, 151),

@@ -67,6 +67,8 @@ public:
 	void characterMove(float offsetX);
 	void onTouchCallback();
 
+	void updateProgress();
+
 private:
 	b2World *m_world;
 	UiLayout *m_mainLayout;
@@ -78,6 +80,7 @@ private:
 	cocos2d::CCSprite *m_arrow;
 	cocos2d::CCLabelAtlas *m_marbleCount;
 	cocos2d::CCPoint m_touchPos;
+	cocos2d::CCProgressTimer *m_progressTimer;
 	float m_topLinePos;
 	float m_bottomLinePos;
 	float m_shootDegree;

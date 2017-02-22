@@ -15,6 +15,7 @@
 #include "GameConfig.h"
 #include "LoginLayer.h"
 #include "LoginUtils.h"
+#include "LuckyLayer.h"
 
 USING_NS_CC;
 
@@ -95,6 +96,9 @@ bool MainMenu::init()
 		GameController::getInstance()->setFirstInGame(false);
 		toLibao1(NULL);
 	}
+
+	LuckyLayer *luckyLayer = LuckyLayer::create();
+	addChild(luckyLayer, KZOrder_LuckyLayer);
 
 	setKeypadEnabled(true);
 

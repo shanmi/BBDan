@@ -8,6 +8,7 @@
 #define GAME_FISH_GUIDE		"game-fish-guide"
 #define GAME_PROP_COUNT     "game-prop-count"
 #define GAME_MARBLE_TYPE    "game-marble-type"
+#define GAME_LUCKY_LEVEL    "game-lucky-level"
 
 class UserInfo
 {
@@ -37,6 +38,9 @@ public:
 
 	void addPropsCount(int type, int count);
 	int getPropsCount(int type);
+
+	bool hasGetLuckyLevel(int level);
+	void setLuckyLevel(int level);
 
 private:
 	UserInfo(){}

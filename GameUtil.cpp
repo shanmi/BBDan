@@ -3,6 +3,7 @@
 #include "SquareModel.h"
 #include "MarbleModel.h"
 #include "GameController.h"
+#include "UserInfo.h"
 
 USING_NS_CC;
 
@@ -436,4 +437,48 @@ vector<int> GameUtil::buildRandomSequence(int length)
 	}
 
 	return seq;
+}
+
+int GameUtil::getTargetLevel()
+{
+	int curLevel = SquareModel::theModel()->getCurrentScore() - 1;
+	int luckyLevelCount = GameConfig::getInstance()->m_luckyLevelCount;
+	auto luckyLevel = GameConfig::getInstance()->m_luckyLevel;
+	for (int i = 0; i < luckyLevelCount; i++)
+	{
+		int temp = luckyLevel[i];
+		bool hasGetLuckyLevel = UserInfo::getInstance()->hasGetLuckyLevel(i);
+		if (!hasGetLuckyLevel && temp >= curLevel)
+		{
+			if (temp == curLevel)
+			{
+				UserInfo::getInstance()->setLuckyLevel(i);
+			}
+			return temp;
+		}
+	}
+	return 1;
+}
+
+int GameUtil::getLastLevel()
+{
+	int curLevel = SquareModel::theModel()->getCurrentScore() - 1;
+	int luckyLevelCount = GameConfig::getInstance()->m_luckyLevelCount;
+	auto luckyLevel = GameConfig::getInstance()->m_luckyLevel;
+	for (int i = 0; i < luckyLevelCount; i++)
+	{
+		int temp = luckyLevel[i];
+		if (temp > curLevel)
+		{
+			if (i >= 1)
+			{
+				return luckyLevel[i - 1];
+			}
+			else
+			{
+				return 1;
+			}
+		}
+	}
+	return 1;
 }

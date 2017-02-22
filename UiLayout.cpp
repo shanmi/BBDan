@@ -166,6 +166,11 @@ void UiLayout::createWidget(rapidxml::xml_node<> *node)
 		{
 			spr->setScale(scale);
 		}
+		auto tempNode = node->first_node("rotate");
+		if (tempNode)
+		{
+			spr->setRotation(atof(tempNode->value()));
+		}
 
 	}
 	else if (widgetName == "imageNum")

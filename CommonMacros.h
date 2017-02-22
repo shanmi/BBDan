@@ -12,8 +12,9 @@ enum TouchPriority
 	kPriority_Pause = -30,
 	kPriority_Shop = -40,
 	kPriority_Login = -50,
-	kPriority_Libao = -60,
-	kPriority_Clipping = -70,
+	kPriority_LuckyLayer = -60,
+	kPriority_Libao = -70,
+	kPriority_Clipping = -80,
 };
 
 enum GameZOrder
@@ -27,11 +28,12 @@ enum GameZOrder
 	kZOrder_Layout,
 	kZOrder_Effect,
 	KZOrder_GuideLayer,
-	KZOrder_PauseLayer,
 	KZOrder_GameOver,
 	kZOrder_Shop,
 	KZOrder_LoginLayer,
-	KZOrder_LibaoLayer
+	KZOrder_LuckyLayer,
+	KZOrder_LibaoLayer,
+	KZOrder_PauseLayer,
 };
 
 enum SquareType
@@ -57,10 +59,22 @@ enum MarbleType
 {
 	kMarble_Normal,
 	kMarble_Faster,
-	kMarble_Biger,
+	kMarble_Bigger,
 	kMarble_Dispersed,
 	kMarble_Bomb,
 	kMarble_Across,
+};
+
+enum LuckyItem
+{
+	kLucky_Faster,
+	kLucky_Hammer,
+	kLucky_Bigger,
+	kLucky_Freezing,
+	kLucky_Bomb,
+	kLucky_Dispersed,
+	kLucky_DoubleAttact,
+	kLucky_Max
 };
 enum ViewTag
 {

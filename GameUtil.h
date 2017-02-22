@@ -43,6 +43,9 @@ namespace GameUtil
 	int clearGameInfo();
 
 	std::vector<int> buildRandomSequence(int length);
+
+	int getTargetLevel();
+	int getLastLevel();
 }
 
 #endif

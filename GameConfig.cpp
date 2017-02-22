@@ -20,6 +20,7 @@ GameConfig::GameConfig()
 , m_addFireLevel(80)
 , m_gravityLevel(120)
 , m_showIronLevel(160)
+, m_bAdvertiseMode(false)
 , m_yijian(0)
 {
 	/*memset(m_nDiamond, 0, sizeof(int)* 10 * 5);
@@ -103,6 +104,28 @@ void GameConfig::preloadData()
 			}
 		}
 
+		Value &luckyprob = root["luckyprob"];
+		if (luckyprob.IsArray()){
+			m_luckyprobCount = luckyprob.Size();
+			for (int i = 0; i < m_luckyprobCount; i++){
+				Value &prop = luckyprob[i];
+				if (!prop.IsArray()){
+					break;
+				}
+				for (int j = 0; j < 2; j++){
+					m_luckyprob[i][j] = prop[j].GetInt();
+				}
+			}
+		}
+
+		Value &luckyLevel = root["luckyLevel"];
+		if (luckyLevel.IsArray()){
+			m_luckyLevelCount = luckyLevel.Size();
+			for (int i = 0; i < m_luckyLevelCount; i++){
+				m_luckyLevel[i] = luckyLevel[i].GetInt();
+			}
+		}
+
 		auto key = "fuhuoCostCoin";
 		if (!root[key].IsNull())
 		{
@@ -174,7 +197,20 @@ void GameConfig::preloadData()
 		{
 			m_showIronLevel = root[key].GetInt();
 		}
-		
+
+		key = "advertiseMode";
+		if (!root[key].IsNull())
+		{
+			if (root[key].GetInt() == 1)
+			{
+				m_bAdvertiseMode = true;
+			}
+			else
+			{
+				m_bAdvertiseMode = false;
+			}
+		}
+
 		key = "yijian";
 		if (!root[key].IsNull())
 		{
