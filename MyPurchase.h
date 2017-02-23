@@ -17,11 +17,6 @@ enum PayResult{
 	PAY_RESULT_TIMEOUT
 };
 
-enum ToastIndex
-{
-	Toast_
-};
-
 enum MyPayProducts{
 	PAY_TYPE_DIAMOND1 = 1, //×êÊ¯1
 	PAY_TYPE_DIAMOND2, //×êÊ¯2

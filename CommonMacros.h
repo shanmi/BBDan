@@ -76,6 +76,7 @@ enum LuckyItem
 	kLucky_DoubleAttact,
 	kLucky_Max
 };
+
 enum ViewTag
 {
 	kTag_Streak = 100,
@@ -95,6 +96,12 @@ enum PropType
 	kProp_Clear,
 	kProp_DoubleAttact,
 	kProp_Freezing
+};
+
+enum ToastType
+{
+	kToast_No_Coin,
+	kToast_No_Prop
 };
 
 #define NOTIFY_VIEWS(_FUNC_ ,...)						\

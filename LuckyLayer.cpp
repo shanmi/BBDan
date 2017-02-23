@@ -34,14 +34,15 @@ bool LuckyLayer::ccTouchBegan(cocos2d::CCTouch *pTouch, cocos2d::CCEvent *pEvent
 	return true;
 }
 
-LuckyLayer::LuckyLayer()
+LuckyLayer::LuckyLayer(bool isFree)
+:m_bIsFree(isFree)
 {
 
 }
 
-LuckyLayer *LuckyLayer::create()
+LuckyLayer *LuckyLayer::create(bool isFree /* = false */)
 {
-	LuckyLayer *dialog = new LuckyLayer();
+	LuckyLayer *dialog = new LuckyLayer(isFree);
 	dialog->init();
 	dialog->autorelease();
 	return dialog;
@@ -77,8 +78,13 @@ void LuckyLayer::initLayout()
 	CCMenuItem *closeItem = dynamic_cast<CCMenuItem*>(m_mainLayout->getChildById(4));
 	closeItem->setTarget(this, menu_selector(LuckyLayer::closePanel));
 
-	CCMenuItem *startItem = dynamic_cast<CCMenuItem*>(m_mainLayout->getChildById(5));
-	startItem->setTarget(this, menu_selector(LuckyLayer::startDraw));
+	CCMenuItem *freeItem = dynamic_cast<CCMenuItem*>(m_mainLayout->getChildById(5));
+	freeItem->setTarget(this, menu_selector(LuckyLayer::startDraw));
+	freeItem->setVisible(m_bIsFree);
+
+	CCMenuItem *againItem = dynamic_cast<CCMenuItem*>(m_mainLayout->getChildById(6));
+	againItem->setTarget(this, menu_selector(LuckyLayer::showVideoDialog));
+	againItem->setVisible(!m_bIsFree);
 
 	CCSprite *arrow = dynamic_cast<CCSprite*>(m_mainLayout->getChildById(2));
 	m_itemLayout = UiLayout::create("layout/lucky_item.xml");
@@ -111,7 +117,7 @@ void LuckyLayer::startDraw(CCObject *pSender)
 		auto rotate2 = CCRotateBy::create(0.6f + 0.2f * i, 360 * 1);
 		actions->addAction(rotate2);
 	}
-	
+
 	int type = kLucky_Max;
 	float degree = LuckyUtil::getInstance()->getRotateDegree(type);
 	auto rotate3 = CCRotateBy::create(kCount * 0.2f, degree);
@@ -147,6 +153,11 @@ void LuckyLayer::startDraw(CCObject *pSender)
 		}
 	});
 	actions->runActions();
+}
+
+void LuckyLayer::showVideoDialog(CCObject *pSender)
+{
+
 }
 
 void LuckyLayer::updateCoins()

@@ -17,9 +17,11 @@ public:
 	void init();
 
 	void playBackground();
+	void pauseBackgroundMusic();
+	void resumeBackgroundMusic();
 	void playEffect(const char *effect);
 	void setMute(bool isMute);
-	bool isMute();
+	bool isMute(){ return m_bIsMute; }
 
 private:
 	SoundMgr() :m_bIsMute(true){}

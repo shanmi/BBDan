@@ -29,6 +29,19 @@ void SoundMgr::playBackground()
 	//SimpleAudioEngine::sharedEngine()->playBackgroundMusic(Background_Music, true);
 }
 
+void SoundMgr::pauseBackgroundMusic()
+{
+	SimpleAudioEngine::sharedEngine()->pauseBackgroundMusic();
+}
+
+void SoundMgr::resumeBackgroundMusic()
+{
+	if (!m_bIsMute)
+	{
+		SimpleAudioEngine::sharedEngine()->resumeBackgroundMusic();
+	}
+}
+
 void SoundMgr::playEffect(const char *effect)
 {
 	if (!m_bIsMute)
@@ -55,7 +68,3 @@ void SoundMgr::setMute(bool isMute)
 	UserInfo::getInstance()->setMute(isMute);
 }
 
-bool SoundMgr::isMute()
-{
-	return m_bIsMute;
-}

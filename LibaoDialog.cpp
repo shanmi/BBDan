@@ -18,6 +18,23 @@ void LibaoDialog::onEnter()
 	CCLayer::onEnter();
 	CCDirector::sharedDirector()->getTouchDispatcher()->addTargetedDelegate(this, kPriority_Libao, true);
 	GameController::getInstance()->addView(this);
+
+	bool advertiseMode = GameConfig::getInstance()->m_bAdvertiseMode;
+	if (advertiseMode)
+	{
+		removeFromParent();
+		int toastTpe = kToast_No_Coin;
+		switch (m_type)
+		{
+		case PAY_TYPE_TIME_LIBAO:
+			toastTpe = kToast_No_Prop;
+			break;
+		case PAY_TYPE_COIN_LIBAO:
+			toastTpe = kToast_No_Coin;
+			break;
+		}
+		MyPurchase::sharedPurchase()->showToast(toastTpe);
+	}
 }
 
 void LibaoDialog::onExit()
@@ -51,7 +68,7 @@ bool LibaoDialog::init()
 	if (!CCLayer::init()){
 		return false;
 	}
-
+	
 	auto winSize = CCDirector::sharedDirector()->getWinSize();
 	auto colorLayer = CCLayerColor::create(ccc4(0, 0, 0, 80));
 	addChild(colorLayer);

@@ -90,11 +90,15 @@ bool MainMenu::init()
 		addChild(loginLayer, KZOrder_LoginLayer, kTag_LoginLayer);
 	}
 
+	bool advertiseMode = GameConfig::getInstance()->m_bAdvertiseMode;
 	bool isFirstIn = GameController::getInstance()->isFirshInGame();
 	if (!hasLoginReward && isFirstIn)
 	{
 		GameController::getInstance()->setFirstInGame(false);
-		toLibao1(NULL);
+		if (!advertiseMode)
+		{
+			toLibao1(NULL);
+		}
 	}
 
 	LuckyLayer *luckyLayer = LuckyLayer::create();
@@ -129,7 +133,7 @@ void MainMenu::initLayout()
 
 	CCMenuItem *toShop = dynamic_cast<CCMenuItem*>(m_mainLayout->getChildById(5));
 	toShop->setTarget(this, menu_selector(MainMenu::toShopLayer));
-	//toShop->setVisible(false);
+	toShop->setVisible(false);
 
 	CCMenuItem *toSkin = dynamic_cast<CCMenuItem*>(m_mainLayout->getChildById(6));
 	toSkin->setTarget(this, menu_selector(MainMenu::toSkinLayer));
@@ -143,11 +147,14 @@ void MainMenu::initLayout()
 	libao1->setTarget(this, menu_selector(MainMenu::toLibao1));
 	auto action3 = GameUtil::getRepeatScaleAction();
 	libao1->runAction(action3);
+	bool advertiseMode = GameConfig::getInstance()->m_bAdvertiseMode;
+	libao1->setVisible(!advertiseMode);
 
 	CCMenuItem *libao2 = dynamic_cast<CCMenuItem*>(m_mainLayout->getChildById(10));
 	libao2->setTarget(this, menu_selector(MainMenu::toLibao2));
 	auto action4 = GameUtil::getRepeatScaleAction();
 	libao2->runAction(action4);
+	libao2->setVisible(!advertiseMode);
 
 	CCMenuItem *toMusicOff = dynamic_cast<CCMenuItem*>(m_mainLayout->getChildById(4));
 	toMusicOff->setTarget(this, menu_selector(MainMenu::toSoundSwitch));

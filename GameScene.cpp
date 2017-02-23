@@ -199,8 +199,8 @@ void GameScene::initTopLayout()
 
 	CCMenuItem *helpBtn = dynamic_cast<CCMenuItem*>(m_topLayout->getChildById(9));
 	helpBtn->setTarget(this, menu_selector(GameScene::onHelpPanel));
-	auto action = GameUtil::getRepeatScaleAction();
-	//helpBtn->runAction(action);
+	/*auto action = GameUtil::getRepeatScaleAction();
+	helpBtn->runAction(action);*/
 
 	bool advertiseMode = GameConfig::getInstance()->m_bAdvertiseMode;
 	if (advertiseMode)
@@ -214,9 +214,9 @@ void GameScene::initTopLayout()
 		CCSprite *target = dynamic_cast<CCSprite*>(m_topLayout->getChildById(16));
 		CCSprite *arrow = dynamic_cast<CCSprite*>(m_topLayout->getChildById(18));
 
-		auto moveBy = CCMoveBy::create(0.5f, ccp(0, 30));
-		auto moveBy2 = CCMoveBy::create(0.5f, ccp(0, 0));
-		auto sequence = CCSequence::create(moveBy, moveBy2, NULL);
+		arrow->setZOrder(arrow->getZOrder() + 1);
+		auto moveBy = CCMoveBy::create(1.1f, ccp(0, 10));
+		auto sequence = CCSequence::create(moveBy, moveBy->reverse(), NULL);
 		auto repeat = CCRepeatForever::create(sequence);
 		arrow->runAction(repeat);
 
@@ -273,7 +273,7 @@ void GameScene::onDoubleAttact(CCObject *pSender)
 	int count = UserInfo::getInstance()->getPropsCount(kProp_DoubleAttact);
 	int coinCount = UserInfo::getInstance()->getCoins();
 	int doubleAttactCost = GameConfig::getInstance()->m_doubleAttactCost;
-	if (coinCount >= doubleAttactCost && count <= 0)
+	if (coinCount < doubleAttactCost && count <= 0)
 	{
 		// show pay point
 		showLibaoDiaolg();
@@ -313,7 +313,7 @@ void GameScene::onClearScreen(CCObject *pSender)
 	bool isRoundOver = GameController::getInstance()->isRoundOver();
 	int coinCount = UserInfo::getInstance()->getCoins();
 	int hammerCost = GameConfig::getInstance()->m_hammerCost;
-	if (coinCount >= hammerCost && count <= 0)
+	if (coinCount < hammerCost && count <= 0)
 	{
 		// show pay point
 		showLibaoDiaolg();
@@ -344,7 +344,7 @@ void GameScene::onFreezing(CCObject *pSender)
 	int count = UserInfo::getInstance()->getPropsCount(kProp_Freezing);
 	int coinCount = UserInfo::getInstance()->getCoins();
 	int freezingCost = GameConfig::getInstance()->m_freezingCost;
-	if (coinCount >= freezingCost && count <= 0)
+	if (coinCount < freezingCost && count <= 0)
 	{
 		// show pay point
 		showLibaoDiaolg();
@@ -420,9 +420,14 @@ void GameScene::onMarbleChange(cocos2d::CCObject *pSender)
 
 void GameScene::checkLibaoShow()
 {
+	bool advertiseMode = GameConfig::getInstance()->m_bAdvertiseMode;
+	if (advertiseMode)
+	{
+		return;
+	}
 	int score = SquareModel::theModel()->getCurrentScore() - 1;
-	int m_showLibaoLevel = GameConfig::getInstance()->m_showLibaoLevel;
-	if (score % m_showLibaoLevel == 0)
+	int showLibaoLevel = GameConfig::getInstance()->m_showLibaoLevel;
+	if (score % showLibaoLevel == 0)
 	{
 		showLibaoDiaolg();
 	}
@@ -1024,6 +1029,11 @@ void GameScene::characterMove(float offsetX)
 
 void GameScene::updateProgress()
 {
+	bool advertiseMode = GameConfig::getInstance()->m_bAdvertiseMode;
+	if (!advertiseMode)
+	{
+		return;
+	}
 	UiLayout *layout = UiLayout::create("layout/game_top.xml");
 	CCSprite *start = dynamic_cast<CCSprite*>(layout->getChildById(15));
 	float startPos = start->getPositionX();
@@ -1052,7 +1062,7 @@ void GameScene::updateProgress()
 
 	auto moveTo = CCMoveTo::create(1, ccp(gotoPos, logo->getPositionY()));
 	logo->runAction(moveTo);
-	moveTo = CCMoveTo::create(1, ccp(gotoPos, logo->getPositionY()));
+	moveTo = CCMoveTo::create(1, ccp(gotoPos, arrow->getPositionY()));
 	arrow->runAction(moveTo);
 
 	float percentage = 100 * gotoPos / layout->getContentSize().width;

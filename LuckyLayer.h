@@ -10,7 +10,7 @@ class LuckyLayer
 {
 public:
 	virtual bool init();
-	static LuckyLayer *create();
+	static LuckyLayer *create(bool isFree = false);
 
 	void onEnter();
 	void onExit();
@@ -22,13 +22,15 @@ public:
 	void initLayout();
 	void closePanel(cocos2d::CCObject *pSender);
 	void startDraw(cocos2d::CCObject *pSender);
+	void showVideoDialog(cocos2d::CCObject *pSender);
 
 private:
-	LuckyLayer();
+	LuckyLayer(bool isFree);
 
 private:
 	UiLayout *m_mainLayout;
 	UiLayout *m_itemLayout;
+	bool m_bIsFree;
 };
 
 #endif
