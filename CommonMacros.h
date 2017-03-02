@@ -14,7 +14,8 @@ enum TouchPriority
 	kPriority_Login = -50,
 	kPriority_LuckyLayer = -60,
 	kPriority_Libao = -70,
-	kPriority_Clipping = -80,
+	kPriority_Reward = -80,
+	kPriority_Clipping = -90,
 };
 
 enum GameZOrder
@@ -74,7 +75,7 @@ enum LuckyItem
 	kLucky_Bomb,
 	kLucky_Dispersed,
 	kLucky_DoubleAttact,
-	kLucky_Max
+	kLucky_MaxCount,
 };
 
 enum ViewTag

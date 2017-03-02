@@ -2,35 +2,46 @@
 #define __LUCKY_LAYER_H__
 
 #include "cocos2d.h"
-#include "GameController.h"
+#include "LuckyUtil.h"
+
+enum LuckyType
+{
+	kLucky_Free,
+	kLucky_Video,
+	kLucky_Close,
+};
+
 class UiLayout;
 class LuckyLayer
 	:public cocos2d::CCLayer
-	, public INotifyView
+	, public ILuckyView
 {
 public:
 	virtual bool init();
-	static LuckyLayer *create(bool isFree = false);
+	static LuckyLayer *create(int type = kLucky_Free);
 
-	void onEnter();
-	void onExit();
+	virtual void onEnter();
+	virtual void onExit();
 	bool ccTouchBegan(cocos2d::CCTouch *pTouch, cocos2d::CCEvent *pEvent);
 
-	virtual void updateCoins();
+	virtual void updateView();
+	virtual void onVideoCallback();
 
 public:
-	void initLayout();
+	void initLayout(bool refresh = false);
+	void initItemLayout();
 	void closePanel(cocos2d::CCObject *pSender);
 	void startDraw(cocos2d::CCObject *pSender);
 	void showVideoDialog(cocos2d::CCObject *pSender);
+	void getLuckyItem(int type);
 
 private:
-	LuckyLayer(bool isFree);
+	LuckyLayer(int type);
 
 private:
 	UiLayout *m_mainLayout;
 	UiLayout *m_itemLayout;
-	bool m_bIsFree;
+	int m_type;
 };
 
 #endif

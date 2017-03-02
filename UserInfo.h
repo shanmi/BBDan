@@ -41,6 +41,7 @@ public:
 
 	bool hasGetLuckyLevel(int level);
 	void setLuckyLevel(int level);
+	void resetLuckyLevel();
 
 private:
 	UserInfo(){}

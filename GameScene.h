@@ -69,6 +69,8 @@ public:
 
 	void updateProgress();
 
+	void showBannerView(float dt);
+
 private:
 	b2World *m_world;
 	UiLayout *m_mainLayout;
@@ -87,5 +89,6 @@ private:
 
 	bool m_bIsDoubleAttact;
 	int m_addMarbleCount;
+	bool m_bShowingBanner;
 };
 #endif

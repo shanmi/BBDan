@@ -251,7 +251,7 @@ void CircleEliCrossNode::doCollisionAction()
 	actions->addAction(action1);
 	actions->addAction(action2);
 	actions->runActions();
-
+	
 	auto colorRow = CCLayerColor::create(ccc4(88, 202, 57, 255));
 	colorRow->setContentSize(ccp(size.width, kColorHintSize));
 	parent->addChild(colorRow, kZOrder_EliEffect);

@@ -12,12 +12,6 @@
 
 USING_NS_CC;
 
-enum TagPanel
-{
-	Tag_CoinPanel,
-	Tag_BallPanel
-};
-
 void FuhuoLibao::onEnter()
 {
 	CCLayer::onEnter();
@@ -50,6 +44,8 @@ bool FuhuoLibao::init()
 	if (!CCLayer::init()){
 		return false;
 	}
+	int curLevel = SquareModel::theModel()->getCurrentScore() - 1;
+	MyPurchase::sharedPurchase()->failStage(curLevel);
 
 	auto winSize = CCDirector::sharedDirector()->getWinSize();
 	auto colorLayer = CCLayerColor::create(ccc4(0, 0, 0, 80));
@@ -102,6 +98,7 @@ void FuhuoLibao::initLayout()
 void FuhuoLibao::closePanel(CCObject *pSender)
 {
 	removeFromParent();
+	UserInfo::getInstance()->resetLuckyLevel();
 	MarbleModel::theModel()->setAttactRate(ATTACT_RATE);
 	GameUtil::clearGameInfo();
 	GameController::getInstance()->backToMainMenu();

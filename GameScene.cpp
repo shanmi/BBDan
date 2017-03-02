@@ -23,6 +23,7 @@
 #include "DarknessLayer.h"
 #include "ShopSkinLayer.h"
 #include "LuckyLayer.h"
+#include "MyAdvertise.h"
 
 USING_NS_CC;
 
@@ -55,6 +56,7 @@ GameScene::GameScene()
 : m_shootDegree(0)
 , m_addMarbleCount(0)
 , m_bIsDoubleAttact(false)
+, m_bShowingBanner(false)
 {
 
 }
@@ -133,6 +135,12 @@ bool GameScene::init()
 
 	updateCoins();
 	updateScore();
+
+	bool advertiseMode = GameConfig::getInstance()->m_bAdvertiseMode;
+	if (advertiseMode)
+	{
+		schedule(schedule_selector(GameScene::showBannerView), 60);
+	}
 
 	scheduleUpdate();
 	return true;
@@ -263,6 +271,10 @@ void GameScene::initBottomLayout()
 		if (!isUnlock)
 		{
 			ballBtn->setColor(ccc3(60, 60, 60));
+		}
+		else
+		{
+			ballBtn->setColor(ccc3(255, 255, 255));
 		}
 	}
 	
@@ -852,6 +864,7 @@ void GameScene::updateCoins()
 	auto action = GameUtil::getOnceScaleAction();
 	coinLabel->runAction(action);
 	updatePropsCount();
+	initBottomLayout();
 }
 
 void GameScene::updateScore()
@@ -870,6 +883,8 @@ void GameScene::updateScore()
 		bestScore = score;
 		UserInfo::getInstance()->setBestScore(score);
 		showEffect = true;
+		int curLevel = SquareModel::theModel()->getCurrentScore() - 1;
+		MyPurchase::sharedPurchase()->successStage(curLevel);
 	}
 	std::string bestStr = GameUtil::intToString(bestScore);
 	CCLabelAtlas *bestScoreLabel = dynamic_cast<CCLabelAtlas*>(m_topLayout->getChildById(13));
@@ -1070,4 +1085,17 @@ void GameScene::updateProgress()
 	m_progressTimer->runAction(CCProgressFromTo::create(1, curPercentage, percentage));
 
 	targetLabel->setString(GameUtil::intToString(targetLevel).c_str());
+}
+
+void GameScene::showBannerView(float dt)
+{
+	if (m_bShowingBanner)
+	{
+		MyAdvertise::getInstance()->closeBannerAdvertise();
+	}
+	else
+	{
+		MyAdvertise::getInstance()->showBannerAdvertise();
+	}
+	m_bShowingBanner = !m_bShowingBanner;
 }

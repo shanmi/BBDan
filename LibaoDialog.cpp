@@ -7,12 +7,6 @@
 
 USING_NS_CC;
 
-enum TagPanel
-{
-	Tag_CoinPanel,
-	Tag_BallPanel,
-};
-
 void LibaoDialog::onEnter()
 {
 	CCLayer::onEnter();

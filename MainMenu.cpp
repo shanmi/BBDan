@@ -16,8 +16,12 @@
 #include "LoginLayer.h"
 #include "LoginUtils.h"
 #include "LuckyLayer.h"
+#include "MyAdvertise.h"
+
+#include "cocos-ext.h"
 
 USING_NS_CC;
+USING_NS_CC_EXT;
 
 void MainMenu::onEnter()
 {
@@ -100,9 +104,11 @@ bool MainMenu::init()
 			toLibao1(NULL);
 		}
 	}
+	
+	MyAdvertise::getInstance()->showScreenAdvertise();
 
-	LuckyLayer *luckyLayer = LuckyLayer::create();
-	addChild(luckyLayer, KZOrder_LuckyLayer);
+	/*LuckyLayer *luckyLayer = LuckyLayer::create();
+	addChild(luckyLayer, KZOrder_LuckyLayer);*/
 
 	setKeypadEnabled(true);
 
@@ -112,6 +118,13 @@ bool MainMenu::init()
 void MainMenu::initLayout()
 {
 	CCSprite *logo = dynamic_cast<CCSprite*>(m_mainLayout->getChildById(7));
+	logo->setVisible(false);
+
+	auto m_pArmature = CCSkeletonAnimation::createWithFile("animation/zujiemian_logo/danzukuanggong_logo.json", "animation/zujiemian_logo/danzukuanggong_logo.atlas", 1);
+	m_pArmature->addAnimation("logo_cuxian", false);
+	m_pArmature->addAnimation("logo_xunhuan", true);
+	m_pArmature->setPosition(logo->getPosition());
+	m_mainLayout->addChild(m_pArmature);
 	//logo->runAction(getAnimation(2.0f, 1.0f));
 
 	auto attr = MarbleModel::theModel()->getMarbleAttr();

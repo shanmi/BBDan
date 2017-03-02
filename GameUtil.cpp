@@ -262,13 +262,13 @@ CCSprite *GameUtil::getAchievementEffect(int type)
 	auto effect = CCSprite::create(temp);
 	auto winSize = CCDirector::sharedDirector()->getWinSize();
 	effect->setPosition(ccp(-effect->getContentSize().width, winSize.height *0.6f));
-	auto move1 = CCMoveBy::create(0.7f, ccp(winSize.width / 2 + effect->getContentSize().width, 0));
+	auto move1 = CCMoveBy::create(0.7f, ccp(winSize.width / 2 + effect->getContentSize().width * 2 / 3, 0));
 	auto ease1 = CCEaseSineInOut::create(move1);
-	auto delay = CCDelayTime::create(0.3f);
+	auto delayMove = CCMoveBy::create(0.8f, ccp(effect->getContentSize().width, 0));
 	auto move2 = CCMoveBy::create(0.5f, ccp(winSize.width / 2 + effect->getContentSize().width, 0));;
 	auto ease2 = CCEaseSineOut::create(move2);
 	auto callback = CCCallFunc::create(effect, callfunc_selector(CCNode::removeFromParent));
-	auto sequence = CCSequence::create(ease1, delay, ease2, callback, NULL);
+	auto sequence = CCSequence::create(ease1, delayMove, ease2, callback, NULL);
 	effect->runAction(sequence);
 	return effect;
 }

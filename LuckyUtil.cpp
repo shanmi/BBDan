@@ -1,11 +1,30 @@
 #include "LuckyUtil.h"
 #include "GameConfig.h"
 #include "CommonMacros.h"
+#include <algorithm>
 
 LuckyUtil *LuckyUtil::getInstance()
 {
-	static LuckyUtil *instance;
-	return instance;
+	static LuckyUtil instance;
+	return &instance;
+}
+
+void LuckyUtil::addView(ILuckyView *view)
+{
+	auto iter = find(m_views.begin(), m_views.end(), view);
+	if (iter == m_views.end())
+	{
+		m_views.push_back(view);
+	}
+}
+
+void LuckyUtil::removeView(ILuckyView *view)
+{
+	auto iter = find(m_views.begin(), m_views.end(), view);
+	if (iter != m_views.end())
+	{
+		m_views.erase(iter);
+	}
 }
 
 float LuckyUtil::getRotateDegree(int &probType)
@@ -34,7 +53,7 @@ float LuckyUtil::getRotateDegree(int &probType)
 			break;
 		}
 	}
-	float degree = (360.0f - 360.0f * probType / kLucky_Max) - 360.0f / (kLucky_Max * 2);
+	float degree = (360.0f - 360.0f * probType / kLucky_MaxCount) + 360.0f / (kLucky_MaxCount);
 	return degree;
 }
 

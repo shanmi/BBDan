@@ -1,6 +1,8 @@
 #include "UserInfo.h"
 #include "CCUserDefaultEx.h"
 #include "CommonMacros.h"
+#include "SquareModel.h"
+#include "GameConfig.h"
 
 UserInfo *UserInfo::getInstance()
 {
@@ -125,5 +127,21 @@ void UserInfo::setLuckyLevel(int level)
 	sprintf(temp, "%s-%d", GAME_LUCKY_LEVEL, level);
 	CCUserDefaultEx::sharedUserDefault()->setBoolForKey(temp, true);
 	CCUserDefaultEx::sharedUserDefault()->flush();
+}
 
+void UserInfo::resetLuckyLevel()
+{
+	char temp[50] = { 0 };
+	int curLevel = SquareModel::theModel()->getCurrentScore() - 1;
+	auto luckyLevel = GameConfig::getInstance()->m_luckyLevel;
+	for (int i = 1; i <= curLevel; i++)
+	{
+		if (luckyLevel[0] == i)
+		{
+			continue;
+		}
+		sprintf(temp, "%s-%d", GAME_LUCKY_LEVEL, i);
+		CCUserDefaultEx::sharedUserDefault()->setBoolForKey(temp, false);
+		CCUserDefaultEx::sharedUserDefault()->flush();
+	}
 }
