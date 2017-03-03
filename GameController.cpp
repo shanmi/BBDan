@@ -158,7 +158,8 @@ void GameController::createPropByMarble(MarbleNode *marble)
 			auto rect = square->boundingBox();
 			if (rect.containsPoint(ccp(posX, posY)))
 			{
-				return;
+				posX = targetPos.x;
+				//return;
 			}
 		}
 	}

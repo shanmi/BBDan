@@ -160,8 +160,8 @@ void MarbleNode::moveToTargetPos()
 
 void MarbleNode::addMotionStreak()
 {
-	m_streak = CCMotionStreak::create(0.1f, 3, 32, ccGREEN, "particle/streak.png");
-	m_streak->setAnchorPoint(ccp(0.5f, 0.5f));
+	m_streak = CCMotionStreak::create(0.1f, 1, 22, ccGREEN, "particle/streak.png");
+	m_streak->setAnchorPoint(ccp(0.5f, 0.8f));
 	CCActionInterval *colorAction;
 	switch (m_attr.skin)
 	{
@@ -183,8 +183,8 @@ void MarbleNode::addMotionStreak()
 		break;
 	case kMarble_Bigger:
 		colorAction = CCRepeatForever::create(CCSequence::create(
-			CCTintTo::create(0.2f, 248, 233, 91),
-			CCTintTo::create(0.2f, 252, 230, 151),
+			CCTintTo::create(0.2f, 219, 106, 13),
+			CCTintTo::create(0.2f, 220, 120, 21),
 			NULL));
 		break;
 	case kMarble_Faster:

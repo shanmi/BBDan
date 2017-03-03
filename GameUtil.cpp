@@ -166,8 +166,8 @@ cocos2d::CCParticleSystemQuad *GameUtil::getBombEffect()
 
 CCMotionStreak *GameUtil::getMotionStreak()
 {
-	auto streak = CCMotionStreak::create(0.1f, 3, 32, ccGREEN, "particle/streak.png");
-	streak->setAnchorPoint(ccp(0.5f, 0.5f));
+	auto streak = CCMotionStreak::create(0.1f, 3, 22, ccGREEN, "particle/streak.png");
+	streak->setAnchorPoint(ccp(0.5f, 0.8f));
 	CCActionInterval *colorAction = CCRepeatForever::create(CCSequence::create(
 		CCTintTo::create(0.2f, 255, 0, 0),
 		CCTintTo::create(0.2f, 0, 255, 0),
@@ -250,7 +250,7 @@ CCAction *GameUtil::getFadeInOutAction()
 {
 	auto fadeIn = CCFadeIn::create(1.2f);
 	auto fadeOut = CCFadeIn::create(2.0f);
-	auto sequence = CCSequence::create(fadeIn, fadeOut, NULL);
+	auto sequence = CCSequence::create(fadeOut, fadeIn, NULL);
 	auto action = CCRepeatForever::create(sequence);
 	return action;
 }
