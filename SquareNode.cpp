@@ -287,9 +287,14 @@ void SquareNode::showBombAction()
 	int skin = MarbleModel::theModel()->getMarbleAttr().skin;
 	if (skin == kMarble_Bomb)
 	{
-		auto explore = GameUtil::getBombEffect();
-		explore->setPosition(getPosition());
-		getParent()->addChild(explore, kZOrder_Square + 1);
+		if (getChildrenCount() < 8)
+		{
+			auto explore = GameUtil::getBombEffect();
+			explore->setPosition(ccp(-explore->getContentSize().width / 2, -explore->getContentSize().height / 2));
+			addChild(explore, kZOrder_Square + 1);
+			/*explore->setPosition(getPosition());
+			getParent()->addChild(explore, kZOrder_Square + 1);*/
+		}
 	}
 }
 

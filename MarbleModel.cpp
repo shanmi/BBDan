@@ -4,6 +4,8 @@
 #include "CommonMacros.h"
 #include "Box2dFactory.h"
 #include "UserInfo.h"
+#include "GameUtil.h"
+#include "GameController.h"
 
 MarbleModel::MarbleModel()
 {
@@ -160,4 +162,61 @@ void MarbleModel::clearMarbles()
 		marble->runRemoveAction();
 	}
 	m_marbles.clear();
+}
+
+void MarbleModel::updateMarbles(cocos2d::CCRect invisibleRect, int addMarbleCount)
+{
+	auto m_marbles = getMarbles();
+	for (auto iter = m_marbles.begin(); iter != m_marbles.end(); ++iter)
+	{
+		if (addMarbleCount == 50 && addMarbleCount < m_marbles.size())
+		{
+			return;
+		}
+
+		auto marble = (*iter);
+		if (!marble)
+		{
+			m_marbles.erase(iter);
+			continue;
+		}
+	}
+
+	for (auto iter = m_marbles.begin(); iter != m_marbles.end(); ++iter)
+	{
+		auto marble = (*iter);
+		if (invisibleRect.containsPoint(marble->getPosition()))
+		{
+			marble->setVisible(false);
+		}
+		else
+		{
+			marble->setVisible(true);
+		}
+		auto body = marble->getBody();
+		MarbleNode *ball = (MarbleNode*)(body->GetUserData());
+		float distance = body->GetLinearVelocity().x*body->GetLinearVelocity().x + body->GetLinearVelocity().y*body->GetLinearVelocity().y;
+		if (distance > 0 && distance < 400)
+		{
+			float angle = GameUtil::getDegreeTwoPoints(ccp(0, 0), ccp(body->GetLinearVelocity().x, body->GetLinearVelocity().y));
+			marble->shoot(angle);
+		}
+		if (ball->isMoving())
+		{
+			b2Vec2 ballPosition = body->GetPosition();
+			ball->setPosition(ccp(ballPosition.x * PTM_RATIO, ballPosition.y * PTM_RATIO));
+			if (ballPosition.y * PTM_RATIO < 0)
+			{
+				marble->setMovingState(false);
+				GameController::getInstance()->addCounter();
+			}
+		}
+		else
+		{
+			if (!marble->isTrueStop())
+			{
+				marble->moveToTargetPos();
+			}
+		}
+	}
 }

@@ -24,6 +24,7 @@
 #include "ShopSkinLayer.h"
 #include "LuckyLayer.h"
 #include "MyAdvertise.h"
+#include "CharacterView.h"
 
 USING_NS_CC;
 
@@ -102,12 +103,9 @@ bool GameScene::init()
 	addChild(m_mainLayout, kZOrder_Main);
 	initMainLayout();
 
-	m_characterLayout = UiLayout::create("layout/character_node.xml");
-	m_characterLayout->setAnchorPoint(ccp(0.5f, 0.5f));
-	m_characterLayout->setPosition(ccpMult(winSize, 0.5f));
-	m_characterLayout->setMenuTouchPriority(kPriority_Game - 1);
-	addChild(m_characterLayout, kZOrder_Character);
-	initCharacterLayout();
+	m_characterView = CharacterView::create();
+	addChild(m_characterView, kZOrder_Character);
+	m_arrow = dynamic_cast<CCSprite *>(m_characterView->getBodyById(11));
 
 	m_topLayout = UiLayout::create("layout/game_top.xml");
 	m_topLayout->setPosition(ccp(0, winSize.height - m_topLayout->getContentSize().height));
@@ -179,25 +177,6 @@ void GameScene::onPauseGame(CCObject *pSender)
 	}
 	PauseLayer *pauseLayer = PauseLayer::create();
 	addChild(pauseLayer, KZOrder_PauseLayer, kTag_Pause);
-}
-
-void GameScene::initCharacterLayout()
-{
-	CCSprite *character_body = dynamic_cast<CCSprite*>(m_characterLayout->getChildById(9));
-	CCSprite *character_head = dynamic_cast<CCSprite*>(m_characterLayout->getChildById(10));
-	m_arrow = dynamic_cast<CCSprite*>(m_characterLayout->getChildById(11));
-	/*character_body->setVisible(false);
-	character_head->setVisible(false);
-	m_arrow->setVisible(false);*/
-
-	auto targetPos = GameController::getInstance()->getTargetPos();
-	if (targetPos.x != 0 && targetPos.y != 0)
-	{
-		character_body->setPosition(ccp(targetPos.x, character_body->getPositionY()));
-
-		character_head->setPosition(ccp(targetPos.x, character_head->getPositionY()));
-		m_arrow->setVisible(false);
-	}
 }
 
 void GameScene::initTopLayout()
@@ -335,18 +314,6 @@ void GameScene::onClearScreen(CCObject *pSender)
 	{
 		ClippingLayer *clippingLayer = ClippingLayer::create();
 		addChild(clippingLayer, KZOrder_LibaoLayer, kTag_Libao);
-		/*if (count > 0)
-		{
-			UserInfo::getInstance()->addPropsCount(kProp_Clear, -1);
-		}
-		else
-		{
-			UserInfo::getInstance()->addCoins(-DOUBLE_ATTACT_COST_COIN);
-		}
-		updateCoins();
-		GameController::getInstance()->setRoundState(false);
-		SquareModel::theModel()->removeAllSquares();
-		oneRoundEnd();*/
 	}
 }
 
@@ -461,7 +428,7 @@ void GameScene::initGameLayout()
 	addChild(m_touchPoint, kZOrder_Layout);
 	m_touchPoint->setVisible(false);
 
-	CCSprite *character_head = dynamic_cast<CCSprite*>(m_characterLayout->getChildById(10));
+	CCSprite *character_head = dynamic_cast<CCSprite*>(m_characterView->getBodyById(10));
 	char temp[50] = { 0 };
 	int attactRate = MarbleModel::theModel()->getAttactRate();
 	sprintf(temp, "%d:%d", attactRate, START_BALL_SIZE);
@@ -549,69 +516,15 @@ void GameScene::update(float dt)
 	bool isRoundOver = GameController::getInstance()->isRoundOver();
 	if (isRoundOver)
 	{
-		//check character's position
-		/*auto targetPos = GameController::getInstance()->getTargetPos();
-		CCSprite *character_body = dynamic_cast<CCSprite*>(m_characterLayout->getChildById(9));
-		character_body->setPosition(ccp(targetPos.x, character_body->getPositionY()));
-
-		CCSprite *character_head = dynamic_cast<CCSprite*>(m_characterLayout->getChildById(10));
-		character_head->setPosition(ccp(targetPos.x, character_head->getPositionY()));*/
 		return;
 	}
 
-	//updateMarbleCount();
-
 	int32 velocityIterations = 10;
 	int32 positionIterations = 10;
-
 	m_world->Step(dt, velocityIterations, positionIterations);
 	m_world->ClearForces();
 
-	auto marbles = MarbleModel::theModel()->getMarbles();
-	int marbleCount = MarbleModel::theModel()->getMarblesCount();
-	for (auto iter = marbles.begin(); iter != marbles.end(); ++iter)
-	{
-		if (m_addMarbleCount == 50 && m_addMarbleCount < marbles.size())
-		{
-			return;
-		}
-		
-		auto marble = (*iter);
-		if (!marble)
-		{
-			marbles.erase(iter);
-			return;
-		}
-		if (m_arrow->boundingBox().containsPoint(marble->getPosition()))
-		{
-			marble->setVisible(false);
-		}
-		else
-		{
-			marble->setVisible(true);
-		}
-		auto body = marble->getBody();
-		MarbleNode *ball = (MarbleNode*)(body->GetUserData());
-		if (ball->isMoving())
-		{
-			b2Vec2 ballPosition = body->GetPosition();
-			ball->setPosition(ccp(ballPosition.x * PTM_RATIO, ballPosition.y * PTM_RATIO));
-			if (ballPosition.y * PTM_RATIO < 0)
-			{
-				marble->setMovingState(false);
-				GameController::getInstance()->addCounter();
-			}
-		}
-		else
-		{
-			if (!marble->isTrueStop())
-			{
-				//m_addMarbleCount++;
-				marble->moveToTargetPos();
-			}
-		}
-		
-	}
+	MarbleModel::theModel()->updateMarbles(m_arrow->boundingBox(), m_addMarbleCount);
 
 	//check squares by not check tool
 	GameController::getInstance()->checkSquares();
@@ -656,8 +569,6 @@ void GameScene::ccTouchEnded(CCTouch *pTouch, CCEvent *pEvent)
 	GameController::getInstance()->startOneRound();
 	m_touchPoint->setVisible(false);
 	m_touchCircle->setVisible(false);
-	CCSprite *character_head = dynamic_cast<CCSprite*>(m_characterLayout->getChildById(10));
-	character_head->setRotation(0);
 	BallHintModel::theModel()->setHintVisible(false);
 
 	GameController::getInstance()->setRoundState(false);
@@ -705,7 +616,6 @@ void GameScene::onTouchCallback()
 {
 	m_touchCircle->setPosition(m_touchPos);
 	m_touchPoint->setPosition(m_touchPos);
-#if(NEW_SHOOT_MODE == 1)
 	auto prePos = m_touchCircle->getPosition();
 	auto targetPos = GameController::getInstance()->getTargetPos();
 
@@ -715,63 +625,15 @@ void GameScene::onTouchCallback()
 	float newY = prePos.y - m_touchCircle->getContentSize().width * 0.5f * sin(radian);
 	m_touchPoint->setPosition(ccp(newX, newY));
 
-	m_arrow->setRotation(180 - m_shootDegree);
-	if (m_shootDegree < 6 || m_shootDegree > 174)
-	{
-		m_arrow->setVisible(false);
-		BallHintModel::theModel()->setHintVisible(false);
-	}
-	else
-	{
-		m_arrow->setVisible(true);
-		BallHintModel::theModel()->setHintVisible(true);
-	}
-
-	CCSprite *character_body = dynamic_cast<CCSprite*>(m_characterLayout->getChildById(9));
-	CCSprite *character_head = dynamic_cast<CCSprite*>(m_characterLayout->getChildById(10));
-	if (m_shootDegree < 90)
-	{
-		character_head->setPositionX(character_body->getPositionX() - 20);
-		character_body->setFlipX(true);
-		character_head->setFlipX(true);
-
-		m_arrow->setAnchorPoint(ccp(0.73f, 0.35f));
-		m_arrow->setPosition(ccp(character_body->getPositionX() + 10, character_body->getPositionY() + 6));
-		m_arrow->setFlipY(true);
-	}
-	else
-	{
-		character_head->setPositionX(character_body->getPositionX());
-		character_body->setFlipX(false);
-		character_head->setFlipX(false);
-
-		m_arrow->setAnchorPoint(ccp(0.73f, 0.65f));
-		m_arrow->setPosition(ccp(character_body->getPositionX() - 12, character_body->getPositionY() + 6));
-		m_arrow->setFlipY(false);
-	}
-
 #if(NEW_SHOOT_MODE == 1)
 	BallHintModel::theModel()->updatePosition(targetPos, m_touchPos, targetPos, m_arrow->getContentSize().width);
 #else
+	m_touchCircle->setVisible(true);
+	m_touchPoint->setVisible(true);
 	BallHintModel::theModel()->updatePosition(m_touchPos, prePos, targetPos, m_arrow->getContentSize().width);
 #endif
 
-	if (m_shootDegree > 60 && m_shootDegree < 90)
-	{
-		character_head->setRotation(60 - m_shootDegree);
-	}
-	else if (m_shootDegree >= 90 && m_shootDegree < 120)
-	{
-		character_head->setRotation(120 - m_shootDegree);
-	}
-	else
-	{
-		character_head->setRotation(0);
-	}
-#else
-	m_touchCircle->setVisible(true);
-	m_touchPoint->setVisible(true);
-#endif
+	m_characterView->touchCallback(m_shootDegree);
 }
 
 void GameScene::didAccelerate(CCAcceleration* pAccelerationValue)
@@ -832,17 +694,10 @@ void GameScene::oneRoundEnd()
 	auto fadeIn = CCFadeIn::create(0.6f);
 	m_marbleCount->runAction(fadeIn);
 
+	m_characterView->checkPosition();
+
 	//check tools when one round end and delete "0 score" tool
 	GameController::getInstance()->checkSquares(true);
-
-	//check character's position
-	CCSprite *character_body = dynamic_cast<CCSprite*>(m_characterLayout->getChildById(9));
-	auto moveTo = CCMoveTo::create(0.5f, ccp(targetPos.x, character_body->getPositionY()));
-	character_body->runAction(moveTo);
-
-	CCSprite *character_head = dynamic_cast<CCSprite*>(m_characterLayout->getChildById(10));
-	auto moveTo2 = CCMoveBy::create(0.5f, ccp(targetPos.x - character_body->getPositionX(), 0));
-	character_head->runAction(moveTo2);
 
 	updateScore();
 
@@ -959,7 +814,7 @@ void GameScene::showAddMarbleEffect(SquareNode *node)
 		auto coinEffect = CCSprite::create(node->getImage().c_str());
 		coinEffect->setPosition(node->getPosition());
 		addChild(coinEffect, kZOrder_Effect);
-		auto pos = m_characterLayout->convertToWorldSpace(m_arrow->getPosition());
+		auto pos = m_characterView->convertToWorldSpace(m_arrow->getPosition());
 		auto jumpTo = CCJumpTo::create(0.6f, pos, 300, 1);
 		auto callback = CCCallFunc::create(coinEffect, callfunc_selector(CCNode::removeFromParent));
 		auto sequence = CCSequence::create(jumpTo, callback, NULL);
@@ -1023,13 +878,8 @@ void GameScene::characterMove(float offsetX)
 		return;
 	}
 
-	CCSprite *character_body = dynamic_cast<CCSprite*>(m_characterLayout->getChildById(9));
-	CCSprite *character_head = dynamic_cast<CCSprite*>(m_characterLayout->getChildById(10));
-	m_arrow = dynamic_cast<CCSprite*>(m_characterLayout->getChildById(11));
-	character_body->setPositionX(character_body->getPositionX() + offsetX);
-	character_head->setPositionX(character_head->getPositionX() + offsetX);
-	m_arrow->setPositionX(m_arrow->getPositionX() + offsetX);
-
+	m_characterView->characterMove(offsetX);
+	
 	auto marbles = MarbleModel::theModel()->getMarbles();
 	for(auto iter = marbles.begin(); iter != marbles.end(); ++iter)
 	{

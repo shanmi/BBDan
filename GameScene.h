@@ -7,6 +7,7 @@
 
 class UiLayout;
 class MarbleNode;
+class CharacterView;
 class GameScene 
 	: public cocos2d::CCLayer
 	, public INotifyView
@@ -51,7 +52,6 @@ public:
 	void onHelpPanel(cocos2d::CCObject *pSender);
 	void onMarbleChange(cocos2d::CCObject *pSender);
 	void initMainLayout();
-	void initCharacterLayout();
 	void initTopLayout();
 	void initBottomLayout();
 	void initGameLayout();
@@ -74,9 +74,9 @@ public:
 private:
 	b2World *m_world;
 	UiLayout *m_mainLayout;
-	UiLayout *m_characterLayout;
 	UiLayout *m_topLayout;
 	UiLayout *m_bottomLayout;
+	CharacterView *m_characterView;
 	cocos2d::CCSprite *m_touchPoint;
 	cocos2d::CCSprite *m_touchCircle;
 	cocos2d::CCSprite *m_arrow;

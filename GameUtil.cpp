@@ -457,7 +457,12 @@ int GameUtil::getTargetLevel()
 			return temp;
 		}
 	}
-	return 1;
+	int targetLevel = 1;
+	while (curLevel > targetLevel)
+	{
+		targetLevel += 50;
+	}
+	return targetLevel;
 }
 
 int GameUtil::getLastLevel()
@@ -465,10 +470,11 @@ int GameUtil::getLastLevel()
 	int curLevel = SquareModel::theModel()->getCurrentScore() - 1;
 	int luckyLevelCount = GameConfig::getInstance()->m_luckyLevelCount;
 	auto luckyLevel = GameConfig::getInstance()->m_luckyLevel;
+	int lastLevel = 1;
 	for (int i = 0; i < luckyLevelCount; i++)
 	{
-		int temp = luckyLevel[i];
-		if (temp > curLevel)
+		lastLevel = luckyLevel[i];
+		if (lastLevel > curLevel)
 		{
 			if (i >= 1)
 			{
@@ -480,5 +486,14 @@ int GameUtil::getLastLevel()
 			}
 		}
 	}
-	return 1;
+	while (curLevel > lastLevel)
+	{
+		lastLevel += 50;
+		if (curLevel > lastLevel)
+		{
+			lastLevel -= 50;
+			break;
+		}
+	}
+	return lastLevel;
 }

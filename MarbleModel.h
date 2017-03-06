@@ -30,6 +30,8 @@ public:
 	bool isMarblesNerverStop();
 	void reboundMarbles();
 	void clearMarbles();
+
+	void updateMarbles(cocos2d::CCRect invisibleRect, int addMarbleCount);
 private:
 	MarbleModel();
 
