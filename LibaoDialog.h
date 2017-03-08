@@ -16,7 +16,7 @@ public:
 	void onExit();
 	bool ccTouchBegan(cocos2d::CCTouch *pTouch, cocos2d::CCEvent *pEvent);
 
-	virtual void updateCoins();
+	virtual void notifyViews();
 
 public:
 	void initLayout();

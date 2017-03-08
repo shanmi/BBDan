@@ -19,10 +19,11 @@ public:
 	bool ccTouchBegan(cocos2d::CCTouch *pTouch, cocos2d::CCEvent *pEvent);
 
 public:
-	virtual void updateCoins();
+	virtual void notifyViews();
 public:
 	void initLayout();
 	void initCoinsLayout();
+	void updateCoins();
 	void closePanel(cocos2d::CCObject *pSender);
 	void buyCoinItem(cocos2d::CCObject *pSender);
 

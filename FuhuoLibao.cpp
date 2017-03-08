@@ -83,7 +83,7 @@ void FuhuoLibao::initLayout()
 	if (isBusinessMode)
 	{
 		auto size = m_mainLayout->getContentSize();
-		buyTip->setPosition(ccp(size.width * 0.5f, -size.height));
+		buyTip->setPosition(ccp(buyTip->getPositionX(), buyTip->getPositionY() - size.height * 0.76f));
 		buyTip->setScale(0.5f);
 		buyTip->setOpacity(120);
 
@@ -111,7 +111,7 @@ void FuhuoLibao::buyLibao(CCObject *pSender)
 	int fuhuoCostCoin = GameConfig::getInstance()->m_fuhuoCostCoin;
 	if (curCoin >= fuhuoCostCoin)
 	{
-		GameController::getInstance()->updateCoins();
+		GameController::getInstance()->notifyViews();
 	}
 	else
 	{
@@ -129,7 +129,7 @@ void FuhuoLibao::buyLibao(CCObject *pSender)
 #endif
 }
 
-void FuhuoLibao::updateCoins()
+void FuhuoLibao::notifyViews()
 {
 	removeFromParent();
 	SquareModel::theModel()->removeBelowSquares();
@@ -137,6 +137,6 @@ void FuhuoLibao::updateCoins()
 #if(BBDAN_SHENBAO == 1)
 	int fuhuoCostCoin = GameConfig::getInstance()->m_fuhuoCostCoin;
 	UserInfo::getInstance()->addCoins(-fuhuoCostCoin);
-	GameController::getInstance()->updateCoins(); 
+	GameController::getInstance()->notifyViews();
 #endif
 }

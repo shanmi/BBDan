@@ -147,7 +147,7 @@ void LuckyView::initRewardItem()
 		break;
 	}
 	rewardItem->initWithFile(imgstr.c_str());
-	GameController::getInstance()->updateCoins();
+	GameController::getInstance()->notifyViews();
 	LuckyUtil::getInstance()->updateView();
 }
 
@@ -164,7 +164,7 @@ void LuckyView::show(CCObject *pSender)
 	removeFromParent();
 }
 
-void LuckyView::updateCoins()
+void LuckyView::notifyViews()
 {
 	
 }

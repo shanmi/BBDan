@@ -20,10 +20,11 @@ public:
 	bool ccTouchBegan(cocos2d::CCTouch *pTouch, cocos2d::CCEvent *pEvent);
 
 public:
-	virtual void updateCoins();
+	virtual void notifyViews();
 public:
 	void initLayout();
 	void initSkinLayout();
+	void updateCoins();
 	void closePanel(cocos2d::CCObject *pSender);
 	void toLeftPanel(cocos2d::CCObject *pSender);
 	void toRightPanel(cocos2d::CCObject *pSender);

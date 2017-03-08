@@ -289,11 +289,15 @@ void SquareNode::showBombAction()
 	{
 		if (getChildrenCount() < 8)
 		{
-			auto explore = GameUtil::getBombEffect();
+			auto explore = GameUtil::getBombEffect2();
 			explore->setPosition(ccp(-explore->getContentSize().width / 2, -explore->getContentSize().height / 2));
 			addChild(explore, kZOrder_Square + 1);
 			/*explore->setPosition(getPosition());
 			getParent()->addChild(explore, kZOrder_Square + 1);*/
+
+			/*auto explore = GameUtil::getRandomExplodeEffect();
+			explore->setPosition(ccp(-explore->getContentSize().width / 2, -explore->getContentSize().height / 2));
+			addChild(explore, kZOrder_Square + 1);*/
 		}
 	}
 }

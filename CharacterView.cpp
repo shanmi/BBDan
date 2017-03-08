@@ -60,15 +60,9 @@ void CharacterView::checkPosition()
 	character_body->runAction(moveTo);
 
 	CCSprite *character_head = dynamic_cast<CCSprite*>(m_characterLayout->getChildById(10));
+	character_head->setRotation(0);
 	auto moveTo2 = CCMoveBy::create(0.5f, ccp(targetPos.x - character_body->getPositionX(), 0));
 	character_head->runAction(moveTo2);
-
-}
-
-void CharacterView::resetCharacterPos()
-{
-	CCSprite *character_head = dynamic_cast<CCSprite*>(m_characterLayout->getChildById(10));
-	character_head->setRotation(0);
 }
 
 void CharacterView::touchCallback(float degree)

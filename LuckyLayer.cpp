@@ -193,15 +193,18 @@ void LuckyLayer::startDraw(CCObject *pSender)
 	int kCount = 4;
 	for (int i = 0; i < kCount; i++)
 	{
-		auto rotate2 = CCRotateBy::create(0.6f + 0.2f * i, 360 * 1);
+		auto rotate2 = CCRotateBy::create(0.6f + 0.3f * i, 360 * 1);
 		actions->addAction(rotate2);
 	}
 
 	int type = kLucky_MaxCount;
 	float degree = LuckyUtil::getInstance()->getRotateDegree(type);
-	float time = (degree / 360) * kCount * 0.3f;
+	float time = (degree / 360) * kCount * 0.5f;
 	auto rotate3 = CCRotateBy::create(time, degree);
 	actions->addAction(rotate3);
+
+	auto delayTime = CCDelayTime::create(0.6f);
+	actions->addAction(delayTime);
 
 	CCFunctionAction *callback = CCFunctionAction::create([=]()
 	{

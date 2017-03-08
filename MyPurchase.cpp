@@ -230,7 +230,7 @@ void MyPurchaseResult::onPayResult(int ret, const char* msg){
 		orderCoins = buyCount + presentCount;
 		CCLOG("Buy success, orderCoins=======================%d", orderCoins);
 		UserInfo::getInstance()->addCoins(orderCoins);
-		GameController::getInstance()->updateCoins();
+		GameController::getInstance()->notifyViews();
 	}
 
 }
@@ -345,7 +345,7 @@ int MyPurchase::isBusinessMode(){
 	}
 	return carrietType;
 #endif
-	return 0;
+	return 1;
 }
 
 std::string MyPurchase::getUserId()

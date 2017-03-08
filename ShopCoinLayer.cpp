@@ -82,8 +82,6 @@ void ShopCoinLayer::initLayout()
 		ballItem->setTag(PAY_TYPE_DIAMOND1 + i);
 		ballItem->setTarget(this, menu_selector(ShopCoinLayer::buyCoinItem));
 	}
-	
-
 	updateCoins();
 }
 
@@ -135,4 +133,9 @@ void ShopCoinLayer::updateCoins()
 	int diamondCount = UserInfo::getInstance()->getCoins();
 	std::string countStr = GameUtil::intToString(diamondCount);
 	diamond_label->setString(countStr.c_str());
+}
+
+void ShopCoinLayer::notifyViews()
+{
+	updateCoins();
 }

@@ -90,6 +90,8 @@ bool GameScene::init()
 		return false;
 	}
 
+	MyAdvertise::getInstance()->showScreenAdvertise();
+
 	setKeypadEnabled(true);
 	setAccelerometerEnabled(true);
 	Box2dFactory::getInstance()->initPhysics(false);
@@ -131,7 +133,7 @@ bool GameScene::init()
 
 	//checkFishGuide();
 
-	updateCoins();
+	notifyViews();
 	updateScore();
 
 	bool advertiseMode = GameConfig::getInstance()->m_bAdvertiseMode;
@@ -189,17 +191,18 @@ void GameScene::initTopLayout()
 	/*auto action = GameUtil::getRepeatScaleAction();
 	helpBtn->runAction(action);*/
 
+	CCSprite *progress_bg = dynamic_cast<CCSprite*>(m_topLayout->getChildById(14));
+	CCSprite *logo = dynamic_cast<CCSprite*>(m_topLayout->getChildById(15));
+	CCSprite *target = dynamic_cast<CCSprite*>(m_topLayout->getChildById(16));
+	CCSprite *arrow = dynamic_cast<CCSprite*>(m_topLayout->getChildById(18));
+	CCLabelAtlas *targetLabel = dynamic_cast<CCLabelAtlas*>(m_topLayout->getChildById(17));
+
 	bool advertiseMode = GameConfig::getInstance()->m_bAdvertiseMode;
 	if (advertiseMode)
 	{
 		UiLayout *layout = UiLayout::create("layout/game_top.xml");
 		CCSprite *start = dynamic_cast<CCSprite*>(layout->getChildById(15));
 		float startPos = start->getPositionX();
-
-		CCSprite *progress_bg = dynamic_cast<CCSprite*>(m_topLayout->getChildById(14));
-		CCSprite *logo = dynamic_cast<CCSprite*>(m_topLayout->getChildById(15));
-		CCSprite *target = dynamic_cast<CCSprite*>(m_topLayout->getChildById(16));
-		CCSprite *arrow = dynamic_cast<CCSprite*>(m_topLayout->getChildById(18));
 
 		arrow->setZOrder(arrow->getZOrder() + 1);
 		auto moveBy = CCMoveBy::create(1.1f, ccp(0, 10));
@@ -226,6 +229,14 @@ void GameScene::initTopLayout()
 		auto topPanel = CCSprite::create("game/youxijiemian_jindutiao_biankuang.png");
 		topPanel->setPosition(ccp(progress_bg->getContentSize().width / 2, progress_bg->getContentSize().height / 2));
 		progress_bg->addChild(topPanel);
+	}
+	else
+	{
+		progress_bg->setVisible(false);
+		logo->setVisible(false);
+		target->setVisible(false);
+		arrow->setVisible(false);
+		targetLabel->setVisible(false);
 	}
 
 }
@@ -256,7 +267,7 @@ void GameScene::initBottomLayout()
 			ballBtn->setColor(ccc3(255, 255, 255));
 		}
 	}
-	
+
 }
 
 void GameScene::onDoubleAttact(CCObject *pSender)
@@ -280,7 +291,7 @@ void GameScene::onDoubleAttact(CCObject *pSender)
 		{
 			UserInfo::getInstance()->addCoins(-doubleAttactCost);
 		}
-		updateCoins();
+		notifyViews();
 		m_bIsDoubleAttact = true;
 
 		GameController::getInstance()->setDoubleAttact();
@@ -339,7 +350,7 @@ void GameScene::onFreezing(CCObject *pSender)
 		{
 			UserInfo::getInstance()->addCoins(-freezingCost);
 		}
-		updateCoins();
+		notifyViews();
 		SquareModel::theModel()->setSquareFreezing(true);
 	}
 }
@@ -466,6 +477,10 @@ void GameScene::initMarbles()
 		{
 			marble->setPosition(targetPos);
 		}
+		if (targetPos.y < m_bottomLinePos)
+		{
+			marble->setPositionY(m_bottomLinePos + marble->getContentSize().height / 2 + 10);
+		}
 		addChild(marble, kZOrder_Marble);
 		if (i == 0)
 		{
@@ -546,7 +561,7 @@ bool GameScene::ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent)
 void GameScene::ccTouchMoved(CCTouch *pTouch, CCEvent *pEvent)
 {
 #if(NEW_SHOOT_MODE == 1)
-	
+
 #else
 	if (!m_touchPoint->isVisible())
 	{
@@ -647,7 +662,7 @@ void GameScene::didAccelerate(CCAcceleration* pAccelerationValue)
 
 	bool isRoundOver = GameController::getInstance()->isRoundOver();
 	bool isGameOver = GameController::getInstance()->isGameOver();
-	
+
 	if (!isRoundOver || isGameOver)
 	{
 		return;
@@ -708,6 +723,13 @@ void GameScene::updateMarbles()
 {
 	// just show adding marble action
 	m_addMarbleCount++;
+}
+
+void GameScene::notifyViews()
+{
+	updateCoins();
+	updatePropsCount();
+	initBottomLayout();
 }
 
 void GameScene::updateCoins()
@@ -879,9 +901,9 @@ void GameScene::characterMove(float offsetX)
 	}
 
 	m_characterView->characterMove(offsetX);
-	
+
 	auto marbles = MarbleModel::theModel()->getMarbles();
-	for(auto iter = marbles.begin(); iter != marbles.end(); ++iter)
+	for (auto iter = marbles.begin(); iter != marbles.end(); ++iter)
 	{
 		auto marble = *iter;
 		marble->setPositionX(marble->getPositionX() + offsetX);

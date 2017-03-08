@@ -368,7 +368,7 @@ void CircleAddCoinNode::doCollisionAction()
 
 	UserInfo::getInstance()->addCoins(ADD_COINS);
 	GameController::getInstance()->showAddCoinEffect(this);
-	GameController::getInstance()->updateCoins();
+	GameController::getInstance()->notifyViews();
 }
 
 ///////////////////////////////////////////////////////

@@ -76,7 +76,7 @@ bool ClippingLayer::ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent)
 				int hammerCost = GameConfig::getInstance()->m_hammerCost;
 				UserInfo::getInstance()->addCoins(-hammerCost);
 			}
-			GameController::getInstance()->updateCoins();
+			GameController::getInstance()->notifyViews();
 			removeFromParent();
 			GameUtil::saveGameInfo();
 			break;

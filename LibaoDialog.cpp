@@ -117,7 +117,7 @@ void LibaoDialog::initLayout()
 	if (isBusinessMode)
 	{
 		auto size = m_mainLayout->getContentSize();
-		buyTip->setPosition(ccp(buyTip->getPositionX(), buyTip->getPositionY() - size.height * 0.8f));
+		buyTip->setPosition(ccp(buyTip->getPositionX(), buyTip->getPositionY() - size.height * 0.76f));
 		buyTip->setScale(0.5f);
 		buyTip->setOpacity(120);
 
@@ -144,7 +144,7 @@ void LibaoDialog::buyLibao(CCObject *pSender)
 	}
 }
 
-void LibaoDialog::updateCoins()
+void LibaoDialog::notifyViews()
 {
 	removeFromParent();
 }

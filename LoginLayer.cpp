@@ -48,11 +48,12 @@ bool LoginLayer::init(){
 	for (int i = 0; i < 7; i++){
 		if (i < days)
 		{
-			CCSprite *pAlready = CCSprite::create("login/login_get.png");
+			std::string img = "login/login_get.png";
 			if (i == 6)
 			{
-				pAlready = CCSprite::create("login/login_get2.png");
+				img = "login/login_get2.png";
 			}
+			CCSprite *pAlready = CCSprite::create(img.c_str());
 			CCSprite * panel = dynamic_cast<CCSprite *>((m_mainLayout->getChildById(4 + i)));
 			pAlready->setPosition(ccp(panel->getPositionX(), panel->getPositionY()+10));
 			m_mainLayout->addChild(pAlready, panel->getZOrder() + 1);
@@ -68,7 +69,15 @@ bool LoginLayer::init(){
 				auto scaleTo = CCScaleTo::create(0.6f, 1.0f);
 				auto callback = CCFunctionAction::create([=]()
 				{
-					pAlready->setVisible(true);
+					auto progressTimer = CCProgressTimer::create(CCSprite::create(img.c_str()));
+					progressTimer->setType(kCCProgressTimerTypeBar);
+					progressTimer->setMidpoint(ccp(0, 1));
+					progressTimer->setBarChangeRate(ccp(1, 0));
+					progressTimer->runAction(CCProgressFromTo::create(0.2f, 0, 100));
+					progressTimer->setPosition(pAlready->getPosition());
+					m_mainLayout->addChild(progressTimer);
+
+					pAlready->setVisible(false);
 					panel->setColor(ccc3(60, 60, 60));
 					getLoginReward();
 					LoginUtils::getInstance()->setTargetDays();

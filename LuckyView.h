@@ -17,7 +17,7 @@ public:
 	void onExit();
 	bool ccTouchBegan(cocos2d::CCTouch *pTouch, cocos2d::CCEvent *pEvent);
 	void setOkCallback(std::function<void()> callback){ m_callback = callback; }
-	virtual void updateCoins();
+	virtual void notifyViews();
 
 public:
 	void initLayout();

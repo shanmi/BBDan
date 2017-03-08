@@ -11,7 +11,7 @@ struct INotifyView
 {
 	virtual void oneRoundEnd(){}
 	virtual void updateMarbles(){}
-	virtual void updateCoins(){}
+	virtual void notifyViews(){}
 	virtual void showGameOver(){}
 	virtual void addSquareNode(SquareNode *node){}
 	virtual void useProtectEffect(){}
@@ -35,7 +35,7 @@ public:
 	void oneRoundEnd(){ NOTIFY_VIEWS(oneRoundEnd); }
 	void showGameOver() { NOTIFY_VIEWS(showGameOver); }
 	void updateMarbles() { NOTIFY_VIEWS(updateMarbles); }
-	void updateCoins() { NOTIFY_VIEWS(updateCoins); }
+	void notifyViews() { NOTIFY_VIEWS(notifyViews); }
 	void addSquareNode(SquareNode *node){ NOTIFY_VIEWS(addSquareNode, node); }
 	void useProtectEffect() { NOTIFY_VIEWS(useProtectEffect); }
 	void useShotGunsEffect() { NOTIFY_VIEWS(useShotGunsEffect); }

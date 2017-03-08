@@ -76,7 +76,7 @@ bool ShopSkinLayer::init(int marbleType)
 
 	initLayout();
 	initSkinLayout();
-	updateCoins();
+	notifyViews();
 	moveToPageIndex(marbleType);
 
 	return true;
@@ -223,7 +223,7 @@ void ShopSkinLayer::payMarbleItem(CCObject *pSender)
 	{
 		UserInfo::getInstance()->addCoins(-price);
 		UserInfo::getInstance()->unlockMarble(m_pageIndex);
-		GameController::getInstance()->updateCoins();
+		GameController::getInstance()->notifyViews();
 	}
 	else
 	{
@@ -265,6 +265,10 @@ void ShopSkinLayer::updateCoins()
 	int diamondCount = UserInfo::getInstance()->getCoins();
 	std::string countStr = GameUtil::intToString(diamondCount);
 	diamond_label->setString(countStr.c_str());
+}
 
+void ShopSkinLayer::notifyViews()
+{
+	updateCoins();
 	updatePage(m_pageIndex);
 }

@@ -68,7 +68,7 @@ void PauseLayer::backToHome(CCObject *pSender)
 	GameController::getInstance()->backToMainMenu();
 }
 
-void PauseLayer::updateCoins()
+void PauseLayer::notifyViews()
 {
 	removeFromParent();
 }

@@ -164,6 +164,32 @@ cocos2d::CCParticleSystemQuad *GameUtil::getBombEffect()
 	return emitter;
 }
 
+cocos2d::CCParticleSystemQuad *GameUtil::getBombEffect2()
+{
+	CCParticleExplosion *pEmitter = CCParticleExplosion::create();
+	pEmitter->setTexture(CCTextureCache::sharedTextureCache()->addImage("particle/fire.png"));
+	pEmitter->setAutoRemoveOnFinish(true);
+
+	ccColor4F c4Start = { 1.0, 0.8, 0.1, 1.0 };
+	ccColor4F c4End = { 1.0, 0.8, 0.1, 1.0 };
+	pEmitter->setStartColor(c4Start);
+	pEmitter->setEndColor(c4End);
+	/*pEmitter->setStartColorVar(c4Start);
+	pEmitter->setEndColorVar(c4End);*/
+
+	pEmitter->setTotalParticles(60);
+
+	pEmitter->setSpeed(180);
+	pEmitter->setSpeedVar(10);
+
+	pEmitter->setLife(0.3f);
+	pEmitter->setLifeVar(0.1f);
+	pEmitter->setScale(0.6f);
+
+	return pEmitter;
+}
+
+
 CCMotionStreak *GameUtil::getMotionStreak()
 {
 	auto streak = CCMotionStreak::create(0.1f, 3, 22, ccGREEN, "particle/streak.png");
@@ -249,7 +275,7 @@ CCAction *GameUtil::getBlinkAction()
 CCAction *GameUtil::getFadeInOutAction()
 {
 	auto fadeIn = CCFadeIn::create(1.2f);
-	auto fadeOut = CCFadeIn::create(2.0f);
+	auto fadeOut = CCFadeOut::create(2.0f);
 	auto sequence = CCSequence::create(fadeOut, fadeIn, NULL);
 	auto action = CCRepeatForever::create(sequence);
 	return action;
@@ -261,10 +287,10 @@ CCSprite *GameUtil::getAchievementEffect(int type)
 	sprintf(temp, "combo/combo_%d.png", type);
 	auto effect = CCSprite::create(temp);
 	auto winSize = CCDirector::sharedDirector()->getWinSize();
-	effect->setPosition(ccp(-effect->getContentSize().width, winSize.height *0.6f));
-	auto move1 = CCMoveBy::create(0.7f, ccp(winSize.width / 2 + effect->getContentSize().width * 2 / 3, 0));
+	effect->setPosition(ccp(-effect->getContentSize().width / 2, winSize.height *0.6f));
+	auto move1 = CCMoveBy::create(0.5f, ccp(winSize.width / 2, 0));
 	auto ease1 = CCEaseSineInOut::create(move1);
-	auto delayMove = CCMoveBy::create(0.8f, ccp(effect->getContentSize().width, 0));
+	auto delayMove = CCMoveBy::create(0.3f, ccp(effect->getContentSize().width / 2, 0));
 	auto move2 = CCMoveBy::create(0.5f, ccp(winSize.width / 2 + effect->getContentSize().width, 0));;
 	auto ease2 = CCEaseSineOut::create(move2);
 	auto callback = CCCallFunc::create(effect, callfunc_selector(CCNode::removeFromParent));

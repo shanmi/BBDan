@@ -104,14 +104,11 @@ bool MainMenu::init()
 			toLibao1(NULL);
 		}
 	}
-	
-	MyAdvertise::getInstance()->showScreenAdvertise();
 
 	/*LuckyLayer *luckyLayer = LuckyLayer::create();
 	addChild(luckyLayer, KZOrder_LuckyLayer);*/
 
 	setKeypadEnabled(true);
-
 	return true;
 }
 
@@ -192,7 +189,10 @@ void MainMenu::initLayout()
 	CCLabelTTF *phoneTip = dynamic_cast<CCLabelTTF*>(m_mainLayout->getChildById(12));
 	if (isBusinessMode && isYijian)
 	{
-		phoneTip->setVisible(false);
+		if (phoneTip)
+		{
+			phoneTip->setVisible(false);
+		}
 	}
 }
 

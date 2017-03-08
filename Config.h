@@ -1,7 +1,7 @@
 #ifndef _CONFIG_H_
 #define _CONFIG_H_
 
-#define BBDAN_SHENBAO 1 //…Í±®MM
+#define BBDAN_SHENBAO 0 //…Í±®MM
 
 #define NEW_SHOOT_MODE 1
 

@@ -19,7 +19,6 @@ public:
 	void initCharacterLayout();
 	cocos2d::CCNode *getBodyById(int id);
 	void checkPosition();
-	void resetCharacterPos();
 	void touchCallback(float degree);
 	void characterMove(float offsetX);
 

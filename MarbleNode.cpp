@@ -183,8 +183,8 @@ void MarbleNode::addMotionStreak()
 		break;
 	case kMarble_Bigger:
 		colorAction = CCRepeatForever::create(CCSequence::create(
-			CCTintTo::create(0.2f, 219, 106, 13),
-			CCTintTo::create(0.2f, 220, 120, 21),
+			CCTintTo::create(0.2f, 255, 201, 155),
+			CCTintTo::create(0.2f, 219, 188, 138),
 			NULL));
 		break;
 	case kMarble_Faster:
@@ -194,7 +194,8 @@ void MarbleNode::addMotionStreak()
 		break;
 	case kMarble_Bomb:
 		colorAction = CCRepeatForever::create(CCSequence::create(
-			CCTintTo::create(0.2f, 255, 255, 0),
+			CCTintTo::create(0.2f, 147, 81, 75),
+			CCTintTo::create(0.2f, 220, 120, 21),
 			NULL));
 		break;
 	}
@@ -211,6 +212,14 @@ void MarbleNode::updateStreak(float delta)
 	if (m_streak)
 	{
 		m_streak->setPosition(getPosition());
+		if (m_bIsMoving)
+		{
+			m_streak->setVisible(true);
+		}
+		else
+		{
+			m_streak->setVisible(false);
+		}
 	}
 }
 

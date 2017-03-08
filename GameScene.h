@@ -34,7 +34,7 @@ public:
 public:
 	void oneRoundEnd();
 	void updateMarbles();
-	void updateCoins();
+	void notifyViews();
 	void updateScore();
 	void updatePropsCount();
 	void updateMarbleCount();
@@ -44,7 +44,7 @@ public:
 	void showAddMarbleEffect(SquareNode *node);
 	void updateMarbleType(int type);
 public:
-
+	void updateCoins();
 	void onDoubleAttact(cocos2d::CCObject *pSender);
 	void onClearScreen(cocos2d::CCObject *pSender);
 	void onFreezing(cocos2d::CCObject *pSender);

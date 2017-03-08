@@ -20,6 +20,7 @@ namespace GameUtil
 	cocos2d::CCParticleExplosion *getExplodeEffect(std::string image);
 	cocos2d::CCParticleExplosion *getRandomExplodeEffect();
 	cocos2d::CCParticleSystemQuad *getBombEffect();
+	cocos2d::CCParticleSystemQuad *getBombEffect2();
 	cocos2d::CCMotionStreak *getMotionStreak();
 
 	std::string getBlockImage(int type, int score);

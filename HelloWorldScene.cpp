@@ -104,7 +104,7 @@ void HelloWorld::menuCloseCallback(CCObject* pSender)
 bool HelloWorld::ccTouchBegan(cocos2d::CCTouch *pTouch, cocos2d::CCEvent *pEvent)
 {
 	/*CCPoint position = pTouch->getLocation();
-	auto pEmitter = GameUtil::getExplodeEffect();
+	auto pEmitter = GameUtil::getBombEffect2();
 	pEmitter->setPosition(position);
 	addChild(pEmitter);*/
 
@@ -117,7 +117,7 @@ bool HelloWorld::ccTouchBegan(cocos2d::CCTouch *pTouch, cocos2d::CCEvent *pEvent
 
 	CCPoint position = pTouch->getLocation();
 	auto effect = GameUtil::getAchievementEffect(1);
-	effect->setPosition(position);
+	effect->setPositionY(position.y);
 	addChild(effect);
 
 	return true;
