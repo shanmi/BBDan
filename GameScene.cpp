@@ -423,6 +423,17 @@ void GameScene::checkLibaoShow()
 	}
 }
 
+void GameScene::checkAchievent()
+{
+	int count = SquareModel::theModel()->getRemainSqaure();
+	if (count == 0)
+	{
+		int random = rand() % 3 + 1;
+		auto effect = GameUtil::getAchievementEffect(random);
+		addChild(effect, kZOrder_Effect);
+	}
+}
+
 void GameScene::initGameLayout()
 {
 	auto ballHints = BallHintModel::theModel()->createBallHints();
@@ -560,6 +571,11 @@ bool GameScene::ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent)
 
 void GameScene::ccTouchMoved(CCTouch *pTouch, CCEvent *pEvent)
 {
+	bool isRoundOver = GameController::getInstance()->isRoundOver();
+	if (!isRoundOver)
+	{
+		return;
+	}
 #if(NEW_SHOOT_MODE == 1)
 
 #else
@@ -672,6 +688,7 @@ void GameScene::didAccelerate(CCAcceleration* pAccelerationValue)
 
 void GameScene::oneRoundEnd()
 {
+	checkAchievent();
 	bool isFreezing = SquareModel::theModel()->isFreezing();
 	if (isFreezing)
 	{

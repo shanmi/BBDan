@@ -21,6 +21,7 @@ public:
 	void checkPosition();
 	void touchCallback(float degree);
 	void characterMove(float offsetX);
+	void checkShooterPos(cocos2d::CCPoint position);
 
 private:
 	CharacterView();

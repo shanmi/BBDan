@@ -16,6 +16,8 @@
 #include "MyPurchase.h"
 #include "GameConfig.h"
 #include "LibaoDialog.h"
+#include "ShopSkinLayer.h"
+#include "CharacterView.h"
 
 USING_NS_CC;
 
@@ -50,6 +52,7 @@ GameShooterMode::GameShooterMode()
 , m_freezingTime(0)
 , m_protectTime(0)
 , m_shotgunsTime(0)
+, m_bIsDoubleAttact(false)
 {
 
 }
@@ -84,6 +87,7 @@ bool GameShooterMode::init()
 
 	setKeypadEnabled(true);
 	Box2dFactory::getInstance()->initPhysics(true);
+	GameUtil::loadGameInfo();
 
 	auto winSize = CCDirector::sharedDirector()->getWinSize();
 	m_mainLayout = UiLayout::create("layout/game_scene.xml");
@@ -93,14 +97,11 @@ bool GameShooterMode::init()
 	addChild(m_mainLayout, kZOrder_Main);
 	initMainLayout();
 
-	m_characterLayout = UiLayout::create("layout/character_node.xml");
-	m_characterLayout->setAnchorPoint(ccp(0.5f, 0.5f));
-	m_characterLayout->setPosition(ccpMult(winSize, 0.5f));
-	m_characterLayout->setMenuTouchPriority(kPriority_Game - 1);
-	addChild(m_characterLayout, kZOrder_Character);
-	initCharacterLayout();
+	m_characterView = CharacterView::create();
+	addChild(m_characterView, kZOrder_Character);
+	m_arrow = dynamic_cast<CCSprite *>(m_characterView->getBodyById(11));
 
-	m_topLayout = UiLayout::create("layout/game_top.xml");
+	m_topLayout = UiLayout::create("layout/game_top2.xml");
 	m_topLayout->setPosition(ccp(0, winSize.height - m_topLayout->getContentSize().height));
 	m_topLayout->setMenuTouchPriority(kPriority_Game - 1);
 	addChild(m_topLayout, kZOrder_Layout);
@@ -139,39 +140,6 @@ void GameShooterMode::initMainLayout()
 
 }
 
-void GameShooterMode::initCharacterLayout()
-{
-	CCSprite *character_body = dynamic_cast<CCSprite*>(m_characterLayout->getChildById(9));
-	CCSprite *character_head = dynamic_cast<CCSprite*>(m_characterLayout->getChildById(10));
-	m_character = dynamic_cast<CCSprite*>(m_characterLayout->getChildById(11));
-	/*character_body->setVisible(false);
-	character_head->setVisible(false);
-	m_arrow->setVisible(false);*/
-
-	auto targetPos = GameController::getInstance()->getTargetPos();
-	m_character->setRotation(m_shootDegree);
-	if (targetPos.x != 0 && targetPos.y != 0)
-	{
-		character_body->setPosition(ccp(targetPos.x, character_body->getPositionY()));
-
-		character_head->setPosition(ccp(targetPos.x, character_head->getPositionY()));
-		//m_character->setVisible(false);
-	}
-	if (m_shootDegree > 60 && m_shootDegree < 90)
-	{
-		character_head->setRotation(60 - m_shootDegree);
-	}
-	else if (m_shootDegree >= 90 && m_shootDegree < 120)
-	{
-		character_head->setRotation(120 - m_shootDegree);
-	}
-	else
-	{
-		character_head->setRotation(0);
-	}
-	GameController::getInstance()->setTargetPos(m_character->getPosition());
-}
-
 void GameShooterMode::onPauseGame(CCObject *pSender)
 {
 	if (getChildByTag(kTag_Pause))
@@ -204,10 +172,21 @@ void GameShooterMode::initBottomLayout()
 	CCMenuItem *freezingBtn = dynamic_cast<CCMenuItem*>(m_bottomLayout->getChildById(3));
 	freezingBtn->setTarget(this, menu_selector(GameShooterMode::onFreezing));
 
-	CCMenuItem *helpBtn = dynamic_cast<CCMenuItem*>(m_bottomLayout->getChildById(9));
-	//helpBtn->setTarget(this, menu_selector(GameShooterMode::onHelpPanel));
-	auto action = GameUtil::getRepeatScaleAction();
-	helpBtn->runAction(action);
+	for (int i = kMarble_Faster; i <= kMarble_Bomb; i++)
+	{
+		CCMenuItem *ballBtn = dynamic_cast<CCMenuItem*>(m_bottomLayout->getChildById(i + 9));
+		ballBtn->setTag(i);
+		ballBtn->setTarget(this, menu_selector(GameShooterMode::onMarbleChange));
+		bool isUnlock = UserInfo::getInstance()->isUnlock(i);
+		if (!isUnlock)
+		{
+			ballBtn->setColor(ccc3(60, 60, 60));
+		}
+		else
+		{
+			ballBtn->setColor(ccc3(255, 255, 255));
+		}
+	}
 
 }
 
@@ -216,7 +195,7 @@ void GameShooterMode::onDoubleAttact(CCObject *pSender)
 	int count = UserInfo::getInstance()->getPropsCount(kProp_DoubleAttact);
 	int coinCount = UserInfo::getInstance()->getCoins();
 	int doubleAttactCost = GameConfig::getInstance()->m_doubleAttactCost;
-	if (coinCount >= doubleAttactCost  && count <= 0)
+	if (coinCount < doubleAttactCost  && count <= 0)
 	{
 		// show pay point
 		showLibaoDiaolg();
@@ -254,10 +233,11 @@ void GameShooterMode::onClearScreen(CCObject *pSender)
 	int count = UserInfo::getInstance()->getPropsCount(kProp_Clear);
 	int coinCount = UserInfo::getInstance()->getCoins();
 	int hammerCost = GameConfig::getInstance()->m_hammerCost;
-	if (coinCount >= hammerCost && count <= 0)
+	if (coinCount < hammerCost && count <= 0)
 	{
 		// show pay point
 		showLibaoDiaolg();
+		return;
 	}
 	if (count > 0)
 	{
@@ -279,10 +259,11 @@ void GameShooterMode::onFreezing(CCObject *pSender)
 	int count = UserInfo::getInstance()->getPropsCount(kProp_Freezing);
 	int coinCount = UserInfo::getInstance()->getCoins();
 	int freezingCost = GameConfig::getInstance()->m_freezingCost;
-	if (coinCount >= freezingCost  && count <= 0)
+	if (coinCount < freezingCost  && count <= 0)
 	{
 		// show pay point
 		showLibaoDiaolg();
+		return;
 	}
 	if (!isFreezing)
 	{
@@ -361,19 +342,23 @@ void GameShooterMode::initMarbles()
 
 void GameShooterMode::addMarble(float dt)
 {
+	auto attr = MarbleModel::theModel()->getMarbleAttr();
 	int shootCount = 1;
 	if (m_shotgunsTime > 0)
 	{
 		shootCount = 3;
 	}
+	if (attr.skin == kMarble_Dispersed)
+	{
+		shootCount += 2;
+	}
 	auto actions = ActionSequence::create(this);
-	MarbleAttr m_attr = FasterMarle();
 	for (int i = 0; i < shootCount; i++)
 	{
 		auto marbles = MarbleModel::theModel()->getMarbles();
 		auto ball = MarbleModel::theModel()->createMarble();
 		ball->setBody();
-		ball->setPosition(ccp(m_character->getPositionX(), m_bottomLinePos + ball->getContentSize().height / 2 + 4));
+		ball->setPosition(ccp(m_arrow->getPositionX(), m_bottomLinePos + ball->getContentSize().height / 2 + 4));
 		addChild(ball);
 		ball->setMovingState(true);
 
@@ -388,7 +373,7 @@ void GameShooterMode::addMarble(float dt)
 		
 		ball->setVisible(true);
 		auto attr = MarbleModel::theModel()->getMarbleAttr();
-		auto action1 = CCDelayTime::create(0.2f / attr.speed);
+		auto action1 = CCDelayTime::create(0.1f / attr.speed);
 		actions->addAction(action1);
 	}
 	auto callback = CCFunctionAction::create([=]()
@@ -454,6 +439,12 @@ void GameShooterMode::update(float dt)
 		auto &marble = (*iter);
 		auto body = marble->getBody();
 		MarbleNode *ball = (MarbleNode*)(body->GetUserData());
+		float distance = body->GetLinearVelocity().x*body->GetLinearVelocity().x + body->GetLinearVelocity().y*body->GetLinearVelocity().y;
+		if (distance > 0 && distance < 400)
+		{
+			float angle = GameUtil::getDegreeTwoPoints(ccp(0, 0), ccp(body->GetLinearVelocity().x, body->GetLinearVelocity().y));
+			marble->shooterShoot(angle);
+		}
 		if (ball->isMoving())
 		{
 			b2Vec2 ballPosition = body->GetPosition();
@@ -477,9 +468,9 @@ void GameShooterMode::update(float dt)
 	if (m_protectTime < 0)
 	{
 		m_protectTime = 0;
-		if (m_character->getChildByTag(kTag_Protect))
+		if (m_arrow->getChildByTag(kTag_Protect))
 		{
-			m_character->removeChildByTag(kTag_Protect);
+			m_arrow->removeChildByTag(kTag_Protect);
 		}
 	}
 
@@ -525,47 +516,15 @@ void GameShooterMode::update(float dt)
 
 bool GameShooterMode::ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent)
 {
-	auto winSize = CCDirector::sharedDirector()->getWinSize();
 	auto location = pTouch->getLocation();
-	if (location.x - m_character->getContentSize().width / 2 < 0)
-	{
-		m_character->setPositionX(m_character->getContentSize().width / 2);
-	}
-	else if (location.x + m_character->getContentSize().width / 2 > winSize.width)
-	{
-		m_character->setPositionX(winSize.width - m_character->getContentSize().width / 2);
-	}
-	else
-	{
-		m_character->setPositionX(location.x);
-	}
-	CCSprite *character_body = dynamic_cast<CCSprite*>(m_characterLayout->getChildById(9));
-	CCSprite *character_head = dynamic_cast<CCSprite*>(m_characterLayout->getChildById(10));
-	character_body->setPositionX(m_character->getPositionX());
-	character_head->setPositionX(m_character->getPositionX());
+	m_characterView->checkShooterPos(location);
 	return true;
 }
 
 void GameShooterMode::ccTouchMoved(CCTouch *pTouch, CCEvent *pEvent)
 {
-	auto winSize = CCDirector::sharedDirector()->getWinSize();
 	auto location = pTouch->getLocation();
-	if (location.x - m_character->getContentSize().width / 2 < 0)
-	{
-		m_character->setPositionX(m_character->getContentSize().width / 2);
-	}
-	else if (location.x + m_character->getContentSize().width / 2 > winSize.width)
-	{
-		m_character->setPositionX(winSize.width - m_character->getContentSize().width / 2);
-	}
-	else
-	{
-		m_character->setPositionX(location.x);
-	}
-	CCSprite *character_body = dynamic_cast<CCSprite*>(m_characterLayout->getChildById(9));
-	CCSprite *character_head = dynamic_cast<CCSprite*>(m_characterLayout->getChildById(10));
-	character_body->setPositionX(m_character->getPositionX());
-	character_head->setPositionX(m_character->getPositionX());
+	m_characterView->checkShooterPos(location);
 }
 
 void GameShooterMode::ccTouchEnded(CCTouch *pTouch, CCEvent *pEvent)
@@ -612,14 +571,13 @@ void GameShooterMode::showGameOver()
 void GameShooterMode::useProtectEffect()
 {
 	m_protectTime = PROTECT_TIME;
-	if (m_character->getChildByTag(kTag_Protect))
+	if (m_arrow->getChildByTag(kTag_Protect))
 	{
-		m_character->removeChildByTag(kTag_Protect);
+		m_arrow->removeChildByTag(kTag_Protect);
 	}
 	auto protect = CCSprite::create("game/protected.png");
 	protect->setTag(kTag_Protect);
-	m_character->addChild(protect);
-
+	m_arrow->addChild(protect);
 }
 
 void GameShooterMode::useShotGunsEffect()
@@ -630,4 +588,32 @@ void GameShooterMode::useShotGunsEffect()
 void GameShooterMode::getBloodEffect()
 {
 	CCLog("add blood effect");
+}
+
+void GameShooterMode::onMarbleChange(cocos2d::CCObject *pSender)
+{
+	bool isRoundOver = GameController::getInstance()->isRoundOver();
+	bool isGameOver = GameController::getInstance()->isGameOver();
+
+	if (!isRoundOver || isGameOver)
+	{
+		return;
+	}
+	int tag = ((CCMenuItem*)pSender)->getTag();
+
+	bool isUnlock = UserInfo::getInstance()->isUnlock(tag);
+	if (isUnlock)
+	{
+		updateMarbleType(tag);
+	}
+	else
+	{
+		ShopSkinLayer *skinLayer = ShopSkinLayer::create(tag);
+		addChild(skinLayer, kZOrder_Shop, kTag_Shop);
+	}
+}
+
+void GameShooterMode::notifyViews()
+{
+	updateCoins();
 }

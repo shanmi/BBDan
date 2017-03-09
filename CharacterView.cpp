@@ -126,3 +126,24 @@ void CharacterView::characterMove(float offsetX)
 	m_arrow->setPositionX(m_arrow->getPositionX() + offsetX);
 
 }
+
+void CharacterView::checkShooterPos(cocos2d::CCPoint position)
+{
+	auto winSize = CCDirector::sharedDirector()->getWinSize();
+	if (position.x - m_arrow->getContentSize().width / 2 < 0)
+	{
+		m_arrow->setPositionX(m_arrow->getContentSize().width / 2);
+	}
+	else if (position.x + m_arrow->getContentSize().width / 2 > winSize.width)
+	{
+		m_arrow->setPositionX(winSize.width - m_arrow->getContentSize().width / 2);
+	}
+	else
+	{
+		m_arrow->setPositionX(position.x);
+	}
+	CCSprite *character_body = dynamic_cast<CCSprite*>(m_characterLayout->getChildById(9));
+	CCSprite *character_head = dynamic_cast<CCSprite*>(m_characterLayout->getChildById(10));
+	character_body->setPositionX(m_arrow->getPositionX());
+	character_head->setPositionX(m_arrow->getPositionX());
+}

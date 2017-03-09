@@ -55,7 +55,7 @@ bool GameController::isCounterFull()
 }
 
 int GameController::getAttactRate()
-{ 
+{
 	auto marbleDamage = MarbleModel::theModel()->getMarbleAttr().damage;
 	int marbleRate = MarbleModel::theModel()->getAttactRate();
 	return m_attactRate * marbleRate * marbleDamage;
@@ -71,13 +71,6 @@ void GameController::checkSquares(bool isRoundEnd /* = false */)
 		{
 			if (square->shouldRemoveDirectly() || isRoundEnd)
 			{
-				int count = SquareModel::theModel()->getRemainSqaure();
-				if (count == 1)
-				{
-					int random = rand() % 3 + 1;
-					auto effect = GameUtil::getAchievementEffect(random);
-					square->getParent()->addChild(effect, kZOrder_Effect);
-				}
 				SquareModel::theModel()->removeSquareNode(square);
 			}
 		}

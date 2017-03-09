@@ -63,6 +63,7 @@ public:
 	void checkFishGuide();
 	void showLibaoDiaolg();
 	void checkLibaoShow();
+	void checkAchievent();
 
 	void characterMove(float offsetX);
 	void onTouchCallback();

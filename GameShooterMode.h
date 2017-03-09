@@ -7,6 +7,7 @@
 
 class UiLayout;
 class MarbleNode;
+class CharacterView;
 class GameShooterMode 
 	: public cocos2d::CCLayer
 	, public INotifyView
@@ -38,6 +39,7 @@ public:
 	void useProtectEffect();
 	void useShotGunsEffect();
 	void getBloodEffect();
+	void notifyViews();
 public:
 	void onPauseGame(cocos2d::CCObject *pSender);
 	void onDoubleAttact(cocos2d::CCObject *pSender);
@@ -45,7 +47,6 @@ public:
 	void onFreezing(cocos2d::CCObject *pSender);
 	void onHelpPanel(cocos2d::CCObject *pSender);
 	void initMainLayout();
-	void initCharacterLayout();
 	void initTopLayout();
 	void initBottomLayout();
 	void initGameLayout();
@@ -55,14 +56,15 @@ public:
 	void addSquares();
 	void checkLibaoShow();
 	void showLibaoDiaolg();
+	void onMarbleChange(cocos2d::CCObject *pSender);
 
 private:
 	b2World *m_world;
 	UiLayout *m_mainLayout;
-	UiLayout *m_characterLayout;
 	UiLayout *m_topLayout;
 	UiLayout *m_bottomLayout;
-	cocos2d::CCSprite *m_character;
+	CharacterView *m_characterView;
+	cocos2d::CCSprite *m_arrow;
 	float m_topLinePos;
 	float m_bottomLinePos;
 	float m_shootDegree;
