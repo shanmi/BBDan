@@ -34,19 +34,10 @@ namespace GameUtil
 	cocos2d::CCLabelAtlas *getImageNum(std::string fontPath, int num);
 	cocos2d::CCLabelAtlas *getImageNum(std::string fontPath, std::string numStr);
 
-	void putInt(int src, FILE* file);
-	void getInt(int &temp, FILE* file);
-	void putString(std::string str, FILE* file);
-	void getString(std::string &str, FILE* file);
-	int xorEncDecInt(int ch);
-	int saveGameInfo();
-	int loadGameInfo();
-	int clearGameInfo();
-
 	std::vector<int> buildRandomSequence(int length);
 
-	int getTargetLevel();
-	int getLastLevel();
+	int getLuckyLevel();
+	int getLastLuckyLevel();
 }
 
 #endif

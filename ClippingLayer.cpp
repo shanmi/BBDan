@@ -3,8 +3,8 @@
 #include "UserInfo.h"
 #include "Config.h"
 #include "GameController.h"
-#include "GameUtil.h"
 #include "GameConfig.h"
+#include "DataHelper.h"
 
 USING_NS_CC;
 
@@ -78,7 +78,7 @@ bool ClippingLayer::ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent)
 			}
 			GameController::getInstance()->notifyViews();
 			removeFromParent();
-			GameUtil::saveGameInfo();
+			DataHelper::getInstance()->saveGameInfo();
 			break;
 		}
 	}

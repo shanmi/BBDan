@@ -17,12 +17,13 @@
 
 
 //shoot mode
-#define BALL_MOVE_SPEED 300
+#define BALL_MOVE_SPEED 100
 #define FREEZING_TIME 5
 #define PROTECT_TIME  10
 #define SHOTGUNS_TIME 10
 #define BLOOD_COUNT   1
 #define ROCKET_TIME   10
+#define BALL_SPEED	  0.1f
 
 #define PLAYER_BLOOD_COUNT	3
 

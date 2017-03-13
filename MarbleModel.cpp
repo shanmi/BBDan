@@ -159,7 +159,10 @@ void MarbleModel::clearMarbles()
 	for (auto iter = m_marbles.begin(); iter != m_marbles.end(); ++iter)
 	{
 		auto marble = *iter;
-		marble->runRemoveAction();
+		if (marble->getParent())
+		{
+			marble->runRemoveAction();
+		}
 	}
 	m_marbles.clear();
 }

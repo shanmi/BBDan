@@ -18,6 +18,8 @@
 #include "LibaoDialog.h"
 #include "ShopSkinLayer.h"
 #include "CharacterView.h"
+#include "DataHelper.h"
+#include "FuhuoLibao.h"
 
 USING_NS_CC;
 
@@ -52,7 +54,9 @@ GameShooterMode::GameShooterMode()
 , m_freezingTime(0)
 , m_protectTime(0)
 , m_shotgunsTime(0)
+, m_addMarbleTime(0)
 , m_bIsDoubleAttact(false)
+, m_bIsGameOver(false)
 {
 
 }
@@ -84,13 +88,14 @@ bool GameShooterMode::init()
 	{
 		return false;
 	}
+	GameController::getInstance()->setGameType(kGame_Shoot);
 
 	setKeypadEnabled(true);
 	Box2dFactory::getInstance()->initPhysics(true);
-	GameUtil::loadGameInfo();
+	DataHelper::getInstance()->loadShootGameInfo();
 
 	auto winSize = CCDirector::sharedDirector()->getWinSize();
-	m_mainLayout = UiLayout::create("layout/game_scene.xml");
+	m_mainLayout = UiLayout::create("layout/game_scene2.xml");
 	m_mainLayout->setAnchorPoint(ccp(0.5f, 0.5f));
 	m_mainLayout->setPosition(ccpMult(winSize, 0.5f));
 	m_mainLayout->setMenuTouchPriority(kPriority_Game - 1);
@@ -100,6 +105,7 @@ bool GameShooterMode::init()
 	m_characterView = CharacterView::create();
 	addChild(m_characterView, kZOrder_Character);
 	m_arrow = dynamic_cast<CCSprite *>(m_characterView->getBodyById(11));
+	m_characterView->initShooterPos();
 
 	m_topLayout = UiLayout::create("layout/game_top2.xml");
 	m_topLayout->setPosition(ccp(0, winSize.height - m_topLayout->getContentSize().height));
@@ -131,8 +137,6 @@ void GameShooterMode::initMainLayout()
 	m_topLinePos = worldPos.y;
 
 	CCSprite *line_bottom = dynamic_cast<CCSprite*>(m_mainLayout->getChildById(7));
-	line_bottom->setPositionY(line_bottom->getPositionY() + 60);
-	line_bottom->setVisible(true);
 	line_bottom->setTag(kTag_Wall);
 	worldPos = line_bottom->convertToWorldSpace(CCPointZero);
 	m_bottomLinePos = worldPos.y;
@@ -151,6 +155,7 @@ void GameShooterMode::onPauseGame(CCObject *pSender)
 	{
 		return;
 	}
+	DataHelper::getInstance()->saveShootGameInfo();
 	PauseLayer *pauseLayer = PauseLayer::create();
 	addChild(pauseLayer, KZOrder_PauseLayer, kTag_Pause);
 }
@@ -159,6 +164,47 @@ void GameShooterMode::initTopLayout()
 {
 	CCMenuItem *pauseItem = dynamic_cast<CCMenuItem*>(m_topLayout->getChildById(6));
 	pauseItem->setTarget(this, menu_selector(GameShooterMode::onPauseGame));
+
+	CCMenuItem *helpBtn = dynamic_cast<CCMenuItem*>(m_topLayout->getChildById(9));
+	helpBtn->setTarget(this, menu_selector(GameShooterMode::onHelpPanel));
+
+	CCSprite *progress_bg = dynamic_cast<CCSprite*>(m_topLayout->getChildById(14));
+	CCSprite *logo = dynamic_cast<CCSprite*>(m_topLayout->getChildById(15));
+	CCSprite *target = dynamic_cast<CCSprite*>(m_topLayout->getChildById(16));
+	CCSprite *arrow = dynamic_cast<CCSprite*>(m_topLayout->getChildById(18));
+	CCLabelAtlas *targetLabel = dynamic_cast<CCLabelAtlas*>(m_topLayout->getChildById(17));
+
+	UiLayout *layout = UiLayout::create("layout/game_top.xml");
+	CCSprite *start = dynamic_cast<CCSprite*>(layout->getChildById(15));
+	float startPos = start->getPositionX();
+
+	arrow->setZOrder(arrow->getZOrder() + 1);
+	auto moveBy = CCMoveBy::create(1.1f, ccp(0, 10));
+	auto sequence = CCSequence::create(moveBy, moveBy->reverse(), NULL);
+	auto repeat = CCRepeatForever::create(sequence);
+	arrow->runAction(repeat);
+
+	int curLevel = SquareModel::theModel()->getCurrentScore();
+	int targetLevel = UserInfo::getInstance()->getTargetLevel();
+	int lastLevel = 0;// targetLevel <= 10 ? 0 : targetLevel / 2;
+	float rate = (target->getPositionX() - startPos) / (targetLevel - lastLevel);
+	float gotoPos = startPos + rate * (curLevel - lastLevel);
+	logo->setPositionX(gotoPos);
+	arrow->setPositionX(gotoPos);
+
+	float progressPos = 100 * gotoPos / layout->getContentSize().width;
+	m_progressTimer = CCProgressTimer::create(CCSprite::create("game/youxijiemian_jindutiao_jindu.png"));
+	m_progressTimer->setType(kCCProgressTimerTypeBar);
+	m_progressTimer->setMidpoint(ccp(0, 1));
+	m_progressTimer->setBarChangeRate(ccp(1, 0));
+	m_progressTimer->setPercentage(progressPos);
+	m_progressTimer->setPosition(ccp(progress_bg->getContentSize().width / 2, progress_bg->getContentSize().height / 2));
+	progress_bg->addChild(m_progressTimer);
+
+	auto topPanel = CCSprite::create("game/youxijiemian_jindutiao_biankuang.png");
+	topPanel->setPosition(ccp(progress_bg->getContentSize().width / 2, progress_bg->getContentSize().height / 2));
+	progress_bg->addChild(topPanel);
+
 }
 
 void GameShooterMode::initBottomLayout()
@@ -312,7 +358,7 @@ void GameShooterMode::showLibaoDiaolg()
 
 void GameShooterMode::checkLibaoShow()
 {
-	int score = SquareModel::theModel()->getCurrentScore() - 1;
+	int score = SquareModel::theModel()->getCurrentScore();
 	int m_showLibaoLevel = GameConfig::getInstance()->m_showLibaoLevel;
 	if (score % m_showLibaoLevel == 0)
 	{
@@ -337,12 +383,18 @@ void GameShooterMode::initPhysicBorder()
 
 void GameShooterMode::initMarbles()
 {
-	addMarble(0);
+	//addMarble(0);
 }
 
 void GameShooterMode::addMarble(float dt)
 {
 	auto attr = MarbleModel::theModel()->getMarbleAttr();
+	m_addMarbleTime += dt;
+	if (m_addMarbleTime < BALL_SPEED / attr.speed)
+	{
+		return;
+	}
+	m_addMarbleTime = 0;
 	int shootCount = 1;
 	if (m_shotgunsTime > 0)
 	{
@@ -352,10 +404,8 @@ void GameShooterMode::addMarble(float dt)
 	{
 		shootCount += 2;
 	}
-	auto actions = ActionSequence::create(this);
 	for (int i = 0; i < shootCount; i++)
 	{
-		auto marbles = MarbleModel::theModel()->getMarbles();
 		auto ball = MarbleModel::theModel()->createMarble();
 		ball->setBody();
 		ball->setPosition(ccp(m_arrow->getPositionX(), m_bottomLinePos + ball->getContentSize().height / 2 + 4));
@@ -368,19 +418,18 @@ void GameShooterMode::addMarble(float dt)
 		}
 		else
 		{
-			ball->shooterShoot(75 + 15* i);
+			ball->shooterShoot(75 + 15 * i);
 		}
-		
 		ball->setVisible(true);
-		auto attr = MarbleModel::theModel()->getMarbleAttr();
-		auto action1 = CCDelayTime::create(0.1f / attr.speed);
-		actions->addAction(action1);
 	}
+	auto actions = ActionSequence::create(this);
+	auto action1 = CCDelayTime::create(0.1f / attr.speed);
+	//actions->addAction(action1);
 	auto callback = CCFunctionAction::create([=]()
 	{
 		addMarble(0);
 	});
-	actions->addAction(callback);
+	//actions->addAction(callback);
 	actions->runActions();
 }
 
@@ -390,9 +439,12 @@ void GameShooterMode::initSquares()
 	for (int i = 0; i < squares.size(); i++)
 	{
 		auto node = squares[i];
-		Index index = node->getIndex();
-		node->setPosition(ccp((node->getContentSize().width / 2 + SQUARE_SPACING) + index.x * (node->getContentSize().width + SQUARE_SPACING),
-			m_bottomLinePos + (node->getContentSize().height + SQUARE_SPACING) * (7.5 - index.y)));
+		if (node->getPositionY() <= 0)
+		{
+			Index index = node->getIndex();
+			node->setPosition(ccp((node->getContentSize().width / 2 + SQUARE_SPACING) + index.x * (node->getContentSize().width + SQUARE_SPACING),
+				m_bottomLinePos + (node->getContentSize().height + SQUARE_SPACING) * (7.5 - index.y)));
+		}
 		addChild(node, kZOrder_Square);
 	}
 	bool isGameOver = GameController::getInstance()->checkGameOver();
@@ -412,7 +464,7 @@ void GameShooterMode::addSquares()
 		square->setIndex(index.x, index.y + 1);
 	}
 
-	auto squares = SquareModel::theModel()->createSquareList(false);
+	auto squares = SquareModel::theModel()->createSquareList();
 	for (int i = 0; i < squares.size(); i++)
 	{
 		auto node = squares[i];
@@ -422,16 +474,23 @@ void GameShooterMode::addSquares()
 			m_bottomLinePos + (node->getContentSize().height + SQUARE_SPACING) * 8.5));
 		addChild(node, kZOrder_Square);
 	}
+	DataHelper::getInstance()->saveShootGameInfo();
+	updateProgress();
 }
 
 void GameShooterMode::update(float dt)
 {
-
+	if (m_bIsGameOver)
+	{
+		return;
+	}
 	int32 velocityIterations = 8;
 	int32 positionIterations = 1;
 
 	m_world->Step(dt, velocityIterations, positionIterations);
 	m_world->ClearForces();
+
+	addMarble(dt);
 
 	auto marbles = MarbleModel::theModel()->getMarbles();
 	for (auto iter = marbles.begin(); iter != marbles.end(); ++iter)
@@ -456,7 +515,7 @@ void GameShooterMode::update(float dt)
 		}
 	}
 
-	if(m_shotgunsTime > 0)
+	if (m_shotgunsTime > 0)
 	{
 		m_shotgunsTime -= dt;
 	}
@@ -486,7 +545,6 @@ void GameShooterMode::update(float dt)
 	}
 	else
 	{
-		auto targetPos = GameController::getInstance()->getTargetPos();
 		auto squares = SquareModel::theModel()->getSquares();
 		for (auto iter = squares.begin(); iter != squares.end(); ++iter)
 		{
@@ -494,28 +552,47 @@ void GameShooterMode::update(float dt)
 			square->setPosition(ccp(square->getPositionX(), square->getPositionY() - (square->getContentSize().height + SQUARE_SPACING) / BALL_MOVE_SPEED));
 			if (square->getPositionY() - square->getContentSize().height / 2 < m_bottomLinePos)
 			{
-				if (square->getSquareType() == kType_Square || square->getSquareType() == kType_Triangle)
+				if (square->canRemoveByProps())
 				{
-					//showGameOver();
+					defenseCrash(square);
 				}
-				SquareModel::theModel()->removeSquareNode(square);
+				else
+				{
+					square->setScore(0);
+				}
 			}
 		}
 		m_moveCounter++;
 		if (m_moveCounter > BALL_MOVE_SPEED)
 		{
 			m_moveCounter = 0;
+
+			int curLevel = SquareModel::theModel()->getCurrentScore();
+			int targetLevel = UserInfo::getInstance()->getTargetLevel();
+			if (curLevel >= targetLevel)
+			{
+				auto remainSquares = SquareModel::theModel()->getRemainSqaure();
+				if (remainSquares <= 0)
+				{
+					UserInfo::getInstance()->setTargetLevel();
+					SquareModel::theModel()->setCurrentScore(0);
+				}
+				return;
+			}
 			addSquares();
 		}
 	}
 
 	//check squares by not check tool
 	GameController::getInstance()->checkSquares(true);
-
 }
 
 bool GameShooterMode::ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent)
 {
+	if (m_bIsGameOver)
+	{
+		return false;
+	}
 	auto location = pTouch->getLocation();
 	m_characterView->checkShooterPos(location);
 	return true;
@@ -523,8 +600,13 @@ bool GameShooterMode::ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent)
 
 void GameShooterMode::ccTouchMoved(CCTouch *pTouch, CCEvent *pEvent)
 {
+	if (m_bIsGameOver)
+	{
+		return;
+	}
 	auto location = pTouch->getLocation();
 	m_characterView->checkShooterPos(location);
+	GameController::getInstance()->setShooterPos(location);
 }
 
 void GameShooterMode::ccTouchEnded(CCTouch *pTouch, CCEvent *pEvent)
@@ -616,4 +698,66 @@ void GameShooterMode::onMarbleChange(cocos2d::CCObject *pSender)
 void GameShooterMode::notifyViews()
 {
 	updateCoins();
+	DataHelper::getInstance()->saveShootGameInfo();
+	m_bIsGameOver = false;
+}
+
+void GameShooterMode::defenseCrash(SquareNode *node)
+{
+	Index index = node->getIndex();
+	CCSprite *defense = dynamic_cast<CCSprite*>(m_mainLayout->getChildById(10+index.x));
+	if (defense->isVisible())
+	{
+		SquareModel::theModel()->removeSameColSquare(node);
+		defense->setVisible(false);
+	}
+	else
+	{
+		if (!m_bIsGameOver)
+		{
+			FuhuoLibao *fuhuoLibao = FuhuoLibao::create();
+			addChild(fuhuoLibao, KZOrder_GameOver, kTag_GameOver);
+			m_bIsGameOver = true;
+		}
+	}
+}
+
+void GameShooterMode::updateProgress()
+{
+	UiLayout *layout = UiLayout::create("layout/game_top2.xml");
+	CCSprite *start = dynamic_cast<CCSprite*>(layout->getChildById(15));
+	float startPos = start->getPositionX();
+
+	CCSprite *progress_bg = dynamic_cast<CCSprite*>(m_topLayout->getChildById(14));
+	CCSprite *logo = dynamic_cast<CCSprite*>(m_topLayout->getChildById(15));
+	CCSprite *target = dynamic_cast<CCSprite*>(m_topLayout->getChildById(16));
+	CCLabelAtlas *targetLabel = dynamic_cast<CCLabelAtlas*>(m_topLayout->getChildById(17));
+	CCSprite *arrow = dynamic_cast<CCSprite*>(m_topLayout->getChildById(18));
+
+	int curLevel = SquareModel::theModel()->getCurrentScore();
+	int targetLevel = UserInfo::getInstance()->getTargetLevel();
+	int lastLevel = 0;// targetLevel <= 10 ? 0 : targetLevel / 2;
+	float gotoPos;
+	if (targetLevel == lastLevel)
+	{
+		gotoPos = target->getPositionX();
+		/*LuckyLayer *luckyLayer = LuckyLayer::create();
+		addChild(luckyLayer, KZOrder_LuckyLayer);*/
+	}
+	else
+	{
+		float rate = (target->getPositionX() - startPos) / (targetLevel - lastLevel);
+		gotoPos = startPos + rate * (curLevel - lastLevel);
+	}
+
+	auto moveTo = CCMoveTo::create(1, ccp(gotoPos, logo->getPositionY()));
+	logo->runAction(moveTo);
+	moveTo = CCMoveTo::create(1, ccp(gotoPos, arrow->getPositionY()));
+	arrow->runAction(moveTo);
+
+	float percentage = 100 * gotoPos / layout->getContentSize().width;
+	float curPercentage = m_progressTimer->getPercentage();
+	m_progressTimer->runAction(CCProgressFromTo::create(1, curPercentage, percentage));
+
+	targetLabel->setString(GameUtil::intToString(targetLevel).c_str());
 }

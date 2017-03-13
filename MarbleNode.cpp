@@ -225,11 +225,12 @@ void MarbleNode::updateStreak(float delta)
 
 void MarbleNode::runRemoveAction()
 {
-	unschedule(schedule_selector(MarbleNode::updateStreak));
+	/*unschedule(schedule_selector(MarbleNode::updateStreak));
 	if (m_streak)
 	{
 		m_streak->removeFromParent();
-	}
+	}*/
+	removeAllChildren();
 	removeBody();
 	removeFromParent();
 }

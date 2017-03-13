@@ -25,6 +25,7 @@
 #include "LuckyLayer.h"
 #include "MyAdvertise.h"
 #include "CharacterView.h"
+#include "DataHelper.h"
 
 USING_NS_CC;
 
@@ -91,11 +92,12 @@ bool GameScene::init()
 	}
 
 	MyAdvertise::getInstance()->showScreenAdvertise();
+	GameController::getInstance()->setGameType(kGame_Normal);
 
 	setKeypadEnabled(true);
 	setAccelerometerEnabled(true);
 	Box2dFactory::getInstance()->initPhysics(false);
-	GameUtil::loadGameInfo();
+	DataHelper::getInstance()->loadGameInfo();
 
 	auto winSize = CCDirector::sharedDirector()->getWinSize();
 	m_mainLayout = UiLayout::create("layout/game_scene.xml");
@@ -124,6 +126,7 @@ bool GameScene::init()
 
 	initPhysicBorder();
 
+	auto marbles = MarbleModel::theModel()->getMarbles();
 	initMarbles();
 	int type = MarbleModel::theModel()->getMarbleAttr().skin;
 	updateMarbleType(type);
@@ -211,8 +214,8 @@ void GameScene::initTopLayout()
 		arrow->runAction(repeat);
 
 		int curLevel = SquareModel::theModel()->getCurrentScore();
-		int targetLevel = GameUtil::getTargetLevel();
-		int lastLevel = GameUtil::getLastLevel();
+		int targetLevel = GameUtil::getLuckyLevel();
+		int lastLevel = GameUtil::getLastLuckyLevel();
 
 		float rate = (target->getPositionX() - startPos) / (targetLevel - lastLevel);
 		float gotoPos = startPos + rate * (curLevel - lastLevel);
@@ -415,7 +418,7 @@ void GameScene::checkLibaoShow()
 	{
 		return;
 	}
-	int score = SquareModel::theModel()->getCurrentScore() - 1;
+	int score = SquareModel::theModel()->getCurrentScore();
 	int showLibaoLevel = GameConfig::getInstance()->m_showLibaoLevel;
 	if (score % showLibaoLevel == 0)
 	{
@@ -516,7 +519,7 @@ void GameScene::initSquares()
 			m_bottomLinePos + (node->getContentSize().height + SQUARE_SPACING) * (7.5 - index.y)));
 		addChild(node, kZOrder_Square);
 	}
-	bool isGameOver = GameController::getInstance()->isGameOver();
+	bool isGameOver = GameController::getInstance()->checkGameOver();
 	if (isGameOver)
 	{
 		showGameOver();
@@ -747,6 +750,7 @@ void GameScene::notifyViews()
 	updateCoins();
 	updatePropsCount();
 	initBottomLayout();
+	DataHelper::getInstance()->saveGameInfo();
 }
 
 void GameScene::updateCoins()
@@ -763,7 +767,7 @@ void GameScene::updateCoins()
 
 void GameScene::updateScore()
 {
-	int score = SquareModel::theModel()->getCurrentScore() - 1;
+	int score = SquareModel::theModel()->getCurrentScore();
 	std::string countStr = GameUtil::intToString(score);
 	CCLabelAtlas *scoreLabel = dynamic_cast<CCLabelAtlas*>(m_topLayout->getChildById(3));
 	scoreLabel->setString(countStr.c_str());
@@ -777,7 +781,7 @@ void GameScene::updateScore()
 		bestScore = score;
 		UserInfo::getInstance()->setBestScore(score);
 		showEffect = true;
-		int curLevel = SquareModel::theModel()->getCurrentScore() - 1;
+		int curLevel = SquareModel::theModel()->getCurrentScore();
 		MyPurchase::sharedPurchase()->successStage(curLevel);
 	}
 	std::string bestStr = GameUtil::intToString(bestScore);
@@ -948,9 +952,9 @@ void GameScene::updateProgress()
 	CCLabelAtlas *targetLabel = dynamic_cast<CCLabelAtlas*>(m_topLayout->getChildById(17));
 	CCSprite *arrow = dynamic_cast<CCSprite*>(m_topLayout->getChildById(18));
 
-	int curLevel = SquareModel::theModel()->getCurrentScore() - 1;
-	int targetLevel = GameUtil::getTargetLevel();
-	int lastLevel = GameUtil::getLastLevel();
+	int curLevel = SquareModel::theModel()->getCurrentScore();
+	int targetLevel = GameUtil::getLuckyLevel();
+	int lastLevel = GameUtil::getLastLuckyLevel();
 	float gotoPos;
 	if (targetLevel == lastLevel)
 	{

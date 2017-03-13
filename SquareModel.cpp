@@ -8,11 +8,12 @@
 #include "cocos2d.h"
 #include "GameUtil.h"
 #include "MarbleModel.h"
+#include "UserInfo.h"
 
 USING_NS_CC;
 
 SquareModel::SquareModel()
-:m_curScore(1)
+:m_curScore(0)
 , m_bIsFreezing(false)
 {
 
@@ -129,28 +130,26 @@ std::vector<SquareNode*> SquareModel::loadSquareList()
 	return m_squares;
 }
 
-std::vector<SquareNode*> SquareModel::createSquareList(bool autoAddScore /* = true */)
+std::vector<SquareNode*> SquareModel::createSquareList()
 {
+	m_curScore++;
 	srand(time(NULL));
 	std::vector<SquareNode*> nodes;
 
-	std::vector<int> ballListType;
-	if (autoAddScore)
+	int gameType = GameController::getInstance()->getGameType();
+	std::vector<int> ballListType = getBallListType1();
+	switch (gameType)
 	{
+	case kGame_Normal:
 		ballListType = getBallListType1();
-	}
-	else
-	{
+		break;
+	case kGame_Shoot:
 		ballListType = getBallListType2();
+		break;
 	}
 	for (int i = 0; i < BALL_COL_SIZE; i++)
 	{
-		int type = kType_AddCoin;// ballListType.at(i);
-		int random = rand() % 2;
-		if (random == 1)
-		{
-			type = kType_Square;
-		}
+		int type = kType_AddCoin;
 
 		type = ballListType.at(i);
 		SquareNode *node = createSquareNode(type);
@@ -159,18 +158,6 @@ std::vector<SquareNode*> SquareModel::createSquareList(bool autoAddScore /* = tr
 			node->setBody();
 			node->setIndex(i, 0);
 			nodes.push_back(node);
-		}
-	}
-	if (autoAddScore)
-	{
-		m_curScore++;
-	}
-	else
-	{
-		m_curScore++;
-		if (m_curScore > 48)
-		{
-			m_curScore = 1;
 		}
 	}
 	return nodes;
@@ -184,7 +171,7 @@ std::vector<int> SquareModel::getBallListType1()
 	for (int i = 0; i < BALL_COL_SIZE; i++)
 	{
 		int type = getBallType(probabilitys, count);
-		if (type == kType_AddMarble || type == kType_AddCoin || type == kType_Rebound || type == kType_EliminateRow || 
+		if (type == kType_AddMarble || type == kType_AddCoin || type == kType_Rebound || type == kType_EliminateRow ||
 			type == kType_EliminateCol || type == kType_EliminateCross || type == kType_BossEatMarble)
 		{
 			auto iter = find(types.begin(), types.end(), type);
@@ -380,7 +367,22 @@ void SquareModel::removeSameRowSquare(SquareNode *node)
 		Index squareIndex = square->getIndex();
 		if (square->canRemoveByProps() && index.y == squareIndex.y)
 		{
-			removeSquareNode(square);
+			square->setScore(0);
+		}
+	}
+}
+
+void SquareModel::removeSameColSquare(SquareNode *node)
+{
+	Index index = node->getIndex();
+	auto squares = getSquares();
+	for (auto iter = squares.begin(); iter != squares.end(); ++iter)
+	{
+		auto square = (*iter);
+		Index squareIndex = square->getIndex();
+		if (square->canRemoveByProps() && index.x == squareIndex.x)
+		{
+			square->setScore(0);
 		}
 	}
 }
@@ -400,7 +402,7 @@ void SquareModel::exchangeSquarePosition()
 		auto square = *iter;
 		if (square->canRemoveByProps() && square->getScore() > 0)
 		{
-			squares.push_back(square); 
+			squares.push_back(square);
 			indexs.push_back(square->getIndex());
 			points->addControlPoint(square->getPosition());
 		}

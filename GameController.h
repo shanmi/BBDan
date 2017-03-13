@@ -54,6 +54,9 @@ public:
 	void setTargetPos(cocos2d::CCPoint pos){ m_targetPos = pos; }
 	cocos2d::CCPoint getTargetPos(){ return m_targetPos; }
 
+	void setShooterPos(cocos2d::CCPoint pos){ m_shooterPos = pos; }
+	cocos2d::CCPoint getShooterPos(){ return m_shooterPos; }
+
 	bool isCounterFull();
 	bool isRoundOver(){ return m_bIsRoundOver; }
 	void setRoundState(bool isOver) { m_bIsRoundOver = isOver; }
@@ -83,17 +86,22 @@ public:
 		}
 	}
 
+	int getGameType(){ return m_gameType; }
+	void setGameType(int type){ m_gameType = type; }
+
 private:
 	GameController();
 
 private:
 	cocos2d::CCPoint m_targetPos;
+	cocos2d::CCPoint m_shooterPos;
 	std::vector<INotifyView*> m_views;
 	int m_counter;
 	int m_attactRate;
 	bool m_bIsRoundOver;
 	bool m_bISFirstIn;
 	int m_bloodCount;
+	int m_gameType;
 };
 
 #endif

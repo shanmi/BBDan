@@ -147,3 +147,20 @@ void CharacterView::checkShooterPos(cocos2d::CCPoint position)
 	character_body->setPositionX(m_arrow->getPositionX());
 	character_head->setPositionX(m_arrow->getPositionX());
 }
+
+void CharacterView::initShooterPos()
+{
+	CCSprite *character_body = dynamic_cast<CCSprite*>(m_characterLayout->getChildById(9));
+	CCSprite *character_head = dynamic_cast<CCSprite*>(m_characterLayout->getChildById(10));
+
+	auto shooterPos = GameController::getInstance()->getShooterPos();
+	if (shooterPos.x != 0 && shooterPos.y != 0)
+	{
+		character_body->setPosition(ccp(shooterPos.x, character_body->getPositionY()));
+
+		character_head->setPosition(ccp(shooterPos.x, character_head->getPositionY()));
+
+		m_arrow->setPosition(ccp(shooterPos.x, m_arrow->getPositionY()));
+		m_arrow->setVisible(false);
+	}
+}

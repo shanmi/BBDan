@@ -57,6 +57,8 @@ public:
 	void checkLibaoShow();
 	void showLibaoDiaolg();
 	void onMarbleChange(cocos2d::CCObject *pSender);
+	void defenseCrash(SquareNode *node);
+	void updateProgress();
 
 private:
 	b2World *m_world;
@@ -65,6 +67,7 @@ private:
 	UiLayout *m_bottomLayout;
 	CharacterView *m_characterView;
 	cocos2d::CCSprite *m_arrow;
+	cocos2d::CCProgressTimer *m_progressTimer;
 	float m_topLinePos;
 	float m_bottomLinePos;
 	float m_shootDegree;
@@ -74,5 +77,7 @@ private:
 	float m_freezingTime;
 	float m_protectTime;
 	float m_shotgunsTime;
+	float m_addMarbleTime;
+	bool m_bIsGameOver;
 };
 #endif

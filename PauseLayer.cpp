@@ -64,8 +64,8 @@ void PauseLayer::closePanel(CCObject *pSender)
 
 void PauseLayer::backToHome(CCObject *pSender)
 {
-	removeFromParent();
 	GameController::getInstance()->backToMainMenu();
+	removeFromParent();
 }
 
 void PauseLayer::notifyViews()

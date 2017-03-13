@@ -4,6 +4,12 @@
 #define FONT_WHITE "numbers/number1.png"
 #define FONT_YELLOW "numbers/number2.png"
 
+enum GameType
+{
+	kGame_Normal,
+	kGame_Shoot,
+};
+
 enum TouchPriority
 {
 	kPriority_Main = -1,

@@ -13,7 +13,7 @@ public:
 	SquareNode *createSquareNode(int type, int shap = -1);
 	void removeSquareNode(SquareNode *node);
 	std::vector<SquareNode*> loadSquareList();
-	std::vector<SquareNode*> createSquareList(bool autoAddScore = true);
+	std::vector<SquareNode*> createSquareList();
 	std::vector<int> getBallListType1();
 	std::vector<int> getBallListType2();
 	int getBallType(int probsArr[10][3], int size);
@@ -34,6 +34,7 @@ public:
 
 	void removeAroundSquare(SquareNode *node);
 	void removeSameRowSquare(SquareNode *node);
+	void removeSameColSquare(SquareNode *node);
 	void exchangeSquarePosition();
 
 	void clearSquares();

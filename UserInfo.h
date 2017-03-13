@@ -9,6 +9,7 @@
 #define GAME_PROP_COUNT     "game-prop-count"
 #define GAME_MARBLE_TYPE    "game-marble-type"
 #define GAME_LUCKY_LEVEL    "game-lucky-level"
+#define GAME_TARGET_LEVEL   "game-target-level"
 
 class UserInfo
 {
@@ -42,6 +43,10 @@ public:
 	bool hasGetLuckyLevel(int level);
 	void setLuckyLevel(int level);
 	void resetLuckyLevel();
+
+	void setTargetLevel();
+	int getTargetLevel();
+	void resetTargetLevel();
 
 private:
 	UserInfo(){}

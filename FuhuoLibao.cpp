@@ -5,10 +5,10 @@
 #include "GameController.h"
 #include "SquareModel.h"
 #include "GameConfig.h"
-#include "GameUtil.h"
 #include "UserInfo.h"
 #include "LibaoDialog.h"
 #include "MarbleModel.h"
+#include "DataHelper.h"
 
 USING_NS_CC;
 
@@ -44,7 +44,7 @@ bool FuhuoLibao::init()
 	if (!CCLayer::init()){
 		return false;
 	}
-	int curLevel = SquareModel::theModel()->getCurrentScore() - 1;
+	int curLevel = SquareModel::theModel()->getCurrentScore();
 	MyPurchase::sharedPurchase()->failStage(curLevel);
 
 	auto winSize = CCDirector::sharedDirector()->getWinSize();
@@ -97,11 +97,23 @@ void FuhuoLibao::initLayout()
 
 void FuhuoLibao::closePanel(CCObject *pSender)
 {
-	removeFromParent();
-	UserInfo::getInstance()->resetLuckyLevel();
 	MarbleModel::theModel()->setAttactRate(ATTACT_RATE);
-	GameUtil::clearGameInfo();
 	GameController::getInstance()->backToMainMenu();
+	int gameType = GameController::getInstance()->getGameType();
+	switch (gameType)
+	{
+	case kGame_Normal:
+		UserInfo::getInstance()->resetLuckyLevel();
+		DataHelper::getInstance()->clearGameInfo();
+		break;
+	case kGame_Shoot:
+		UserInfo::getInstance()->resetTargetLevel();
+		DataHelper::getInstance()->clearShootGameInfo();
+		break;
+	default:
+		break;
+	}
+	removeFromParent();
 }
 
 void FuhuoLibao::buyLibao(CCObject *pSender)
@@ -133,7 +145,7 @@ void FuhuoLibao::notifyViews()
 {
 	removeFromParent();
 	SquareModel::theModel()->removeBelowSquares();
-	GameUtil::saveGameInfo();
+	GameController::getInstance()->notifyViews();
 #if(BBDAN_SHENBAO == 1)
 	int fuhuoCostCoin = GameConfig::getInstance()->m_fuhuoCostCoin;
 	UserInfo::getInstance()->addCoins(-fuhuoCostCoin);

@@ -9,6 +9,7 @@
 #include "SquareModel.h"
 #include "SoundMgr.h"
 #include "GameConfig.h"
+#include "DataHelper.h"
 
 USING_NS_CC;
 
@@ -118,7 +119,7 @@ void SquareNode::moveDown(bool isLastOne /* = false */)
 	{
 		GameController::getInstance()->setRoundState(true);
 		GameController::getInstance()->checkGameOver();
-		GameUtil::saveGameInfo();
+		DataHelper::getInstance()->saveGameInfo();
 	});
 	actions->addAction(delay);
 	actions->addAction(move);

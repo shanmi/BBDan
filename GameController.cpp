@@ -14,6 +14,7 @@ GameController::GameController()
 , m_attactRate(ATTACT_RATE)
 , m_bISFirstIn(true)
 , m_bloodCount(PLAYER_BLOOD_COUNT)
+, m_gameType(kGame_Normal)
 {
 }
 
@@ -122,7 +123,7 @@ bool GameController::checkGameOver()
 				showGameOver();
 				return true;
 			}
-			SquareModel::theModel()->removeSquareNode(square);
+			//SquareModel::theModel()->removeSquareNode(square);
 		}
 	}
 	return false;

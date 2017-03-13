@@ -132,7 +132,7 @@ void UserInfo::setLuckyLevel(int level)
 void UserInfo::resetLuckyLevel()
 {
 	char temp[50] = { 0 };
-	int curLevel = SquareModel::theModel()->getCurrentScore() - 1;
+	int curLevel = SquareModel::theModel()->getCurrentScore();
 	auto luckyLevel = GameConfig::getInstance()->m_luckyLevel;
 	for (int i = 1; i <= curLevel; i++)
 	{
@@ -144,4 +144,22 @@ void UserInfo::resetLuckyLevel()
 		CCUserDefaultEx::sharedUserDefault()->setBoolForKey(temp, false);
 		CCUserDefaultEx::sharedUserDefault()->flush();
 	}
+}
+
+void UserInfo::setTargetLevel()
+{
+	int curTarget = getTargetLevel();
+	CCUserDefaultEx::sharedUserDefault()->setIntegerForKey(GAME_TARGET_LEVEL, curTarget * 2);
+	CCUserDefaultEx::sharedUserDefault()->flush();
+}
+
+int UserInfo::getTargetLevel()
+{
+	return CCUserDefaultEx::sharedUserDefault()->getIntegerForKey(GAME_TARGET_LEVEL, 10);
+}
+
+void UserInfo::resetTargetLevel()
+{
+	CCUserDefaultEx::sharedUserDefault()->setIntegerForKey(GAME_TARGET_LEVEL, 10);
+	CCUserDefaultEx::sharedUserDefault()->flush();
 }

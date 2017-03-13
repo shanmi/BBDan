@@ -4,6 +4,7 @@
 
 #define GAME_CONFIG "data/data_config.json"
 #define GAME_DATA "game.dat"
+#define GAME_SHOOT_DATA "game_shoot.dat"
 
 #define GAME_DATA_VERSION 1
 
