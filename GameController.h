@@ -21,6 +21,8 @@ struct INotifyView
 	virtual void showAddMarbleEffect(SquareNode *node){}
 	virtual void updateMarbleType(int type){}
 	virtual void updateProgress(){}
+	virtual void addBoss(){}
+	virtual void bossAttactEffect(int type){}
 };
 
 class GameController
@@ -44,6 +46,9 @@ public:
 	void showAddMarbleEffect(SquareNode *node){ NOTIFY_VIEWS(showAddMarbleEffect, node); }
 	void updateMarbleType(int type){ NOTIFY_VIEWS(updateMarbleType, type); }
 	void updateProgress(){ NOTIFY_VIEWS(updateProgress); }
+
+	void addBoss(){ NOTIFY_VIEWS(addBoss); }
+	void bossAttactEffect(int type){ NOTIFY_VIEWS(bossAttactEffect, type); }
 
 public:
 	void startOneRound();

@@ -167,6 +167,32 @@ void MarbleModel::clearMarbles()
 	m_marbles.clear();
 }
 
+void MarbleModel::updateMarbles()
+{
+	auto marbles = getMarbles();
+	for (auto iter = marbles.begin(); iter != marbles.end(); ++iter)
+	{
+		auto &marble = (*iter);
+		auto body = marble->getBody();
+		MarbleNode *ball = (MarbleNode*)(body->GetUserData());
+		float distance = body->GetLinearVelocity().x*body->GetLinearVelocity().x + body->GetLinearVelocity().y*body->GetLinearVelocity().y;
+		if (distance > 0 && distance < 400)
+		{
+			float angle = GameUtil::getDegreeTwoPoints(ccp(0, 0), ccp(body->GetLinearVelocity().x, body->GetLinearVelocity().y));
+			marble->shooterShoot(angle);
+		}
+		if (ball->isMoving())
+		{
+			b2Vec2 ballPosition = body->GetPosition();
+			ball->setPosition(ccp(ballPosition.x * PTM_RATIO, ballPosition.y * PTM_RATIO));
+		}
+		else
+		{
+			MarbleModel::theModel()->removeMarble(marble);
+		}
+	}
+}
+
 void MarbleModel::updateMarbles(cocos2d::CCRect invisibleRect, int addMarbleCount)
 {
 	auto m_marbles = getMarbles();

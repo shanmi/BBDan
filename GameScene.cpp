@@ -992,3 +992,4 @@ void GameScene::showBannerView(float dt)
 	}
 	m_bShowingBanner = !m_bShowingBanner;
 }
+

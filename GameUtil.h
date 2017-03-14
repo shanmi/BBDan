@@ -38,6 +38,8 @@ namespace GameUtil
 
 	int getLuckyLevel();
 	int getLastLuckyLevel();
+
+	cocos2d::CCParticleMeteor *getBossSkillEffect(cocos2d::CCPoint pos1, cocos2d::CCPoint pos2);
 }
 
 #endif

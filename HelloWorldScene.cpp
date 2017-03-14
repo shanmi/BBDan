@@ -4,6 +4,7 @@
 #include "Config.h"
 #include "GameUtil.h"
 #include "Box2dFactory.h"
+#include "BossView.h"
 
 USING_NS_CC;
 
@@ -32,7 +33,7 @@ bool HelloWorld::init()
         return false;
     }
     
-	Box2dFactory::getInstance()->initPhysics(false);
+	Box2dFactory::getInstance()->initPhysics(true);
 
     CCSize visibleSize = CCDirector::sharedDirector()->getVisibleSize();
     CCPoint origin = CCDirector::sharedDirector()->getVisibleOrigin();
@@ -50,7 +51,8 @@ bool HelloWorld::init()
 		{
 			auto node = squares[i];
 			node->setPosition(ccp(node->getContentSize().width / 2 + 4 + node->getIndex().x * (node->getContentSize().width + 4), node->getContentSize().height / 2 + n*(node->getContentSize().height+4)));
-			//addChild(node);
+			addChild(node);
+			node->setVisible(false);
 		}
 	}
 
@@ -64,13 +66,13 @@ bool HelloWorld::init()
 	auto actions = CCRepeatForever::create(sequence);
 	runAction(actions);*/
 
-	CCParticleSun* par = CCParticleSun::create();
-	par->setStartSize(60);
-	par->setEmissionRate(100);
-	par->setAnchorPoint(ccp(0.5f, 0.5f));
-	par->setPosition(0, 0);
-	par->setTexture(CCTextureCache::sharedTextureCache()->addImage("particle/fire.png"));
-	addChild(par, 10);
+	//CCParticleSun* par = CCParticleSun::create();
+	//par->setStartSize(60);
+	//par->setEmissionRate(100);
+	//par->setAnchorPoint(ccp(0.5f, 0.5f));
+	//par->setPosition(0, 0);
+	//par->setTexture(CCTextureCache::sharedTextureCache()->addImage("particle/fire.png"));
+	//addChild(par, 10);
 
 	//auto fire = CCParticleMeteor::create();
 	//par->setStartSize(60);
@@ -79,12 +81,18 @@ bool HelloWorld::init()
 	//fire->setPosition(230, 600);
 	//addChild(fire);
 
-	auto delay = CCDelayTime::create(1.0f);
+	/*auto delay = CCDelayTime::create(1.0f);
 	auto moveTo = CCMoveBy::create(1.0f, ccp(0, -500));
 	auto moveBack = moveTo->reverse();
 	auto sequence = CCSequence::create(delay, moveTo, moveBack, NULL);
-	auto actions = CCRepeatForever::create(sequence);
+	auto actions = CCRepeatForever::create(sequence);*/
 	//par->runAction(actions);
+
+	auto winSize = CCDirector::sharedDirector()->getWinSize();
+	m_bossView = BossView::create(kBoss_Ghost);
+	m_bossView->setPosition(ccp(winSize.width / 2, winSize.height * 0.7f));
+	addChild(m_bossView);
+	m_bossView->setBody();
 
     return true;
 }
@@ -120,6 +128,8 @@ bool HelloWorld::ccTouchBegan(cocos2d::CCTouch *pTouch, cocos2d::CCEvent *pEvent
 	effect->setPositionY(position.y);
 	addChild(effect);
 
+	m_bossView->startMoveAction();
+
 	return true;
 }
 
@@ -133,4 +143,10 @@ void HelloWorld::onExit()
 {
 	CCLayer::onExit();
 	CCDirector::sharedDirector()->getTouchDispatcher()->removeDelegate(this);
+}
+
+void HelloWorld::draw()
+{
+	CCLayer::draw();
+	Box2dFactory::getInstance()->debugDraw();
 }

@@ -22,6 +22,7 @@ void SoundMgr::init()
 	audioMgr->preloadEffect(Effect_Pop1);
 	audioMgr->preloadEffect(Effect_Pop2);
 	audioMgr->preloadEffect(Effect_Pop3);
+	audioMgr->preloadEffect(Effect_Boss);
 }
 
 void SoundMgr::playBackground()

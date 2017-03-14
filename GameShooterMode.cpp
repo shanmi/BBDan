@@ -20,6 +20,8 @@
 #include "CharacterView.h"
 #include "DataHelper.h"
 #include "FuhuoLibao.h"
+#include "BossView.h"
+#include "SoundMgr.h"
 
 USING_NS_CC;
 
@@ -486,34 +488,11 @@ void GameShooterMode::update(float dt)
 	}
 	int32 velocityIterations = 8;
 	int32 positionIterations = 1;
-
 	m_world->Step(dt, velocityIterations, positionIterations);
 	m_world->ClearForces();
 
 	addMarble(dt);
-
-	auto marbles = MarbleModel::theModel()->getMarbles();
-	for (auto iter = marbles.begin(); iter != marbles.end(); ++iter)
-	{
-		auto &marble = (*iter);
-		auto body = marble->getBody();
-		MarbleNode *ball = (MarbleNode*)(body->GetUserData());
-		float distance = body->GetLinearVelocity().x*body->GetLinearVelocity().x + body->GetLinearVelocity().y*body->GetLinearVelocity().y;
-		if (distance > 0 && distance < 400)
-		{
-			float angle = GameUtil::getDegreeTwoPoints(ccp(0, 0), ccp(body->GetLinearVelocity().x, body->GetLinearVelocity().y));
-			marble->shooterShoot(angle);
-		}
-		if (ball->isMoving())
-		{
-			b2Vec2 ballPosition = body->GetPosition();
-			ball->setPosition(ccp(ballPosition.x * PTM_RATIO, ballPosition.y * PTM_RATIO));
-		}
-		else
-		{
-			MarbleModel::theModel()->removeMarble(marble);
-		}
-	}
+	MarbleModel::theModel()->updateMarbles();
 
 	if (m_shotgunsTime > 0)
 	{
@@ -705,7 +684,7 @@ void GameShooterMode::notifyViews()
 void GameShooterMode::defenseCrash(SquareNode *node)
 {
 	Index index = node->getIndex();
-	CCSprite *defense = dynamic_cast<CCSprite*>(m_mainLayout->getChildById(10+index.x));
+	CCSprite *defense = dynamic_cast<CCSprite*>(m_mainLayout->getChildById(10 + index.x));
 	if (defense->isVisible())
 	{
 		SquareModel::theModel()->removeSameColSquare(node);
@@ -738,6 +717,10 @@ void GameShooterMode::updateProgress()
 	int targetLevel = UserInfo::getInstance()->getTargetLevel();
 	int lastLevel = 0;// targetLevel <= 10 ? 0 : targetLevel / 2;
 	float gotoPos;
+	if (curLevel * 2 == targetLevel)
+	{
+		addBoss();
+	}
 	if (targetLevel == lastLevel)
 	{
 		gotoPos = target->getPositionX();
@@ -760,4 +743,49 @@ void GameShooterMode::updateProgress()
 	m_progressTimer->runAction(CCProgressFromTo::create(1, curPercentage, percentage));
 
 	targetLabel->setString(GameUtil::intToString(targetLevel).c_str());
+}
+
+void GameShooterMode::updateMarbleType(int type)
+{
+	auto attr = MarbleModel::theModel()->getMarbleAttrByType(type);
+	MarbleModel::theModel()->setMarbleAttr(attr);
+	for (int i = kMarble_Faster; i <= kMarble_Bomb; i++)
+	{
+		CCMenuItem *ballBtn = dynamic_cast<CCMenuItem*>(m_bottomLayout->getChildById(i + 9));
+		ballBtn->stopAllActions();
+		ballBtn->setScale(1.0f);
+		if (type == i)
+		{
+			ballBtn->setColor(ccc3(255, 255, 255));
+			auto action = GameUtil::getRepeatScaleAction();
+			ballBtn->runAction(action);
+		}
+	}
+}
+
+void GameShooterMode::bossAttactEffect(int type)
+{
+	CCLog("attact type = %d", type);
+	switch (type)
+	{
+	case kBoss_Ghost:
+		break;
+	case kBoss_Spider:
+		break;
+	case kBoss_Moth:
+		break;
+
+	}
+	auto bossEffect = GameUtil::getBossSkillEffect(m_bossView->getPosition(), m_arrow->getPosition());
+	addChild(bossEffect, 1000);
+}
+
+void GameShooterMode::addBoss()
+{
+	SoundMgr::theMgr()->playEffect(Effect_Boss);
+	auto winSize = CCDirector::sharedDirector()->getWinSize();
+	m_bossView = BossView::create(kBoss_Spider);
+	m_bossView->setPosition(ccp(winSize.width / 2, winSize.height * 0.8f));
+	m_bossView->startMoveAction();
+	addChild(m_bossView, kZOrder_Boss);
 }

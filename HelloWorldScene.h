@@ -3,6 +3,7 @@
 
 #include "cocos2d.h"
 
+class BossView;
 class HelloWorld : public cocos2d::CCLayer
 {
 public:
@@ -20,11 +21,13 @@ public:
 
 	void onEnter();
 	void onExit();
+	virtual void draw();
 	bool ccTouchBegan(cocos2d::CCTouch *pTouch, cocos2d::CCEvent *pEvent);
 
 public:
 	cocos2d::CCMotionStreak *m_streak;
 	cocos2d::CCSprite *m_root;
+	BossView *m_bossView;
 };
 
 #endif // __HELLOWORLD_SCENE_H__

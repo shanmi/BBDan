@@ -7,6 +7,7 @@
 #include "ccMacros.h"
 #include "CircleNode.h"
 #include "MarbleModel.h"
+#include "BossView.h"
 
 USING_NS_CC;
 
@@ -37,6 +38,13 @@ void ContactShooterListener::BeginContact(b2Contact* contact)
 			marble->setVisible(false);
 			marble->stop();
 		}
+		else if (node->getTag() == kTag_Boss)
+		{
+			marble->setVisible(false);
+			marble->stop();
+			auto boss = dynamic_cast<BossView*>(node);
+			boss->addBlood(-1);
+		}
 		else
 		{
 			auto square = dynamic_cast<SquareNode*>(node);
@@ -48,26 +56,6 @@ void ContactShooterListener::BeginContact(b2Contact* contact)
 			}
 			marble->stop();
 			marble->setVisible(false);
-		}
-	}
-	else
-	{
-		MarbleNode *marble;
-		if (spriteA != nullptr)
-		{
-			marble = dynamic_cast<MarbleNode*>(spriteA);
-		}
-		else
-		{
-			marble = dynamic_cast<MarbleNode*>(spriteB);
-		}
-		marble->stop();
-		marble->addReboundTimes();
-
-		bool isMarbleNeverStop = MarbleModel::theModel()->isMarblesNerverStop();
-		if (isMarbleNeverStop)
-		{
-			GameController::getInstance()->createPropByMarble(marble);
 		}
 	}
 }

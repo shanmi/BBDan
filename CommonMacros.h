@@ -30,6 +30,7 @@ enum GameZOrder
 	kZOrder_EliEffect,
 	kZOrder_Square,
 	kZOrder_Marble,
+	kZOrder_Boss,
 	kZOrder_Darkness,
 	kZOrder_Character,
 	kZOrder_Layout,
@@ -88,6 +89,7 @@ enum ViewTag
 {
 	kTag_Streak = 100,
 	kTag_Wall = 200,
+	kTag_Boss = 210,
 	kTag_Marble = 300,
 	kTag_Pause,
 	kTag_Shop,
@@ -111,6 +113,13 @@ enum ToastType
 	kToast_No_Prop
 };
 
+enum BossType
+{
+	kBoss_Ghost,
+	kBoss_Spider,
+	kBoss_Moth,
+	kBoss_Max
+};
 #define NOTIFY_VIEWS(_FUNC_ ,...)						\
 for (size_t index = 0; index < m_views.size(); ++index) \
 {														\

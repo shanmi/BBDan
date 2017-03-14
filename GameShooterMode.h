@@ -8,6 +8,7 @@
 class UiLayout;
 class MarbleNode;
 class CharacterView;
+class BossView;
 class GameShooterMode 
 	: public cocos2d::CCLayer
 	, public INotifyView
@@ -40,6 +41,9 @@ public:
 	void useShotGunsEffect();
 	void getBloodEffect();
 	void notifyViews();
+	void updateMarbleType(int type);
+	void addBoss();
+	void bossAttactEffect(int type);
 public:
 	void onPauseGame(cocos2d::CCObject *pSender);
 	void onDoubleAttact(cocos2d::CCObject *pSender);
@@ -68,6 +72,7 @@ private:
 	CharacterView *m_characterView;
 	cocos2d::CCSprite *m_arrow;
 	cocos2d::CCProgressTimer *m_progressTimer;
+	BossView *m_bossView;
 	float m_topLinePos;
 	float m_bottomLinePos;
 	float m_shootDegree;

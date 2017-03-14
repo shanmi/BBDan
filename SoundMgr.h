@@ -9,6 +9,7 @@
 #define Effect_Lazer		"sounds/lazer.ogg"
 #define Effect_Coin			"sounds/coin.ogg"
 #define Effect_GameOver		"sounds/gameover.ogg"
+#define Effect_Boss			"sounds/boss_alarm.ogg"	
 
 class SoundMgr
 {

@@ -32,6 +32,7 @@ public:
 	void clearMarbles();
 
 	void updateMarbles(cocos2d::CCRect invisibleRect, int addMarbleCount);
+	void updateMarbles();
 private:
 	MarbleModel();
 

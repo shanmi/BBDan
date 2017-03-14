@@ -4,6 +4,8 @@
 #include "MarbleModel.h"
 #include "GameController.h"
 #include "UserInfo.h"
+#include "ActionSequence.h"
+#include "CCFunctionAction.h"
 
 USING_NS_CC;
 
@@ -288,7 +290,7 @@ CCSprite *GameUtil::getAchievementEffect(int type)
 	auto effect = CCSprite::create(temp);
 	auto winSize = CCDirector::sharedDirector()->getWinSize();
 	effect->setPosition(ccp(-effect->getContentSize().width / 2, winSize.height *0.6f));
-	auto move1 = CCMoveBy::create(0.5f, ccp(winSize.width / 2, 0));
+	auto move1 = CCMoveBy::create(0.5f, ccp(winSize.width / 2 + 40, 0));
 	auto ease1 = CCEaseSineInOut::create(move1);
 	auto delayMove = CCMoveBy::create(0.3f, ccp(effect->getContentSize().width / 2, 0));
 	auto move2 = CCMoveBy::create(0.5f, ccp(winSize.width / 2 + effect->getContentSize().width, 0));;
@@ -396,4 +398,27 @@ int GameUtil::getLastLuckyLevel()
 		}
 	}
 	return lastLevel;
+}
+
+CCParticleMeteor *GameUtil::getBossSkillEffect(CCPoint pos1, CCPoint pos2)
+{
+	CCParticleMeteor* shootingEffect = CCParticleMeteor::create();
+	shootingEffect->setPosition(pos1);
+	shootingEffect->setAutoRemoveOnFinish(true);
+	shootingEffect->setEmitterMode(kCCParticleModeRadius);
+	shootingEffect->setDuration(0.2);
+	int degree = GameUtil::getDegreeTwoPoints(pos1, pos2);
+	shootingEffect->setAngleVar(degree);
+	shootingEffect->setStartRadiusVar(6);
+	shootingEffect->setEndRadiusVar(2);
+
+	auto actions = ActionSequence::create(shootingEffect);
+	auto moveTo = CCMoveTo::create(0.2f, pos2);
+	actions->addAction(moveTo);
+	auto callback = CCFunctionAction::create([=](){
+		shootingEffect->removeFromParent();
+	});
+	actions->addAction(callback);
+	actions->runActions();
+	return shootingEffect;
 }
