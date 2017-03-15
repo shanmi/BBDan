@@ -36,13 +36,9 @@ bool BossView::init()
 
 	setTag(kTag_Boss);
 	int targetLevel = UserInfo::getInstance()->getTargetLevel();
-	k_bloodRecord = targetLevel;
-	m_bloodCount = targetLevel;
-
-	/*auto winSize = CCDirector::sharedDirector()->getWinSize();
-	auto colorLayer = CCLayerColor::create(ccc4(0, 0, 0, 200));
-	addChild(colorLayer);
-	colorLayer->runAction(CCFadeOut::create(1.0f));*/
+	int bloodCount = GameController::getInstance()->getBossBloodCount();
+	k_bloodRecord = targetLevel*100;
+	m_bloodCount = bloodCount * 100;
 
 	std::string path = "animation/boss/diren001_bossyouling.ExportJson";
 	CCPoint anchor = ccp(0.5f, 0.5f);
@@ -82,7 +78,8 @@ bool BossView::init()
 	m_bloodProgress->setType(kCCProgressTimerTypeBar);
 	m_bloodProgress->setMidpoint(ccp(0, 1));
 	m_bloodProgress->setBarChangeRate(ccp(1, 0));
-	m_bloodProgress->setPercentage(100);
+	float curProgress = m_bloodCount * 100.0f / k_bloodRecord;
+	m_bloodProgress->setPercentage(curProgress);
 	m_bloodProgress->setPosition(ccp(progress_bg->getContentSize().width / 2, progress_bg->getContentSize().height / 2));
 	progress_bg->addChild(m_bloodProgress);
 
@@ -98,51 +95,56 @@ void BossView::startMoveAction()
 {
 	auto winSize = CCDirector::sharedDirector()->getWinSize();
 	m_armature->getAnimation()->play("yidong");
+	bool isGamePause = GameController::getInstance()->isGamePause();
 
 	auto actions = ActionSequence::create(this);
-	int kMovePosCount = 3;
-	m_posIndex = (m_posIndex + 1) % kMovePosCount;
-	CCPoint targetPos = getPosition();
-	switch (m_posIndex)
+	if (!isGamePause)
 	{
-	case 0:
-		targetPos = ccp(winSize.width / 2, targetPos.y + m_armature->getContentSize().height);
-		break;
-	case 1:
-		targetPos = ccp(m_armature->getContentSize().width*0.6f, targetPos.y - m_armature->getContentSize().height);
-		break;
-	case 2:
-		targetPos = ccp(winSize.width - m_armature->getContentSize().width*0.6f, targetPos.y);
-		break;
+		int kMovePosCount = 3;
+		m_posIndex = (m_posIndex + 1) % kMovePosCount;
+		CCPoint targetPos = getPosition();
+		switch (m_posIndex)
+		{
+		case 0:
+			targetPos = ccp(winSize.width / 2, targetPos.y + m_armature->getContentSize().height);
+			break;
+		case 1:
+			targetPos = ccp(m_armature->getContentSize().width*0.6f, targetPos.y - m_armature->getContentSize().height);
+			break;
+		case 2:
+			targetPos = ccp(winSize.width - m_armature->getContentSize().width*0.6f, targetPos.y);
+			break;
+		}
+		auto moveTo = CCMoveTo::create(1.0f, targetPos);
+		actions->addAction(moveTo);
+		CCFunctionAction *doSleep = CCFunctionAction::create([=](){
+			doSleepAction();
+			if (getPositionX() < winSize.width / 2)
+			{
+				m_armature->setScaleX(-1);
+			}
+			else
+			{
+				m_armature->setScaleX(1);
+			}
+		});
+		actions->addAction(doSleep);
+		auto delay1 = CCDelayTime::create(0.5f);
+		actions->addAction(delay1);
+		CCFunctionAction *doAttact = CCFunctionAction::create([=](){
+			doAttactAction();
+		});
+		actions->addAction(doAttact);
+		auto delay2 = CCDelayTime::create(0.5f);
+		actions->addAction(delay2);
+		CCFunctionAction *doEffect = CCFunctionAction::create([=](){
+			bossAttactEffect();
+		});
+		actions->addAction(doEffect);
+		auto delay3 = CCDelayTime::create(1.5f);
+		actions->addAction(delay3);
 	}
-	auto moveTo = CCMoveTo::create(1.0f, targetPos);
-	actions->addAction(moveTo);
-	CCFunctionAction *doSleep = CCFunctionAction::create([=](){
-		doSleepAction();
-		if (getPositionX() < winSize.width / 2)
-		{
-			m_armature->setScaleX(-1);
-		}
-		else
-		{
-			m_armature->setScaleX(1);
-		}
-	});
-	actions->addAction(doSleep);
-	auto delay1 = CCDelayTime::create(0.5f);
-	actions->addAction(delay1);
-	CCFunctionAction *doAttact = CCFunctionAction::create([=](){
-		doAttactAction();
-	});
-	actions->addAction(doAttact);
-	auto delay2 = CCDelayTime::create(0.5f);
-	actions->addAction(delay2);
-	CCFunctionAction *doEffect = CCFunctionAction::create([=](){
-		bossAttactEffect();
-	});
-	actions->addAction(doEffect);
-	auto delay3 = CCDelayTime::create(1.5f);
-	actions->addAction(delay3);
+
 	CCFunctionAction *doMove = CCFunctionAction::create([=](){
 		startMoveAction();
 	});
@@ -187,6 +189,7 @@ void BossView::addBlood(int count)
 	}
 	float progress = m_bloodCount * 100.0f / k_bloodRecord;
 	m_bloodProgress->runAction(CCProgressFromTo::create(0.2f, m_bloodProgress->getPercentage(), progress));
+	GameController::getInstance()->setBossBloodCount(m_bloodCount);
 }
 
 void BossView::runDieEffect()

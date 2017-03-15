@@ -389,8 +389,9 @@ void SquareModel::removeSameColSquare(SquareNode *node)
 
 void SquareModel::exchangeSquarePosition()
 {
+	int gameType = GameController::getInstance()->getGameType();
 	int curLevel = SquareModel::theModel()->getCurrentScore();
-	if (curLevel < GameConfig::getInstance()->m_reorderLevel)
+	if (curLevel < GameConfig::getInstance()->m_reorderLevel && gameType == kGame_Normal)
 	{
 		return;
 	}
@@ -434,16 +435,52 @@ void SquareModel::clearSquares()
 	m_curScore = 1;
 }
 
-int SquareModel::getRemainSqaure()
+std::vector<SquareNode*> SquareModel::getRemainSqaure()
 {
-	int count = 0;
+	std::vector<SquareNode*> remains;
 	for (auto iter = m_squares.begin(); iter != m_squares.end(); ++iter)
 	{
 		auto square = *iter;
 		if (square->getSquareType() == kType_Square || square->getSquareType() == kType_Triangle)
 		{
-			count++;
+			remains.push_back(square);
 		}
 	}
-	return count;
+	return remains;
+}
+
+SquareNode * SquareModel::addDoubleScore()
+{
+	auto remains = getRemainSqaure();
+	int index = rand() % remains.size();
+	auto node = remains.at(index);
+	node->setScore(node->getScore() * 2);
+	return node;
+}
+
+SquareNode * SquareModel::addDoubleSpeed()
+{
+	auto remains = getRemainSqaure();
+	int size = remains.size();
+	int index = rand() % size;
+	SquareNode *node;
+	for (int i = index; i < size + index; i++)
+	{
+		node = remains.at(index % size);
+		if (node->getSpeed() <= BLOCK_SPEED)
+		{
+			node->setSpeed(node->getSpeed() * 2);
+			break;
+		}
+	}
+	return node;
+}
+
+SquareNode *SquareModel::createRandomSquare()
+{
+	SquareNode *node = createSquareNode(kType_Square);
+	node->setBody();
+	node->setIndex(0, 0);
+	m_squares.push_back(node);
+	return node;
 }

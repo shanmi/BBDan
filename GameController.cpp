@@ -15,6 +15,8 @@ GameController::GameController()
 , m_bISFirstIn(true)
 , m_bloodCount(PLAYER_BLOOD_COUNT)
 , m_gameType(kGame_Normal)
+, m_bIsGamePause(false)
+, m_bossBloodCount(0)
 {
 }
 

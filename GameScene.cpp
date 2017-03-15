@@ -428,7 +428,7 @@ void GameScene::checkLibaoShow()
 
 void GameScene::checkAchievent()
 {
-	int count = SquareModel::theModel()->getRemainSqaure();
+	int count = SquareModel::theModel()->getRemainSqaure().size();
 	if (count == 0)
 	{
 		int random = rand() % 3 + 1;

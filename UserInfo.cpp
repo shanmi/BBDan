@@ -163,3 +163,4 @@ void UserInfo::resetTargetLevel()
 	CCUserDefaultEx::sharedUserDefault()->setIntegerForKey(GAME_TARGET_LEVEL, 10);
 	CCUserDefaultEx::sharedUserDefault()->flush();
 }
+

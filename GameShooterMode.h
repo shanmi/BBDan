@@ -63,6 +63,7 @@ public:
 	void onMarbleChange(cocos2d::CCObject *pSender);
 	void defenseCrash(SquareNode *node);
 	void updateProgress();
+	void saveGameData();
 
 private:
 	b2World *m_world;
@@ -83,6 +84,7 @@ private:
 	float m_protectTime;
 	float m_shotgunsTime;
 	float m_addMarbleTime;
+	bool m_bIsGamePause;
 	bool m_bIsGameOver;
 };
 #endif

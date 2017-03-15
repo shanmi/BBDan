@@ -38,7 +38,11 @@ public:
 	void exchangeSquarePosition();
 
 	void clearSquares();
-	int getRemainSqaure();
+	std::vector<SquareNode*> getRemainSqaure();
+
+	SquareNode *addDoubleScore();
+	SquareNode *addDoubleSpeed();
+	SquareNode *createRandomSquare();
 
 private:
 	SquareModel();

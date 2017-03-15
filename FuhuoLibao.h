@@ -24,6 +24,7 @@ public:
 	void initLayout();
 	void closePanel(cocos2d::CCObject *pSender);
 	void buyLibao(cocos2d::CCObject *pSender);
+	void pauseGame(float dt);
 
 private:
 	UiLayout *m_mainLayout;

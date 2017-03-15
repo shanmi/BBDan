@@ -17,7 +17,8 @@
 
 
 //shoot mode
-#define BALL_MOVE_SPEED 30
+#define BLOCK_DISTANCE 150
+#define BLOCK_SPEED 0.5f
 #define FREEZING_TIME 5
 #define PROTECT_TIME  10
 #define SHOTGUNS_TIME 10

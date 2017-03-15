@@ -25,6 +25,7 @@ void ShopSkinLayer::onEnter()
 	CCLayer::onEnter();
 	CCDirector::sharedDirector()->getTouchDispatcher()->addTargetedDelegate(this, kPriority_Shop, true);
 	GameController::getInstance()->addView(this);
+	GameController::getInstance()->setGamePause(true);
 }
 
 void ShopSkinLayer::onExit()
@@ -32,6 +33,7 @@ void ShopSkinLayer::onExit()
 	CCLayer::onExit();
 	CCDirector::sharedDirector()->getTouchDispatcher()->removeDelegate(this);
 	GameController::getInstance()->removeView(this);
+	GameController::getInstance()->setGamePause(false);
 }
 
 bool ShopSkinLayer::ccTouchBegan(cocos2d::CCTouch *pTouch, cocos2d::CCEvent *pEvent)

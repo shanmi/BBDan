@@ -168,6 +168,8 @@ int DataHelper::loadShootGameInfo(){
 			int shap = xorEncDecInt(temp);
 			getInt(temp, file);
 			int score = xorEncDecInt(temp);
+			getInt(temp, file);
+			int speed = xorEncDecInt(temp);
 
 			SquareNode *node = SquareModel::theModel()->createSquareNode(type, shap);
 			if (node != nullptr)
@@ -176,8 +178,12 @@ int DataHelper::loadShootGameInfo(){
 				node->setIndex(x, y);
 				node->setPosition(ccp(posx, posy));
 				node->setScore(score);
+				node->setSpeed(speed);
 			}
 		}
+		getInt(temp, file);
+		int bossBloodCount = xorEncDecInt(temp);
+		GameController::getInstance()->setBossBloodCount(bossBloodCount);
 		fclose(file);
 		return OK;
 	}
@@ -207,6 +213,7 @@ int DataHelper::saveShootGameInfo(){
 			int shap = square->getTag(); //for triangle is 0~3, other is -1
 			int score = square->getScore();
 			Index index = square->getIndex();
+			int speed = square->getSpeed();
 			putInt(xorEncDecInt(index.x), file);
 			putInt(xorEncDecInt(index.y), file);
 			putInt(xorEncDecInt(pos.x), file);
@@ -214,7 +221,10 @@ int DataHelper::saveShootGameInfo(){
 			putInt(xorEncDecInt(type), file);
 			putInt(xorEncDecInt(shap), file);
 			putInt(xorEncDecInt(score), file);
+			putInt(xorEncDecInt(speed), file);
 		}
+		int bossBloodCount = GameController::getInstance()->getBossBloodCount();
+		putInt(xorEncDecInt(bossBloodCount), file);
 		fclose(file);
 		return OK;
 	}

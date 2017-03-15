@@ -55,6 +55,9 @@ public:
 	int getScore() { return m_score; }
 	void setScore(int score){ m_score = score; addScore(0); }
 
+	float getSpeed() { return m_speed; }
+	void setSpeed(int speed){ m_speed = speed; }
+
 	int getSquareType(){ return m_squareType; }
 	b2Body *getBody(){ return m_body; }
 
@@ -79,7 +82,7 @@ protected:
 	int m_score;
 	Index m_index;
 	int m_color;
-
+	float m_speed;
 };
 
 class TriangleNode : public SquareNode

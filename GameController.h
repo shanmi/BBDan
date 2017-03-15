@@ -94,6 +94,12 @@ public:
 	int getGameType(){ return m_gameType; }
 	void setGameType(int type){ m_gameType = type; }
 
+	bool isGamePause(){ return m_bIsGamePause; }
+	void setGamePause(bool isPause) { m_bIsGamePause = isPause; }
+
+	int getBossBloodCount(){ return m_bossBloodCount; }
+	void setBossBloodCount(int count){ m_bossBloodCount = count; }
+
 private:
 	GameController();
 
@@ -107,6 +113,8 @@ private:
 	bool m_bISFirstIn;
 	int m_bloodCount;
 	int m_gameType;
+	bool m_bIsGamePause;
+	int m_bossBloodCount;
 };
 
 #endif

@@ -17,6 +17,7 @@ SquareNode::SquareNode()
 :m_scoreLabel(NULL)
 , m_body(NULL)
 , m_squareType(kType_Square)
+, m_speed(BLOCK_SPEED)
 {
 
 }

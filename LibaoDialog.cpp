@@ -29,6 +29,10 @@ void LibaoDialog::onEnter()
 		}
 		MyPurchase::sharedPurchase()->showToast(toastTpe);
 	}
+	else
+	{
+		GameController::getInstance()->setGamePause(true);
+	}
 }
 
 void LibaoDialog::onExit()
@@ -36,6 +40,7 @@ void LibaoDialog::onExit()
 	CCLayer::onExit();
 	CCDirector::sharedDirector()->getTouchDispatcher()->removeDelegate(this);
 	GameController::getInstance()->removeView(this);
+	GameController::getInstance()->setGamePause(false);
 }
 
 bool LibaoDialog::ccTouchBegan(cocos2d::CCTouch *pTouch, cocos2d::CCEvent *pEvent)

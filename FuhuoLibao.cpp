@@ -17,6 +17,7 @@ void FuhuoLibao::onEnter()
 	CCLayer::onEnter();
 	CCDirector::sharedDirector()->getTouchDispatcher()->addTargetedDelegate(this, kPriority_Libao, true);
 	GameController::getInstance()->addView(this);
+	GameController::getInstance()->setGamePause(true);
 }
 
 void FuhuoLibao::onExit()
@@ -24,6 +25,7 @@ void FuhuoLibao::onExit()
 	CCLayer::onExit();
 	CCDirector::sharedDirector()->getTouchDispatcher()->removeDelegate(this);
 	GameController::getInstance()->removeView(this);
+	GameController::getInstance()->setGamePause(false);
 }
 
 bool FuhuoLibao::ccTouchBegan(cocos2d::CCTouch *pTouch, cocos2d::CCEvent *pEvent)
@@ -108,6 +110,7 @@ void FuhuoLibao::closePanel(CCObject *pSender)
 		break;
 	case kGame_Shoot:
 		UserInfo::getInstance()->resetTargetLevel();
+		GameController::getInstance()->setBossBloodCount(0);
 		DataHelper::getInstance()->clearShootGameInfo();
 		break;
 	default:
@@ -144,7 +147,18 @@ void FuhuoLibao::buyLibao(CCObject *pSender)
 void FuhuoLibao::notifyViews()
 {
 	removeFromParent();
-	SquareModel::theModel()->removeBelowSquares();
+	int gameType = GameController::getInstance()->getGameType();
+	switch (gameType)
+	{
+	case kGame_Normal:
+		SquareModel::theModel()->removeBelowSquares();
+		break;
+	case kGame_Shoot:
+		SquareModel::theModel()->removeBelowSquares(); // 先清除下面的方块
+		SquareModel::theModel()->removeAllSquares();
+		break;
+	}
+
 	GameController::getInstance()->notifyViews();
 #if(BBDAN_SHENBAO == 1)
 	int fuhuoCostCoin = GameConfig::getInstance()->m_fuhuoCostCoin;
