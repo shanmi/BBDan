@@ -12,27 +12,38 @@ DataHelper *DataHelper::getInstance()
 	return &helper;
 }
 
-void DataHelper::putInt(int src, FILE* file){
-	int temp = src;
-	fwrite((char *)(&temp), sizeof(temp), 1, file);
-}
-
 void DataHelper::putString(std::string str, FILE* file)
 {
 	fwrite(str.c_str(), str.size(), 1, file);
-}
-
-void DataHelper::getInt(int &temp, FILE* file){
-	fread((char *)(&temp), sizeof(temp), 1, file);
 }
 
 void DataHelper::getString(std::string &str, FILE* file){
 	fread(&str, str.size(), 1, file);
 }
 
+
+void DataHelper::putInt(int src, FILE* file){
+	int temp = src;
+	fwrite((char *)(&temp), sizeof(temp), 1, file);
+}
+
+void DataHelper::getInt(int &temp, FILE* file){
+	fread((char *)(&temp), sizeof(temp), 1, file);
+}
+
 int DataHelper::xorEncDecInt(int ch){
 	return ch ^ 0x8B7E;
 }
+
+void DataHelper::putFloat(float src, FILE* file){
+	float temp = src;
+	fwrite((&temp), sizeof(temp), 1, file);
+}
+
+void DataHelper::getFloat(float &temp, FILE* file){
+	fread((&temp), sizeof(temp), 1, file);
+}
+
 
 int DataHelper::loadGameInfo(){
 	std::string path = CCFileUtils::sharedFileUtils()->getWritablePath() + GAME_DATA;
@@ -168,8 +179,8 @@ int DataHelper::loadShootGameInfo(){
 			int shap = xorEncDecInt(temp);
 			getInt(temp, file);
 			int score = xorEncDecInt(temp);
-			getInt(temp, file);
-			int speed = xorEncDecInt(temp);
+			float speed;
+			getFloat(speed, file);
 
 			SquareNode *node = SquareModel::theModel()->createSquareNode(type, shap);
 			if (node != nullptr)
@@ -184,6 +195,13 @@ int DataHelper::loadShootGameInfo(){
 		getInt(temp, file);
 		int bossBloodCount = xorEncDecInt(temp);
 		GameController::getInstance()->setBossBloodCount(bossBloodCount);
+		auto crystalBloods = GameController::getInstance()->getCrystalBloods();
+		for (auto iter = crystalBloods.begin(); iter != crystalBloods.end(); ++iter)
+		{
+			getInt(temp, file);
+			auto &blood = *iter;
+			blood = xorEncDecInt(temp);
+		}
 		fclose(file);
 		return OK;
 	}
@@ -213,7 +231,7 @@ int DataHelper::saveShootGameInfo(){
 			int shap = square->getTag(); //for triangle is 0~3, other is -1
 			int score = square->getScore();
 			Index index = square->getIndex();
-			int speed = square->getSpeed();
+			float speed = square->getSpeed();
 			putInt(xorEncDecInt(index.x), file);
 			putInt(xorEncDecInt(index.y), file);
 			putInt(xorEncDecInt(pos.x), file);
@@ -221,10 +239,16 @@ int DataHelper::saveShootGameInfo(){
 			putInt(xorEncDecInt(type), file);
 			putInt(xorEncDecInt(shap), file);
 			putInt(xorEncDecInt(score), file);
-			putInt(xorEncDecInt(speed), file);
+			putFloat(speed, file);
 		}
 		int bossBloodCount = GameController::getInstance()->getBossBloodCount();
 		putInt(xorEncDecInt(bossBloodCount), file);
+		auto crystalBloods = GameController::getInstance()->getCrystalBloods();
+		for (auto iter = crystalBloods.begin(); iter != crystalBloods.end(); ++iter)
+		{
+			auto blood = *iter;
+			putInt(xorEncDecInt(blood), file);
+		}
 		fclose(file);
 		return OK;
 	}

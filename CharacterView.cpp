@@ -18,6 +18,22 @@ bool CharacterView::init()
 		return false;
 	}
 
+	int gameType = GameController::getInstance()->getGameType();
+	switch (gameType)
+	{
+	case kGame_Normal:
+		initCharacterLayout();
+		break;
+	case kGame_Shoot:
+		initCharacterLayout2();
+		break;
+	}
+
+	return true;
+}
+
+void CharacterView::initCharacterLayout()
+{
 	auto winSize = CCDirector::sharedDirector()->getWinSize();
 
 	m_characterLayout = UiLayout::create("layout/character_node.xml");
@@ -25,13 +41,7 @@ bool CharacterView::init()
 	m_characterLayout->setPosition(ccpMult(winSize, 0.5f));
 	m_characterLayout->setMenuTouchPriority(kPriority_Game - 1);
 	addChild(m_characterLayout, kZOrder_Character);
-	initCharacterLayout();
 
-	return true;
-}
-
-void CharacterView::initCharacterLayout()
-{
 	CCSprite *character_body = dynamic_cast<CCSprite*>(m_characterLayout->getChildById(9));
 	CCSprite *character_head = dynamic_cast<CCSprite*>(m_characterLayout->getChildById(10));
 	m_arrow = dynamic_cast<CCSprite*>(m_characterLayout->getChildById(11));
@@ -43,6 +53,29 @@ void CharacterView::initCharacterLayout()
 
 		character_head->setPosition(ccp(targetPos.x, character_head->getPositionY()));
 		m_arrow->setVisible(false);
+	}
+}
+
+void CharacterView::initCharacterLayout2()
+{
+	m_characterLayout = UiLayout::create("layout/character_node2.xml");
+	m_characterLayout->setAnchorPoint(ccp(0.5f, 0.5f));
+	m_characterLayout->setMenuTouchPriority(kPriority_Game - 1);
+	addChild(m_characterLayout, kZOrder_Character);
+	setContentSize(m_characterLayout->getContentSize());
+
+	CCSprite *character_body = dynamic_cast<CCSprite*>(m_characterLayout->getChildById(4));
+	CCSprite *character_head = dynamic_cast<CCSprite*>(m_characterLayout->getChildById(3));
+	m_arrow = dynamic_cast<CCSprite*>(m_characterLayout->getChildById(2));
+
+	auto targetPos = GameController::getInstance()->getShooterPos();
+	if (targetPos.x != 0 && targetPos.y != 0)
+	{
+		/*character_body->setPosition(ccp(targetPos.x, character_body->getPositionY()));
+
+		character_head->setPosition(ccp(targetPos.x, character_head->getPositionY()));
+		m_arrow->setVisible(false);*/
+		setPosition(targetPos);
 	}
 }
 

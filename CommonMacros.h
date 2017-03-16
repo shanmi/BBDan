@@ -57,10 +57,9 @@ enum SquareType
 	kType_EliminateCross,
 	kType_BossEatMarble,
 	kType_Iron,
-	kType_Protect,
+	kType_Crystal,
 	kType_Shotguns,
-	kType_Blood,
-	kType_Rocket,
+	kType_Bomb,
 };
 
 enum MarbleType

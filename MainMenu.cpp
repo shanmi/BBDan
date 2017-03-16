@@ -143,7 +143,7 @@ void MainMenu::initLayout()
 
 	CCMenuItem *toShop = dynamic_cast<CCMenuItem*>(m_mainLayout->getChildById(5));
 	toShop->setTarget(this, menu_selector(MainMenu::toShopLayer));
-	toShop->setVisible(false);
+	//toShop->setVisible(false);
 
 	CCMenuItem *toSkin = dynamic_cast<CCMenuItem*>(m_mainLayout->getChildById(6));
 	toSkin->setTarget(this, menu_selector(MainMenu::toSkinLayer));

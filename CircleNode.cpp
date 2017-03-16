@@ -372,15 +372,15 @@ void CircleAddCoinNode::doCollisionAction()
 }
 
 ///////////////////////////////////////////////////////
-CircleProtectNode *CircleProtectNode::create()
+CircleCrystalNode *CircleCrystalNode::create()
 {
-	CircleProtectNode *node = new CircleProtectNode();
+	CircleCrystalNode *node = new CircleCrystalNode();
 	node->autorelease();
 	node->init();
 	return node;
 }
 
-bool CircleProtectNode::init()
+bool CircleCrystalNode::init()
 {
 	m_score = 1;
 	auto sizeSprite = CCSprite::create("squares/fangkuai_hong1.png");
@@ -396,23 +396,23 @@ bool CircleProtectNode::init()
 	return true;
 }
 
-void CircleProtectNode::setBody()
+void CircleCrystalNode::setBody()
 {
 	m_body = Box2dFactory::getInstance()->createCircle(this, m_imageSprite->getContentSize(), true);
 }
 
-void CircleProtectNode::runRemoveAction()
+void CircleCrystalNode::runRemoveAction()
 {
 	removeBody();
 	removeFromParent();
 }
 
-void CircleProtectNode::doCollisionAction()
+void CircleCrystalNode::doCollisionAction()
 {
 	int attactRate = GameController::getInstance()->getAttactRate();
 	addScore(-attactRate); //delete
 
-	GameController::getInstance()->useProtectEffect();
+	GameController::getInstance()->addCrystalEffect();
 }
 
 ///////////////////////////////////////////////////////
@@ -460,59 +460,15 @@ void CircleShotgunsNode::doCollisionAction()
 }
 
 ///////////////////////////////////////////////////////
-CircleBloodNode *CircleBloodNode::create()
+CircleBombNode *CircleBombNode::create()
 {
-	CircleBloodNode *node = new CircleBloodNode();
+	CircleBombNode *node = new CircleBombNode();
 	node->autorelease();
 	node->init();
 	return node;
 }
 
-bool CircleBloodNode::init()
-{
-	m_score = 1;
-	auto sizeSprite = CCSprite::create("squares/fangkuai_hong1.png");
-	auto size = sizeSprite->getContentSize();
-	setContentSize(size);
-
-	m_image = "squares/fangkuai_xueliangbao.png";
-	m_imageSprite = CCSprite::create(m_image.c_str());
-	addChild(m_imageSprite);
-	auto fanIn = CCFadeIn::create(0.6f);
-	m_imageSprite->runAction(fanIn);
-
-	return true;
-}
-
-void CircleBloodNode::setBody()
-{
-	m_body = Box2dFactory::getInstance()->createCircle(this, m_imageSprite->getContentSize(), true);
-}
-
-void CircleBloodNode::runRemoveAction()
-{
-	removeBody();
-	removeFromParent();
-}
-
-void CircleBloodNode::doCollisionAction()
-{
-	int attactRate = GameController::getInstance()->getAttactRate();
-	addScore(-attactRate); //delete
-
-	GameController::getInstance()->getBloodEffect();
-}
-
-///////////////////////////////////////////////////////
-CircleRocketNode *CircleRocketNode::create()
-{
-	CircleRocketNode *node = new CircleRocketNode();
-	node->autorelease();
-	node->init();
-	return node;
-}
-
-bool CircleRocketNode::init()
+bool CircleBombNode::init()
 {
 	m_score = 1;
 	auto sizeSprite = CCSprite::create("squares/fangkuai_hong1.png");
@@ -528,12 +484,12 @@ bool CircleRocketNode::init()
 	return true;
 }
 
-void CircleRocketNode::setBody()
+void CircleBombNode::setBody()
 {
 	m_body = Box2dFactory::getInstance()->createCircle(this, m_imageSprite->getContentSize(), true);
 }
 
-void CircleRocketNode::runRemoveAction()
+void CircleBombNode::runRemoveAction()
 {
 	SoundMgr::theMgr()->playEffect(Effect_Pop3);
 
@@ -548,7 +504,7 @@ void CircleRocketNode::runRemoveAction()
 	removeFromParent();
 }
 
-void CircleRocketNode::doCollisionAction()
+void CircleBombNode::doCollisionAction()
 {
 	int attactRate = GameController::getInstance()->getAttactRate();
 	addScore(-attactRate); //delete

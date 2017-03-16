@@ -14,7 +14,7 @@ struct INotifyView
 	virtual void notifyViews(){}
 	virtual void showGameOver(){}
 	virtual void addSquareNode(SquareNode *node){}
-	virtual void useProtectEffect(){}
+	virtual void addCrystalEffect(){}
 	virtual void useShotGunsEffect(){}
 	virtual void getBloodEffect(){}
 	virtual void showAddCoinEffect(SquareNode *node){}
@@ -23,6 +23,7 @@ struct INotifyView
 	virtual void updateProgress(){}
 	virtual void addBoss(){}
 	virtual void bossAttactEffect(int type){}
+	virtual void rebuildCrystal(){}
 };
 
 class GameController
@@ -39,7 +40,7 @@ public:
 	void updateMarbles() { NOTIFY_VIEWS(updateMarbles); }
 	void notifyViews() { NOTIFY_VIEWS(notifyViews); }
 	void addSquareNode(SquareNode *node){ NOTIFY_VIEWS(addSquareNode, node); }
-	void useProtectEffect() { NOTIFY_VIEWS(useProtectEffect); }
+	void addCrystalEffect() { NOTIFY_VIEWS(addCrystalEffect); }
 	void useShotGunsEffect() { NOTIFY_VIEWS(useShotGunsEffect); }
 	void getBloodEffect(){ addBloodCount(1); NOTIFY_VIEWS(getBloodEffect); }
 	void showAddCoinEffect(SquareNode *node){ NOTIFY_VIEWS(showAddCoinEffect, node); }
@@ -49,6 +50,7 @@ public:
 
 	void addBoss(){ NOTIFY_VIEWS(addBoss); }
 	void bossAttactEffect(int type){ NOTIFY_VIEWS(bossAttactEffect, type); }
+	void rebuildCrystal(){ NOTIFY_VIEWS(rebuildCrystal) }
 
 public:
 	void startOneRound();
@@ -100,6 +102,11 @@ public:
 	int getBossBloodCount(){ return m_bossBloodCount; }
 	void setBossBloodCount(int count){ m_bossBloodCount = count; }
 
+	std::vector<int> getCrystalBloods(){ return m_crystalBloods; }
+	int getCrystalBlood(int index);
+	void setCrystalBlood(int index, int bloodCount);
+	void resetCrystalBloods(){ m_crystalBloods = { 2, 3, 2 }; rebuildCrystal(); }
+
 private:
 	GameController();
 
@@ -115,6 +122,7 @@ private:
 	int m_gameType;
 	bool m_bIsGamePause;
 	int m_bossBloodCount;
+	std::vector<int> m_crystalBloods;
 };
 
 #endif

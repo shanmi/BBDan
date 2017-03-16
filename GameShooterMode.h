@@ -37,7 +37,7 @@ public:
 	void addMarble(float dt);
 	void addSquareNode(SquareNode *node);
 	void showGameOver();
-	void useProtectEffect();
+	void addCrystalEffect();
 	void useShotGunsEffect();
 	void getBloodEffect();
 	void notifyViews();

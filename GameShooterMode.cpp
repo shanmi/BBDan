@@ -107,9 +107,10 @@ bool GameShooterMode::init()
 	initMainLayout();
 
 	m_characterView = CharacterView::create();
+	m_characterView->setScale(0.8f);
 	addChild(m_characterView, kZOrder_Character);
 	m_arrow = dynamic_cast<CCSprite *>(m_characterView->getBodyById(11));
-	m_characterView->initShooterPos();
+	m_characterView->setPosition(winSize.width / 2, m_bottomLinePos - 50);
 
 	m_topLayout = UiLayout::create("layout/game_top2.xml");
 	m_topLayout->setPosition(ccp(0, winSize.height - m_topLayout->getContentSize().height));
@@ -117,10 +118,10 @@ bool GameShooterMode::init()
 	addChild(m_topLayout, kZOrder_Layout);
 	initTopLayout();
 
-	m_bottomLayout = UiLayout::create("layout/game_bottom.xml");
+	m_bottomLayout = UiLayout::create("layout/game_bottom2.xml");
 	m_bottomLayout->setPosition(ccp(0, 0));
 	m_bottomLayout->setMenuTouchPriority(kPriority_Game - 1);
-	addChild(m_bottomLayout);
+	addChild(m_bottomLayout, kZOrder_Layout);
 	initBottomLayout();
 	initGameLayout();
 
@@ -150,8 +151,7 @@ void GameShooterMode::initMainLayout()
 	for (int i = 0; i < 3; i++)
 	{
 		CCSprite *crystal = dynamic_cast<CCSprite*>(m_mainLayout->getChildById(10 + i));
-		int crystalType = (i == 1 ? kCrystal_Big : kCrystal_Small);
-		CrystalView *view = CrystalView::create(crystalType);
+		CrystalView *view = CrystalView::create(i);
 		view->setPosition(crystal->getPosition());
 		m_mainLayout->addChild(view, crystal->getZOrder(), crystal->getTag());
 		crystal->removeFromParent();
@@ -238,13 +238,17 @@ void GameShooterMode::initBottomLayout()
 		CCMenuItem *ballBtn = dynamic_cast<CCMenuItem*>(m_bottomLayout->getChildById(i + 9));
 		ballBtn->setTag(i);
 		ballBtn->setTarget(this, menu_selector(GameShooterMode::onMarbleChange));
+		CCSprite *lock = dynamic_cast<CCSprite*>(m_bottomLayout->getChildById(i + 13));
+		lock->setZOrder(ballBtn->getZOrder() + 1);
 		bool isUnlock = UserInfo::getInstance()->isUnlock(i);
 		if (!isUnlock)
 		{
+			lock->setVisible(true);
 			ballBtn->setColor(ccc3(60, 60, 60));
 		}
 		else
 		{
+			lock->setVisible(false);
 			ballBtn->setColor(ccc3(255, 255, 255));
 		}
 	}
@@ -353,7 +357,7 @@ void GameShooterMode::onHelpPanel(CCObject *pSender)
 
 void GameShooterMode::showLibaoDiaolg()
 {
-	bool isBusinessMode = MyPurchase::sharedPurchase()->isBusinessMode();
+	bool isBusinessMode = MyPurchase::sharedPurchase()->isBusinessMode() == 1;
 	int isYijian = GameConfig::getInstance()->m_yijian;
 	if (isBusinessMode && isYijian)
 	{
@@ -422,7 +426,7 @@ void GameShooterMode::addMarble(float dt)
 	{
 		auto ball = MarbleModel::theModel()->createMarble();
 		ball->setBody();
-		ball->setPosition(ccp(m_arrow->getPositionX(), m_bottomLinePos + ball->getContentSize().height / 2 + 4));
+		ball->setPosition(ccp(m_characterView->getPositionX(), m_bottomLinePos + ball->getContentSize().height / 2 + 4));
 		addChild(ball);
 		ball->setMovingState(true);
 
@@ -450,14 +454,14 @@ void GameShooterMode::addMarble(float dt)
 void GameShooterMode::initSquares()
 {
 	auto squares = SquareModel::theModel()->loadSquareList();
-	for (int i = 0; i < squares.size(); i++)
+	for (size_t i = 0; i < squares.size(); i++)
 	{
 		auto node = squares[i];
 		if (node->getPositionY() <= 0)
 		{
 			Index index = node->getIndex();
 			node->setPosition(ccp((node->getContentSize().width / 2 + SQUARE_SPACING) + index.x * (node->getContentSize().width + SQUARE_SPACING),
-				m_bottomLinePos + (node->getContentSize().height + SQUARE_SPACING) * (7.5 - index.y)));
+				m_bottomLinePos + (node->getContentSize().height + SQUARE_SPACING) * (8.5 - index.y)));
 		}
 		addChild(node, kZOrder_Square);
 	}
@@ -479,7 +483,7 @@ void GameShooterMode::addSquares()
 	}
 
 	auto squares = SquareModel::theModel()->createSquareList();
-	for (int i = 0; i < squares.size(); i++)
+	for (size_t i = 0; i < squares.size(); i++)
 	{
 		auto node = squares[i];
 		Index index = node->getIndex();
@@ -519,9 +523,9 @@ void GameShooterMode::update(float dt)
 	if (m_protectTime < 0)
 	{
 		m_protectTime = 0;
-		if (m_arrow->getChildByTag(kTag_Protect))
+		if (m_characterView->getChildByTag(kTag_Protect))
 		{
-			m_arrow->removeChildByTag(kTag_Protect);
+			m_characterView->removeChildByTag(kTag_Protect);
 		}
 	}
 
@@ -568,6 +572,7 @@ void GameShooterMode::update(float dt)
 				{
 					UserInfo::getInstance()->setTargetLevel();
 					SquareModel::theModel()->setCurrentScore(0);
+					GameController::getInstance()->resetCrystalBloods();
 				}
 			}
 			else
@@ -588,7 +593,25 @@ bool GameShooterMode::ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent)
 		return false;
 	}
 	auto location = pTouch->getLocation();
-	m_characterView->checkShooterPos(location);
+	auto winSize = CCDirector::sharedDirector()->getWinSize();
+	auto characterPos = m_characterView->getPosition();
+	auto size = m_characterView->getContentSize();
+	auto rect = CCRect(characterPos.x - size.width / 2, characterPos.y - size.height / 2,
+		size.width, size.height);
+	if (!rect.containsPoint(location))
+	{
+		return false;
+	}
+	if (location.x < 32)
+	{
+		location.x = 32;
+	}
+	else if (location.x > winSize.width - 32)
+	{
+		location.x = winSize.width - 32;
+	}
+	m_characterView->setScale(0.82f);
+	m_characterView->setPositionX(location.x);
 	return true;
 }
 
@@ -599,13 +622,38 @@ void GameShooterMode::ccTouchMoved(CCTouch *pTouch, CCEvent *pEvent)
 		return;
 	}
 	auto location = pTouch->getLocation();
-	m_characterView->checkShooterPos(location);
+	auto previous = pTouch->getPreviousLocation();
+	for (int i = 0; i < 2; i++)
+	{
+		auto wheelBig = dynamic_cast<CCSprite *>(m_characterView->getBodyById(7 + i));
+		auto wheelSmall = dynamic_cast<CCSprite *>(m_characterView->getBodyById(10 + i));
+		auto rotate1 = CCRotateBy::create(0.6, (location.x - previous.x) * 60);
+		auto rotate2 = CCRotateBy::create(0.6, (previous.x - location.x) * 60);
+
+		wheelBig->stopAllActions();
+		wheelBig->runAction(rotate1);
+
+		wheelSmall->stopAllActions();
+		wheelSmall->runAction(rotate2);
+	}
+
+	auto winSize = CCDirector::sharedDirector()->getWinSize();
+	auto size = m_characterView->getContentSize();
+	if (location.x < 32)
+	{
+		location.x = 32;
+	}
+	else if (location.x > winSize.width - 32)
+	{
+		location.x = winSize.width - 32;
+	}
+	m_characterView->setPositionX(location.x);
 	GameController::getInstance()->setShooterPos(location);
 }
 
 void GameShooterMode::ccTouchEnded(CCTouch *pTouch, CCEvent *pEvent)
 {
-
+	m_characterView->setScale(0.8f);
 }
 
 void GameShooterMode::oneRoundEnd()
@@ -643,16 +691,16 @@ void GameShooterMode::showGameOver()
 	SquareModel::theModel()->removeBelowSquares();
 }
 
-void GameShooterMode::useProtectEffect()
+void GameShooterMode::addCrystalEffect()
 {
 	m_protectTime = PROTECT_TIME;
-	if (m_arrow->getChildByTag(kTag_Protect))
+	if (m_characterView->getChildByTag(kTag_Protect))
 	{
-		m_arrow->removeChildByTag(kTag_Protect);
+		m_characterView->removeChildByTag(kTag_Protect);
 	}
 	auto protect = CCSprite::create("game/protected.png");
 	protect->setTag(kTag_Protect);
-	m_arrow->addChild(protect);
+	m_characterView->addChild(protect);
 }
 
 void GameShooterMode::useShotGunsEffect()
@@ -712,13 +760,13 @@ void GameShooterMode::defenseCrash(SquareNode *node)
 		col = 2;
 	}
 	CrystalView *crystal = dynamic_cast<CrystalView*>(m_mainLayout->getChildById(10 + col));
+	CCLog("col === %d", col);
 	crystal->addBloodCount(-1);
-	if (crystal->getBloodCount() <= 0)
+	if (crystal->getBloodCount() < 0)
 	{
 		if (!m_bIsGameOver)
 		{
 			//crystal->runDieEffect();
-			crystal->setVisible(false);
 			FuhuoLibao *fuhuoLibao = FuhuoLibao::create();
 			addChild(fuhuoLibao, KZOrder_GameOver, kTag_GameOver);
 			m_bIsGameOver = true;
@@ -782,10 +830,12 @@ void GameShooterMode::updateMarbleType(int type)
 	for (int i = kMarble_Faster; i <= kMarble_Bomb; i++)
 	{
 		CCMenuItem *ballBtn = dynamic_cast<CCMenuItem*>(m_bottomLayout->getChildById(i + 9));
+		CCSprite *lock = dynamic_cast<CCSprite*>(m_bottomLayout->getChildById(i + 13));
 		ballBtn->stopAllActions();
 		ballBtn->setScale(1.0f);
 		if (type == i)
 		{
+			lock->setVisible(false);
 			ballBtn->setColor(ccc3(255, 255, 255));
 			auto action = GameUtil::getRepeatScaleAction();
 			ballBtn->runAction(action);
@@ -799,12 +849,12 @@ void GameShooterMode::bossAttactEffect(int type)
 
 	auto remainSquares = SquareModel::theModel()->getRemainSqaure();
 	int remainCount = remainSquares.size();
-	CCPoint targetPos = m_arrow->getPosition();
+	CCPoint targetPos = m_characterView->getPosition();
 	if (remainCount <= 0)
 	{
 		int col = rand() % BALL_COL_SIZE;
 		auto node = SquareModel::theModel()->createSquareNode(kBlock_Square);
-		node->setIndex(0, col);
+		node->setIndex(col, 0);
 		node->setPosition(ccp(node->getContentSize().width / 2 + SQUARE_SPACING + col * (node->getContentSize().width + SQUARE_SPACING),
 			m_bottomLinePos + (node->getContentSize().height + SQUARE_SPACING) * 8.5));
 		targetPos = node->getPosition();

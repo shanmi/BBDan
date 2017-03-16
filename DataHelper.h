@@ -9,6 +9,8 @@ public:
 
 	void putInt(int src, FILE* file);
 	void getInt(int &temp, FILE* file);
+	void putFloat(float src, FILE* file);
+	void getFloat(float &temp, FILE* file);
 	void putString(std::string str, FILE* file);
 	void getString(std::string &str, FILE* file);
 	int xorEncDecInt(int ch);

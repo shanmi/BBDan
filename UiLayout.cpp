@@ -3,6 +3,7 @@
 #include "rapidxml/rapidxml_print.hpp"
 #include "cocos-ext.h"
 #include <algorithm>
+#include "EmptyBox.h"
 USING_NS_CC;
 using namespace std;
 using namespace rapidxml;
@@ -214,6 +215,14 @@ void UiLayout::createWidget(rapidxml::xml_node<> *node)
 
 		float rotate = atof(node->first_node("rotate")->value());
 		armature->setRotation(rotate);
+	}
+	else if (widgetName == "emptyBox")
+	{
+		EmptyBox *node = EmptyBox::create();
+		addChild(node, 0, id);
+		node->setAnchorPoint(ccp(anchorPtX, anchorPtY));
+		node->setPosition(ccp(x, y));
+		node->setScale(scale);
 	}
 	else
 	{

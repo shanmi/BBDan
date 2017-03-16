@@ -70,11 +70,11 @@ public:
 	virtual void doCollisionAction();
 };
 
-class CircleProtectNode : public SquareNode
+class CircleCrystalNode : public SquareNode
 {
 public:
-	CircleProtectNode() : SquareNode(){ m_squareType = kType_Protect; }
-	static CircleProtectNode *create();
+	CircleCrystalNode() : SquareNode(){ m_squareType = kType_Crystal; }
+	static CircleCrystalNode *create();
 	virtual bool init();
 	virtual void setBody();
 	virtual void runRemoveAction();
@@ -92,22 +92,11 @@ public:
 	virtual void doCollisionAction();
 };
 
-class CircleBloodNode : public SquareNode
+class CircleBombNode : public SquareNode
 {
 public:
-	CircleBloodNode() : SquareNode(){ m_squareType = kType_Blood; }
-	static CircleBloodNode *create();
-	virtual bool init();
-	virtual void setBody();
-	virtual void runRemoveAction();
-	virtual void doCollisionAction();
-};
-
-class CircleRocketNode : public SquareNode
-{
-public:
-	CircleRocketNode() : SquareNode(){ m_squareType = kType_Rocket; }
-	static CircleRocketNode *create();
+	CircleBombNode() : SquareNode(){ m_squareType = kType_Bomb; }
+	static CircleBombNode *create();
 	virtual bool init();
 	virtual void setBody();
 	virtual void runRemoveAction();

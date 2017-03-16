@@ -260,13 +260,17 @@ void GameScene::initBottomLayout()
 		CCMenuItem *ballBtn = dynamic_cast<CCMenuItem*>(m_bottomLayout->getChildById(i + 9));
 		ballBtn->setTag(i);
 		ballBtn->setTarget(this, menu_selector(GameScene::onMarbleChange));
+		CCSprite *lock = dynamic_cast<CCSprite*>(m_bottomLayout->getChildById(i + 13));
+		lock->setZOrder(ballBtn->getZOrder() + 1);
 		bool isUnlock = UserInfo::getInstance()->isUnlock(i);
 		if (!isUnlock)
 		{
+			lock->setVisible(true);
 			ballBtn->setColor(ccc3(60, 60, 60));
 		}
 		else
 		{
+			lock->setVisible(false);
 			ballBtn->setColor(ccc3(255, 255, 255));
 		}
 	}
@@ -874,10 +878,12 @@ void GameScene::updateMarbleType(int type)
 	for (int i = kMarble_Faster; i <= kMarble_Bomb; i++)
 	{
 		CCMenuItem *ballBtn = dynamic_cast<CCMenuItem*>(m_bottomLayout->getChildById(i + 9));
+		CCSprite *lock = dynamic_cast<CCSprite*>(m_bottomLayout->getChildById(i + 13));
 		ballBtn->stopAllActions();
 		ballBtn->setScale(1.0f);
 		if (type == i)
 		{
+			lock->setVisible(false);
 			ballBtn->setColor(ccc3(255, 255, 255));
 			auto action = GameUtil::getRepeatScaleAction();
 			ballBtn->runAction(action);

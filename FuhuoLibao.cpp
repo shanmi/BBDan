@@ -111,6 +111,7 @@ void FuhuoLibao::closePanel(CCObject *pSender)
 	case kGame_Shoot:
 		UserInfo::getInstance()->resetTargetLevel();
 		GameController::getInstance()->setBossBloodCount(0);
+		GameController::getInstance()->resetCrystalBloods();
 		DataHelper::getInstance()->clearShootGameInfo();
 		break;
 	default:

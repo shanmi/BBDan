@@ -4,6 +4,18 @@
 
 USING_NS_CC;
 
+void CrystalView::onEnter()
+{
+	CCNode::onEnter();
+	GameController::getInstance()->addView(this);
+}
+
+void CrystalView::onExit()
+{
+	CCNode::onExit();
+	GameController::getInstance()->removeView(this);
+}
+
 CrystalView::CrystalView(int type)
 :m_type(type)
 {
@@ -26,19 +38,21 @@ bool CrystalView::init()
 	}
 	switch (m_type)
 	{
-	case kCrystal_Small:
+	case kCrystal_1:
 		m_image = CCSprite::create("game/crystal1.png");
-		m_bloodCount = 2;
 		break;
-	case kCrystal_Big:
-		m_bloodCount = 3;
+	case kCrystal_2:
 		m_image = CCSprite::create("game/crystal2.png");
 		break;
+	case kCrystal_3:
+		m_image = CCSprite::create("game/crystal1.png");
+		break;
 	}
+	m_bloodCount = GameController::getInstance()->getCrystalBlood(m_type);
 	addChild(m_image);
 	auto size = m_image->getContentSize();
 	setContentSize(size);
-
+	addBloodCount(0);
 
 	return true;
 }
@@ -46,6 +60,11 @@ bool CrystalView::init()
 void CrystalView::addBloodCount(int count)
 {
 	m_bloodCount += count;
+	GameController::getInstance()->setCrystalBlood(m_type, m_bloodCount);
+	if (m_bloodCount <= 0)
+	{
+		setVisible(false);
+	}
 }
 
 void CrystalView::runDieEffect()
@@ -59,4 +78,16 @@ void CrystalView::runDieEffect()
 	});
 	actions->addAction(callback);
 	actions->runActions();
+}
+
+void CrystalView::rebuildCrystal()
+{
+	m_bloodCount = GameController::getInstance()->getCrystalBlood(m_type);
+	setVisible(true);
+}
+
+void CrystalView::addCrystalEffect()
+{
+	m_bloodCount++;
+	setVisible(true);
 }

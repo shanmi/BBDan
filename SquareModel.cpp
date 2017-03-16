@@ -60,17 +60,14 @@ SquareNode *SquareModel::createSquareNode(int type, int shap /* = -1 */)
 	case kType_Iron:
 		node = IronNode::create();
 		break;
-	case kType_Protect:
-		node = CircleProtectNode::create();
+	case kType_Crystal:
+		node = CircleCrystalNode::create();
 		break;
 	case kType_Shotguns:
 		node = CircleShotgunsNode::create();
 		break;
-	case kType_Blood:
-		node = CircleBloodNode::create();
-		break;
-	case kType_Rocket:
-		node = CircleRocketNode::create();
+	case kType_Bomb:
+		node = CircleBombNode::create();
 		break;
 	case kType_Empty:
 		node = nullptr;
@@ -219,7 +216,7 @@ std::vector<int> SquareModel::getBallListType2()
 	for (int i = 0; i < BALL_COL_SIZE; i++)
 	{
 		int type = getBallType(probabilitys, count);
-		if (type == kType_AddCoin || type == kType_EliminateRow || type == kType_EliminateCol || type == kType_EliminateCross || type == kType_Protect)
+		if (type == kType_AddCoin || type == kType_EliminateRow || type == kType_EliminateCol || type == kType_EliminateCross || type == kType_Crystal)
 		{
 			auto iter = find(types.begin(), types.end(), type);
 			while (iter != types.end())

@@ -37,8 +37,8 @@ bool BossView::init()
 	setTag(kTag_Boss);
 	int targetLevel = UserInfo::getInstance()->getTargetLevel();
 	int bloodCount = GameController::getInstance()->getBossBloodCount();
-	k_bloodRecord = targetLevel*100;
-	m_bloodCount = bloodCount * 100;
+	k_bloodRecord = targetLevel;
+	m_bloodCount = bloodCount;
 
 	std::string path = "animation/boss/diren001_bossyouling.ExportJson";
 	CCPoint anchor = ccp(0.5f, 0.5f);

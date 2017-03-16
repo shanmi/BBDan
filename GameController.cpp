@@ -17,6 +17,7 @@ GameController::GameController()
 , m_gameType(kGame_Normal)
 , m_bIsGamePause(false)
 , m_bossBloodCount(0)
+, m_crystalBloods({ 2, 3, 2})
 {
 }
 
@@ -173,4 +174,14 @@ void GameController::backToMainMenu()
 	CCDirector* pDirector = CCDirector::sharedDirector();
 	CCScene *pScene = MainMenu::scene();
 	pDirector->replaceScene(pScene);
+}
+
+void GameController::setCrystalBlood(int index, int bloodCount)
+{
+	m_crystalBloods.at(index) = bloodCount;
+}
+
+int GameController::getCrystalBlood(int index)
+{
+	return m_crystalBloods.at(index);
 }
