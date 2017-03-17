@@ -96,7 +96,6 @@ enum ViewTag
 	kTag_LoginLayer,
 	kTag_GuideLayer,
 	kTag_GameOver,
-	kTag_Protect,
 };
 
 enum PropType

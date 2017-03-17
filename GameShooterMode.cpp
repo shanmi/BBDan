@@ -54,11 +54,10 @@ void GameShooterMode::keyBackClicked()
 GameShooterMode::GameShooterMode()
 : m_moveCounter(0)
 , m_shootDegree(90)
+, m_doubleAttactTime(0)
 , m_freezingTime(0)
-, m_protectTime(0)
 , m_shotgunsTime(0)
 , m_addMarbleTime(0)
-, m_bIsDoubleAttact(false)
 , m_bIsGameOver(false)
 , m_bossView(NULL)
 {
@@ -110,7 +109,10 @@ bool GameShooterMode::init()
 	m_characterView->setScale(0.8f);
 	addChild(m_characterView, kZOrder_Character);
 	m_arrow = dynamic_cast<CCSprite *>(m_characterView->getBodyById(11));
-	m_characterView->setPosition(winSize.width / 2, m_bottomLinePos - 50);
+	auto arrow = dynamic_cast<CCSprite *>(m_mainLayout->getChildById(14));
+	arrow->setVisible(false);
+	auto worldPos = m_mainLayout->convertToWorldSpace(arrow->getPosition());
+	m_characterView->setPosition(winSize.width / 2, worldPos.y);
 
 	m_topLayout = UiLayout::create("layout/game_top2.xml");
 	m_topLayout->setPosition(ccp(0, winSize.height - m_topLayout->getContentSize().height));
@@ -130,6 +132,7 @@ bool GameShooterMode::init()
 	initMarbles();
 	initSquares();
 	addBoss();
+	updateScore();
 
 	scheduleUpdate();
 	return true;
@@ -148,6 +151,8 @@ void GameShooterMode::initMainLayout()
 	m_bottomLinePos = worldPos.y;
 	Box2dFactory::getInstance()->createSquare(line_bottom, true);
 
+	CCSprite *railway = dynamic_cast<CCSprite*>(m_mainLayout->getChildById(13));
+	railway->setZOrder(railway->getZOrder() + 1);
 	for (int i = 0; i < 3; i++)
 	{
 		CCSprite *crystal = dynamic_cast<CCSprite*>(m_mainLayout->getChildById(10 + i));
@@ -188,8 +193,9 @@ void GameShooterMode::initTopLayout()
 	CCSprite *target = dynamic_cast<CCSprite*>(m_topLayout->getChildById(16));
 	CCSprite *arrow = dynamic_cast<CCSprite*>(m_topLayout->getChildById(18));
 	CCLabelAtlas *targetLabel = dynamic_cast<CCLabelAtlas*>(m_topLayout->getChildById(17));
+	CCSprite *bossLabel = dynamic_cast<CCSprite*>(m_topLayout->getChildById(19));
 
-	UiLayout *layout = UiLayout::create("layout/game_top.xml");
+	UiLayout *layout = UiLayout::create("layout/game_top2.xml");
 	CCSprite *start = dynamic_cast<CCSprite*>(layout->getChildById(15));
 	float startPos = start->getPositionX();
 
@@ -200,12 +206,17 @@ void GameShooterMode::initTopLayout()
 	arrow->runAction(repeat);
 
 	int curLevel = SquareModel::theModel()->getCurrentScore();
-	int targetLevel = UserInfo::getInstance()->getTargetLevel();
-	int lastLevel = 0;// targetLevel <= 10 ? 0 : targetLevel / 2;
+	int targetLevel = GameController::getInstance()->getTargetLevel();
+	int lastLevel = targetLevel <= 10 ? 0 : targetLevel / 2;
 	float rate = (target->getPositionX() - startPos) / (targetLevel - lastLevel);
 	float gotoPos = startPos + rate * (curLevel - lastLevel);
 	logo->setPositionX(gotoPos);
 	arrow->setPositionX(gotoPos);
+	targetLabel->setString(GameUtil::intToString(targetLevel).c_str());
+
+	float bossPos = startPos + rate * ((targetLevel - lastLevel) / 2);
+	bossLabel->setPositionX(bossPos);
+	updateBoss();
 
 	float progressPos = 100 * gotoPos / layout->getContentSize().width;
 	m_progressTimer = CCProgressTimer::create(CCSprite::create("game/youxijiemian_jindutiao_jindu.png"));
@@ -266,7 +277,7 @@ void GameShooterMode::onDoubleAttact(CCObject *pSender)
 		showLibaoDiaolg();
 		return;
 	}
-	if (!m_bIsDoubleAttact)
+	if (m_doubleAttactTime <= 0)
 	{
 		if (count > 0)
 		{
@@ -277,7 +288,7 @@ void GameShooterMode::onDoubleAttact(CCObject *pSender)
 			UserInfo::getInstance()->addCoins(-doubleAttactCost);
 		}
 		updateCoins();
-		m_bIsDoubleAttact = true;
+		m_doubleAttactTime = DOUBLE_ATTACT_TIME;
 
 		GameController::getInstance()->setDoubleAttact();
 		CCMenuItem *doubleAttactBtn = dynamic_cast<CCMenuItem*>(m_bottomLayout->getChildById(5));
@@ -493,6 +504,7 @@ void GameShooterMode::addSquares()
 		addChild(node, kZOrder_Square);
 	}
 	saveGameData();
+	updateScore();
 	updateProgress();
 }
 
@@ -516,17 +528,9 @@ void GameShooterMode::update(float dt)
 		m_shotgunsTime -= dt;
 	}
 
-	if (m_protectTime > 0)
+	if (m_doubleAttactTime > 0)
 	{
-		m_protectTime -= dt;
-	}
-	if (m_protectTime < 0)
-	{
-		m_protectTime = 0;
-		if (m_characterView->getChildByTag(kTag_Protect))
-		{
-			m_characterView->removeChildByTag(kTag_Protect);
-		}
+		m_doubleAttactTime -= dt;
 	}
 
 	bool isFreezing = SquareModel::theModel()->isFreezing();
@@ -541,6 +545,11 @@ void GameShooterMode::update(float dt)
 	}
 	else
 	{
+		bool isCanMove = GameController::getInstance()->isCanMove();
+		if (!isCanMove)
+		{
+			return;
+		}
 		auto squares = SquareModel::theModel()->getSquares();
 		for (auto iter = squares.begin(); iter != squares.end(); ++iter)
 		{
@@ -564,15 +573,17 @@ void GameShooterMode::update(float dt)
 			m_moveCounter = 0;
 
 			int curLevel = SquareModel::theModel()->getCurrentScore();
-			int targetLevel = UserInfo::getInstance()->getTargetLevel();
+			int targetLevel = GameController::getInstance()->getTargetLevel();
 			if (curLevel >= targetLevel)
 			{
 				auto remainSquares = SquareModel::theModel()->getRemainSqaure().size();
-				if (remainSquares <= 0 && !getChildByTag(kTag_Boss))
+				if (remainSquares <= 0)
 				{
-					UserInfo::getInstance()->setTargetLevel();
-					SquareModel::theModel()->setCurrentScore(0);
-					GameController::getInstance()->resetCrystalBloods();
+					GameController::getInstance()->setTargetLevel(targetLevel*2);
+					SquareModel::theModel()->setCurrentScore(curLevel);
+					GameController::getInstance()->setBossType(kBoss_Max);
+					//GameController::getInstance()->resetCrystalBloods();
+					updateBoss();
 				}
 			}
 			else
@@ -596,8 +607,7 @@ bool GameShooterMode::ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent)
 	auto winSize = CCDirector::sharedDirector()->getWinSize();
 	auto characterPos = m_characterView->getPosition();
 	auto size = m_characterView->getContentSize();
-	auto rect = CCRect(characterPos.x - size.width / 2, characterPos.y - size.height / 2,
-		size.width, size.height);
+	auto rect = CCRect(characterPos.x - size.width / 2, characterPos.y, size.width, size.height);
 	if (!rect.containsPoint(location))
 	{
 		return false;
@@ -691,26 +701,9 @@ void GameShooterMode::showGameOver()
 	SquareModel::theModel()->removeBelowSquares();
 }
 
-void GameShooterMode::addCrystalEffect()
-{
-	m_protectTime = PROTECT_TIME;
-	if (m_characterView->getChildByTag(kTag_Protect))
-	{
-		m_characterView->removeChildByTag(kTag_Protect);
-	}
-	auto protect = CCSprite::create("game/protected.png");
-	protect->setTag(kTag_Protect);
-	m_characterView->addChild(protect);
-}
-
 void GameShooterMode::useShotGunsEffect()
 {
 	m_shotgunsTime = SHOTGUNS_TIME;
-}
-
-void GameShooterMode::getBloodEffect()
-{
-	CCLog("add blood effect");
 }
 
 void GameShooterMode::onMarbleChange(cocos2d::CCObject *pSender)
@@ -778,6 +771,34 @@ void GameShooterMode::defenseCrash(SquareNode *node)
 	}
 }
 
+void GameShooterMode::updateScore()
+{
+	int score = SquareModel::theModel()->getCurrentScore();
+	std::string countStr = GameUtil::intToString(score);
+	CCLabelAtlas *scoreLabel = dynamic_cast<CCLabelAtlas*>(m_topLayout->getChildById(3));
+	scoreLabel->setString(countStr.c_str());
+	auto action1 = GameUtil::getOnceScaleAction();
+	scoreLabel->runAction(action1);
+
+	bool showEffect = false;
+	int bestScore = UserInfo::getInstance()->getShootBestScore();
+	if (score > bestScore)
+	{
+		bestScore = score;
+		UserInfo::getInstance()->setShootBestScore(score);
+		showEffect = true;
+		//MyPurchase::sharedPurchase()->successStage(curLevel);
+	}
+	std::string bestStr = GameUtil::intToString(bestScore);
+	CCLabelAtlas *bestScoreLabel = dynamic_cast<CCLabelAtlas*>(m_topLayout->getChildById(13));
+	bestScoreLabel->setString(bestStr.c_str());
+	if (showEffect)
+	{
+		auto action2 = GameUtil::getOnceScaleAction();
+		bestScoreLabel->runAction(action2);
+	}
+}
+
 void GameShooterMode::updateProgress()
 {
 	UiLayout *layout = UiLayout::create("layout/game_top2.xml");
@@ -791,10 +812,11 @@ void GameShooterMode::updateProgress()
 	CCSprite *arrow = dynamic_cast<CCSprite*>(m_topLayout->getChildById(18));
 
 	int curLevel = SquareModel::theModel()->getCurrentScore();
-	int targetLevel = UserInfo::getInstance()->getTargetLevel();
-	int lastLevel = 0;// targetLevel <= 10 ? 0 : targetLevel / 2;
+	int targetLevel = GameController::getInstance()->getTargetLevel();
+	int lastLevel = targetLevel <= 10 ? 0 : targetLevel / 2;
+	int bossLevel = lastLevel + (targetLevel - lastLevel) / 2;
 	float gotoPos;
-	if (curLevel * 2 == targetLevel)
+	if (curLevel == bossLevel)
 	{
 		GameController::getInstance()->setBossBloodCount(targetLevel);
 		addBoss();
@@ -864,8 +886,28 @@ void GameShooterMode::bossAttactEffect(int type)
 		SquareNode *node = nullptr;
 		switch (type)
 		{
+		case kBoss_Spider:
+			node = SquareModel::theModel()->addDoubleScore();
+			node->setScale(1);
+			node->runAction(GameUtil::getOnceScaleAction());
+			break;
+		case kBoss_Moth:
+			node = SquareModel::theModel()->addDoubleSpeed();
+			node->setScale(1);
+			node->runAction(GameUtil::getOnceScaleAction());
+			break;
 		case kBoss_Ghost:
 			SquareModel::theModel()->exchangeSquarePosition();
+			GameController::getInstance()->setCanMove(false);
+			auto actions = ActionSequence::create(this);
+			auto delay = CCDelayTime::create(0.5f);
+			actions->addAction(delay);
+			auto callback = CCFunctionAction::create([=]()
+			{
+				GameController::getInstance()->setCanMove(true);
+			});
+			actions->addAction(callback);
+			actions->runActions();
 			for (auto iter = remainSquares.begin(); iter != remainSquares.end(); ++iter)
 			{
 				auto node = *iter;
@@ -877,17 +919,6 @@ void GameShooterMode::bossAttactEffect(int type)
 				}
 			}
 			break;
-		case kBoss_Spider:
-			node = SquareModel::theModel()->addDoubleScore();
-			node->setScale(1);
-			node->runAction(GameUtil::getOnceScaleAction());
-			break;
-		case kBoss_Moth:
-			node = SquareModel::theModel()->addDoubleSpeed();
-			node->setScale(1);
-			node->runAction(GameUtil::getOnceScaleAction());
-			break;
-
 		}
 		if (node != nullptr)
 		{
@@ -912,10 +943,29 @@ void GameShooterMode::addBoss()
 	addChild(colorLayer, kZOrder_Boss);
 	colorLayer->runAction(CCFadeOut::create(2.0f));
 
-	m_bossView = BossView::create(kBoss_Ghost);
+	int bossType = GameController::getInstance()->getBossType();
+	if (bossType == kBoss_Max)
+	{
+		bossType = rand() % kBoss_Max;
+	}
+	m_bossView = BossView::create(bossType);
 	m_bossView->setPosition(ccp(winSize.width / 2, winSize.height * 0.8f));
 	m_bossView->startMoveAction();
 	addChild(m_bossView, kZOrder_Boss, kTag_Boss);
+}
+
+void GameShooterMode::updateBoss()
+{
+	CCSprite *bossLabel = dynamic_cast<CCSprite*>(m_topLayout->getChildById(19));
+	int bossType = GameController::getInstance()->getBossType();
+	if (bossType == kBoss_Max)
+	{
+		bossType = rand() % kBoss_Max;
+	}
+	char temp[100] = { 0 };
+	sprintf(temp, "animation/boss/boss_icon_%d.png", bossType);
+	bossLabel->initWithFile(temp);
+	GameController::getInstance()->setBossType(bossType);
 }
 
 void GameShooterMode::saveGameData()

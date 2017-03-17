@@ -16,7 +16,6 @@ struct INotifyView
 	virtual void addSquareNode(SquareNode *node){}
 	virtual void addCrystalEffect(){}
 	virtual void useShotGunsEffect(){}
-	virtual void getBloodEffect(){}
 	virtual void showAddCoinEffect(SquareNode *node){}
 	virtual void showAddMarbleEffect(SquareNode *node){}
 	virtual void updateMarbleType(int type){}
@@ -42,7 +41,6 @@ public:
 	void addSquareNode(SquareNode *node){ NOTIFY_VIEWS(addSquareNode, node); }
 	void addCrystalEffect() { NOTIFY_VIEWS(addCrystalEffect); }
 	void useShotGunsEffect() { NOTIFY_VIEWS(useShotGunsEffect); }
-	void getBloodEffect(){ addBloodCount(1); NOTIFY_VIEWS(getBloodEffect); }
 	void showAddCoinEffect(SquareNode *node){ NOTIFY_VIEWS(showAddCoinEffect, node); }
 	void showAddMarbleEffect(SquareNode *node){ NOTIFY_VIEWS(showAddMarbleEffect, node); }
 	void updateMarbleType(int type){ NOTIFY_VIEWS(updateMarbleType, type); }
@@ -83,21 +81,14 @@ public:
 	bool isFirshInGame(){ return m_bISFirstIn; }
 	void setFirstInGame(bool firtIn){ m_bISFirstIn = firtIn; }
 
-	int getBloodCount(){ return m_bloodCount; }
-	void addBloodCount(int count)
-	{ 
-		m_bloodCount += count; 
-		if (m_bloodCount >= PLAYER_BLOOD_COUNT)
-		{
-			m_bloodCount = PLAYER_BLOOD_COUNT;
-		}
-	}
-
 	int getGameType(){ return m_gameType; }
 	void setGameType(int type){ m_gameType = type; }
 
 	bool isGamePause(){ return m_bIsGamePause; }
 	void setGamePause(bool isPause) { m_bIsGamePause = isPause; }
+
+	int getBossType(){ return m_bossType; }
+	void setBossType(int type){ m_bossType = type; }
 
 	int getBossBloodCount(){ return m_bossBloodCount; }
 	void setBossBloodCount(int count){ m_bossBloodCount = count; }
@@ -106,6 +97,13 @@ public:
 	int getCrystalBlood(int index);
 	void setCrystalBlood(int index, int bloodCount);
 	void resetCrystalBloods(){ m_crystalBloods = { 2, 3, 2 }; rebuildCrystal(); }
+
+	bool isCanMove(){ return m_bCanMove; }
+	void setCanMove(bool canMove) { m_bCanMove = canMove; }
+
+	void setTargetLevel(int level);
+	int getTargetLevel();
+	void resetTargetLevel();
 
 private:
 	GameController();
@@ -118,11 +116,13 @@ private:
 	int m_attactRate;
 	bool m_bIsRoundOver;
 	bool m_bISFirstIn;
-	int m_bloodCount;
 	int m_gameType;
 	bool m_bIsGamePause;
+	int m_bossType;
 	int m_bossBloodCount;
 	std::vector<int> m_crystalBloods;
+	bool m_bCanMove;
+	int m_targetLevel;
 };
 
 #endif

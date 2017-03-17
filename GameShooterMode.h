@@ -37,12 +37,11 @@ public:
 	void addMarble(float dt);
 	void addSquareNode(SquareNode *node);
 	void showGameOver();
-	void addCrystalEffect();
 	void useShotGunsEffect();
-	void getBloodEffect();
 	void notifyViews();
 	void updateMarbleType(int type);
 	void addBoss();
+	void updateBoss();
 	void bossAttactEffect(int type);
 public:
 	void onPauseGame(cocos2d::CCObject *pSender);
@@ -62,6 +61,7 @@ public:
 	void showLibaoDiaolg();
 	void onMarbleChange(cocos2d::CCObject *pSender);
 	void defenseCrash(SquareNode *node);
+	void updateScore();
 	void updateProgress();
 	void saveGameData();
 
@@ -79,9 +79,8 @@ private:
 	float m_shootDegree;
 	int m_moveCounter;
 
-	bool m_bIsDoubleAttact;
+	float m_doubleAttactTime;
 	float m_freezingTime;
-	float m_protectTime;
 	float m_shotgunsTime;
 	float m_addMarbleTime;
 	bool m_bIsGamePause;

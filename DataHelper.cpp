@@ -193,6 +193,9 @@ int DataHelper::loadShootGameInfo(){
 			}
 		}
 		getInt(temp, file);
+		int bossType = xorEncDecInt(temp);
+		GameController::getInstance()->setBossType(bossType);
+		getInt(temp, file);
 		int bossBloodCount = xorEncDecInt(temp);
 		GameController::getInstance()->setBossBloodCount(bossBloodCount);
 		auto crystalBloods = GameController::getInstance()->getCrystalBloods();
@@ -202,6 +205,9 @@ int DataHelper::loadShootGameInfo(){
 			auto &blood = *iter;
 			blood = xorEncDecInt(temp);
 		}
+		getInt(temp, file);
+		int targetLevel = xorEncDecInt(temp);
+		GameController::getInstance()->setTargetLevel(targetLevel);
 		fclose(file);
 		return OK;
 	}
@@ -241,6 +247,8 @@ int DataHelper::saveShootGameInfo(){
 			putInt(xorEncDecInt(score), file);
 			putFloat(speed, file);
 		}
+		int bossType = GameController::getInstance()->getBossType();
+		putInt(xorEncDecInt(bossType), file);
 		int bossBloodCount = GameController::getInstance()->getBossBloodCount();
 		putInt(xorEncDecInt(bossBloodCount), file);
 		auto crystalBloods = GameController::getInstance()->getCrystalBloods();
@@ -249,6 +257,8 @@ int DataHelper::saveShootGameInfo(){
 			auto blood = *iter;
 			putInt(xorEncDecInt(blood), file);
 		}
+		int targetLevel = GameController::getInstance()->getTargetLevel();
+		putInt(xorEncDecInt(targetLevel), file);
 		fclose(file);
 		return OK;
 	}

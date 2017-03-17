@@ -11,6 +11,7 @@ enum CrystalType
 	kCrystal_3,
 };
 
+class UiLayout;
 class CrystalView :
 	public cocos2d::CCNode
 	, INotifyView
@@ -34,7 +35,9 @@ private:
 	CrystalView(int type);
 
 public:
+	UiLayout *m_mainLayout;
 	cocos2d::CCSprite *m_image;
+	cocos2d::CCLabelAtlas *m_count;
 	int m_type;
 	int m_bloodCount;
 };

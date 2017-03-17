@@ -12,8 +12,6 @@ USING_NS_CC_EXT;
 BossView::BossView(int type)
 : m_type(type)
 , m_body(NULL)
-, m_bloodCount(BLOOD_COUNT)
-, k_bloodRecord(BLOOD_COUNT)
 , m_posIndex(0)
 {
 
@@ -35,7 +33,7 @@ bool BossView::init()
 	}
 
 	setTag(kTag_Boss);
-	int targetLevel = UserInfo::getInstance()->getTargetLevel();
+	int targetLevel = GameController::getInstance()->getTargetLevel();
 	int bloodCount = GameController::getInstance()->getBossBloodCount();
 	k_bloodRecord = targetLevel;
 	m_bloodCount = bloodCount;

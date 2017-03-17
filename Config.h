@@ -15,17 +15,13 @@
 #define ATTACT_RATE 1
 #define REBOUND_TIMES 3  //create a rebound ball when bigger than this value
 
-
 //shoot mode
 #define BLOCK_DISTANCE 150
 #define BLOCK_SPEED 0.5f
+#define DOUBLE_ATTACT_TIME 5
 #define FREEZING_TIME 5
-#define PROTECT_TIME  10
 #define SHOTGUNS_TIME 10
-#define BLOOD_COUNT   40
-#define ROCKET_TIME   10
 #define BALL_SPEED	  0.1f
 
-#define PLAYER_BLOOD_COUNT	3
 
 #endif

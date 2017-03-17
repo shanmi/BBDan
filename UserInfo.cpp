@@ -48,6 +48,21 @@ int UserInfo::getBestScore()
 	return CCUserDefaultEx::sharedUserDefault()->getIntegerForKey(GAME_BEST_SCORE, 0);
 }
 
+void UserInfo::setShootBestScore(int score)
+{
+	int bestScore = getShootBestScore();
+	if (score > bestScore)
+	{
+		CCUserDefaultEx::sharedUserDefault()->setIntegerForKey(GAME_SHOOT_BEST, score);
+		CCUserDefaultEx::sharedUserDefault()->flush();
+	}
+}
+
+int UserInfo::getShootBestScore()
+{
+	return CCUserDefaultEx::sharedUserDefault()->getIntegerForKey(GAME_SHOOT_BEST, 0);
+}
+
 void UserInfo::setCurMarbleType(int type)
 {
 	CCUserDefaultEx::sharedUserDefault()->setIntegerForKey(GAME_MARBLE_TYPE, type);
@@ -144,23 +159,5 @@ void UserInfo::resetLuckyLevel()
 		CCUserDefaultEx::sharedUserDefault()->setBoolForKey(temp, false);
 		CCUserDefaultEx::sharedUserDefault()->flush();
 	}
-}
-
-void UserInfo::setTargetLevel()
-{
-	int curTarget = getTargetLevel();
-	CCUserDefaultEx::sharedUserDefault()->setIntegerForKey(GAME_TARGET_LEVEL, curTarget * 2);
-	CCUserDefaultEx::sharedUserDefault()->flush();
-}
-
-int UserInfo::getTargetLevel()
-{
-	return CCUserDefaultEx::sharedUserDefault()->getIntegerForKey(GAME_TARGET_LEVEL, 10);
-}
-
-void UserInfo::resetTargetLevel()
-{
-	CCUserDefaultEx::sharedUserDefault()->setIntegerForKey(GAME_TARGET_LEVEL, 10);
-	CCUserDefaultEx::sharedUserDefault()->flush();
 }
 

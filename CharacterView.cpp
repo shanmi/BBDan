@@ -59,7 +59,7 @@ void CharacterView::initCharacterLayout()
 void CharacterView::initCharacterLayout2()
 {
 	m_characterLayout = UiLayout::create("layout/character_node2.xml");
-	m_characterLayout->setAnchorPoint(ccp(0.5f, 0.5f));
+	m_characterLayout->setAnchorPoint(ccp(0.5f, 0.0f));
 	m_characterLayout->setMenuTouchPriority(kPriority_Game - 1);
 	addChild(m_characterLayout, kZOrder_Character);
 	setContentSize(m_characterLayout->getContentSize());

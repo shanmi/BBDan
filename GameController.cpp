@@ -13,11 +13,13 @@ GameController::GameController()
 , m_targetPos(ccp(0, 0))
 , m_attactRate(ATTACT_RATE)
 , m_bISFirstIn(true)
-, m_bloodCount(PLAYER_BLOOD_COUNT)
 , m_gameType(kGame_Normal)
 , m_bIsGamePause(false)
+, m_bossType(kBoss_Max)
 , m_bossBloodCount(0)
 , m_crystalBloods({ 2, 3, 2})
+, m_bCanMove(true)
+, m_targetLevel(10)
 {
 }
 
@@ -184,4 +186,18 @@ void GameController::setCrystalBlood(int index, int bloodCount)
 int GameController::getCrystalBlood(int index)
 {
 	return m_crystalBloods.at(index);
+}
+
+void GameController::setTargetLevel(int level)
+{
+	m_targetLevel = level;
+}
+
+int GameController::getTargetLevel()
+{
+	return m_targetLevel;
+}
+void GameController::resetTargetLevel()
+{
+	m_targetLevel = 10;
 }

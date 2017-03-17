@@ -18,6 +18,7 @@ public:
 
 public:
 	void initLayout();
+	void initLayout2();
 	void closePanel(cocos2d::CCObject *pSender);
 
 private:

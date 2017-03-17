@@ -225,6 +225,15 @@ std::vector<int> SquareModel::getBallListType2()
 				iter = find(types.begin(), types.end(), type);
 			}
 		}
+		int curLevel = SquareModel::theModel()->getCurrentScore();
+		int showFireLevel = GameConfig::getInstance()->m_showFireLevel;
+		if (curLevel < showFireLevel)
+		{
+			if (type == kType_BossEatMarble)
+			{
+				type = kType_Triangle;
+			}
+		}
 		types.push_back(type);
 	}
 	return types;
@@ -302,6 +311,14 @@ void SquareModel::elimateSameRowSquare(SquareNode *node)
 		{
 			square->addScore(-1);
 		}
+		int gameType = GameController::getInstance()->getGameType();
+		if (gameType == kGame_Shoot)
+		{
+			if (fabsf(node->getPositionY() - square->getPositionY()) <= 1)
+			{
+				square->setScore(0);
+			}
+		}
 	}
 }
 
@@ -315,6 +332,14 @@ void SquareModel::elimateSameColSquare(SquareNode *node)
 		if (square->canRemoveByProps() && index.x == squareIndex.x)
 		{
 			square->addScore(-1);
+		}
+		int gameType = GameController::getInstance()->getGameType();
+		if (gameType == kGame_Shoot)
+		{
+			if (fabsf(node->getPositionX() - square->getPositionX()) <= 1)
+			{
+				square->setScore(0);
+			}
 		}
 	}
 }
@@ -413,6 +438,8 @@ void SquareModel::exchangeSquarePosition()
 		square->setIndex(index);
 		auto pos = points->getControlPointAtIndex(seq[i]);
 		CCMoveTo *moveTo = CCMoveTo::create(0.4f, pos);
+		square->stopAllActions();
+		square->setRotation(0);
 		square->runAction(CCEaseBackInOut::create(moveTo));
 	}
 }

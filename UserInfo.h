@@ -4,12 +4,12 @@
 #define GAME_MUTE			"game-mute"
 #define GAME_COINS_COUNT	"game-coins-count"
 #define GAME_BEST_SCORE		"game-best-score"
+#define GAME_SHOOT_BEST		"game-shoot-best"
 #define GAME_UNLOCK_MARBLE  "game-unlock-marble"
 #define GAME_FISH_GUIDE		"game-fish-guide"
 #define GAME_PROP_COUNT     "game-prop-count"
 #define GAME_MARBLE_TYPE    "game-marble-type"
 #define GAME_LUCKY_LEVEL    "game-lucky-level"
-#define GAME_TARGET_LEVEL   "game-target-level"
 
 class UserInfo
 {
@@ -27,6 +27,9 @@ public:
 	void setBestScore(int score);
 	int getBestScore();
 
+	void setShootBestScore(int score);
+	int getShootBestScore();
+
 	void setCurMarbleType(int type);
 	int getCurMarbleType();
 
@@ -43,10 +46,6 @@ public:
 	bool hasGetLuckyLevel(int level);
 	void setLuckyLevel(int level);
 	void resetLuckyLevel();
-
-	void setTargetLevel();
-	int getTargetLevel();
-	void resetTargetLevel();
 
 private:
 	UserInfo(){}

@@ -1,6 +1,8 @@
 #include "CrystalView.h"
 #include "CCFunctionAction.h"
 #include "ActionSequence.h"
+#include "UiLayout.h"
+#include "GameUtil.h"
 
 USING_NS_CC;
 
@@ -36,20 +38,29 @@ bool CrystalView::init()
 	{
 		return false;
 	}
-	switch (m_type)
-	{
-	case kCrystal_1:
-		m_image = CCSprite::create("game/crystal1.png");
-		break;
-	case kCrystal_2:
-		m_image = CCSprite::create("game/crystal2.png");
-		break;
-	case kCrystal_3:
-		m_image = CCSprite::create("game/crystal1.png");
-		break;
-	}
+	m_mainLayout = UiLayout::create("layout/crystal_node.xml");
+	m_mainLayout->setAnchorPoint(ccp(0.5f, 0.5f));
+	addChild(m_mainLayout);
+
+	m_image = dynamic_cast<CCSprite*>(m_mainLayout->getChildById(1));
+	m_count = dynamic_cast<CCLabelAtlas*>(m_mainLayout->getChildById(2));
+
 	m_bloodCount = GameController::getInstance()->getCrystalBlood(m_type);
-	addChild(m_image);
+	m_count->setString(GameUtil::intToString(m_bloodCount).c_str());
+
+	char temp[100] = { 0 };
+	int index = 1;
+	if (m_bloodCount <= 0)
+	{
+		index = 3;
+	}
+	else if (m_bloodCount == 1)
+	{
+		index = 2;
+	}
+	sprintf(temp, "game/sejimosi_kuangshi%d_%d.png", m_type+1, index);
+	m_image->initWithFile(temp);
+
 	auto size = m_image->getContentSize();
 	setContentSize(size);
 	addBloodCount(0);
@@ -60,11 +71,29 @@ bool CrystalView::init()
 void CrystalView::addBloodCount(int count)
 {
 	m_bloodCount += count;
-	GameController::getInstance()->setCrystalBlood(m_type, m_bloodCount);
+	m_count->setString(GameUtil::intToString(m_bloodCount).c_str());
 	if (m_bloodCount <= 0)
 	{
-		setVisible(false);
+		m_count->setVisible(false);
 	}
+	else
+	{
+		m_count->setVisible(true);
+	}
+
+	GameController::getInstance()->setCrystalBlood(m_type, m_bloodCount);
+	char temp[100] = { 0 };
+	int index = 1;
+	if (m_bloodCount <= 0)
+	{
+		index = 3;
+	}
+	else if (m_bloodCount == 1)
+	{
+		index = 2;
+	}
+	sprintf(temp, "game/sejimosi_kuangshi%d_%d.png", m_type + 1, index);
+	m_image->initWithFile(temp);
 }
 
 void CrystalView::runDieEffect()
@@ -83,11 +112,9 @@ void CrystalView::runDieEffect()
 void CrystalView::rebuildCrystal()
 {
 	m_bloodCount = GameController::getInstance()->getCrystalBlood(m_type);
-	setVisible(true);
 }
 
 void CrystalView::addCrystalEffect()
 {
-	m_bloodCount++;
-	setVisible(true);
+	addBloodCount(1);
 }

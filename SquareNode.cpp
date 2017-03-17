@@ -33,6 +33,16 @@ SquareNode *SquareNode::create()
 bool SquareNode::init()
 {
 	m_score = SquareModel::theModel()->getCurrentScore();
+	int gameType = GameController::getInstance()->getGameType();
+	switch (gameType)
+	{
+	case kGame_Normal:
+		break;
+	case kGame_Shoot:
+		m_score = rand() % m_score + 1;
+		break;
+	}
+
 	if (m_score % 10 == 0)
 	{
 		int random = rand() % 100;
@@ -506,7 +516,7 @@ IronNode *IronNode::create()
 bool IronNode::init()
 {
 	m_score = 1;// SquareModel::theModel()->getCurrentScore();
-
+	m_speed = BLOCK_SPEED * 2;
 	m_imageSprite = CCSprite::create("squares/fangkuai_tie.png");
 	addChild(m_imageSprite);
 	auto fanIn = CCFadeIn::create(0.6f);
