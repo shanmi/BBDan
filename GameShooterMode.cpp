@@ -48,7 +48,7 @@ void GameShooterMode::draw()
 
 void GameShooterMode::keyBackClicked()
 {
-	GameController::getInstance()->backToMainMenu();
+	onPauseGame(NULL);
 }
 
 GameShooterMode::GameShooterMode()
@@ -94,6 +94,7 @@ bool GameShooterMode::init()
 	GameController::getInstance()->setGameType(kGame_Shoot);
 
 	setKeypadEnabled(true);
+	setAccelerometerEnabled(true);
 	Box2dFactory::getInstance()->initPhysics(true);
 	DataHelper::getInstance()->loadShootGameInfo();
 
@@ -141,9 +142,11 @@ bool GameShooterMode::init()
 void GameShooterMode::initMainLayout()
 {
 	CCSprite *line_top = dynamic_cast<CCSprite*>(m_mainLayout->getChildById(8));
+	line_top->setTag(kTag_Wall_Top);
 	line_top->setVisible(false);
 	auto worldPos = m_mainLayout->convertToWorldSpace(line_top->getPosition());
 	m_topLinePos = worldPos.y;
+	Box2dFactory::getInstance()->createSquare(line_top, true);
 
 	CCSprite *line_bottom = dynamic_cast<CCSprite*>(m_mainLayout->getChildById(7));
 	line_bottom->setTag(kTag_Wall);
@@ -178,6 +181,7 @@ void GameShooterMode::onPauseGame(CCObject *pSender)
 	saveGameData();
 	PauseLayer *pauseLayer = PauseLayer::create();
 	addChild(pauseLayer, KZOrder_PauseLayer, kTag_Pause);
+	CCLog("m_world->GetBodyCount()======================%d", m_world->GetBodyCount());
 }
 
 void GameShooterMode::initTopLayout()
@@ -325,7 +329,6 @@ void GameShooterMode::onClearScreen(CCObject *pSender)
 	}
 	updateCoins();
 	SquareModel::theModel()->removeAllSquares();
-	//oneRoundEnd();
 }
 
 void GameShooterMode::onFreezing(CCObject *pSender)
@@ -437,7 +440,7 @@ void GameShooterMode::addMarble(float dt)
 	{
 		auto ball = MarbleModel::theModel()->createMarble();
 		ball->setBody();
-		ball->setPosition(ccp(m_characterView->getPositionX(), m_bottomLinePos + ball->getContentSize().height / 2 + 4));
+		ball->setPosition(ccp(m_characterView->getPositionX() - 5, m_bottomLinePos + ball->getContentSize().height / 2 + 4));
 		addChild(ball);
 		ball->setMovingState(true);
 
@@ -451,15 +454,15 @@ void GameShooterMode::addMarble(float dt)
 		}
 		ball->setVisible(true);
 	}
-	auto actions = ActionSequence::create(this);
-	auto action1 = CCDelayTime::create(0.1f / attr.speed);
-	//actions->addAction(action1);
-	auto callback = CCFunctionAction::create([=]()
-	{
-		addMarble(0);
-	});
-	//actions->addAction(callback);
-	actions->runActions();
+	//auto actions = ActionSequence::create(this);
+	//auto action1 = CCDelayTime::create(0.1f / attr.speed);
+	////actions->addAction(action1);
+	//auto callback = CCFunctionAction::create([=]()
+	//{
+	//	addMarble(0);
+	//});
+	////actions->addAction(callback);
+	//actions->runActions();
 }
 
 void GameShooterMode::initSquares()
@@ -515,14 +518,13 @@ void GameShooterMode::update(float dt)
 	{
 		return;
 	}
-	int32 velocityIterations = 8;
-	int32 positionIterations = 1;
+	int32 velocityIterations = 10;
+	int32 positionIterations = 10;
 	m_world->Step(dt, velocityIterations, positionIterations);
 	m_world->ClearForces();
 
 	addMarble(dt);
 	MarbleModel::theModel()->updateMarbles();
-
 	if (m_shotgunsTime > 0)
 	{
 		m_shotgunsTime -= dt;
@@ -531,6 +533,14 @@ void GameShooterMode::update(float dt)
 	if (m_doubleAttactTime > 0)
 	{
 		m_doubleAttactTime -= dt;
+	}
+	else if (m_doubleAttactTime < 0)
+	{
+		m_doubleAttactTime = 0;
+		GameController::getInstance()->resetAttactRate();
+		CCMenuItem *doubleAttactBtn = dynamic_cast<CCMenuItem*>(m_bottomLayout->getChildById(5));
+		doubleAttactBtn->stopAllActions();
+		doubleAttactBtn->setScale(0.7f);
 	}
 
 	bool isFreezing = SquareModel::theModel()->isFreezing();
@@ -622,6 +632,7 @@ bool GameShooterMode::ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent)
 	}
 	m_characterView->setScale(0.82f);
 	m_characterView->setPositionX(location.x);
+	m_bIsTouching = true;
 	return true;
 }
 
@@ -637,8 +648,8 @@ void GameShooterMode::ccTouchMoved(CCTouch *pTouch, CCEvent *pEvent)
 	{
 		auto wheelBig = dynamic_cast<CCSprite *>(m_characterView->getBodyById(7 + i));
 		auto wheelSmall = dynamic_cast<CCSprite *>(m_characterView->getBodyById(10 + i));
-		auto rotate1 = CCRotateBy::create(0.6, (location.x - previous.x) * 60);
-		auto rotate2 = CCRotateBy::create(0.6, (previous.x - location.x) * 60);
+		auto rotate1 = CCRotateBy::create(0.6f, (location.x - previous.x) * 60);
+		auto rotate2 = CCRotateBy::create(0.6f, (previous.x - location.x) * 60);
 
 		wheelBig->stopAllActions();
 		wheelBig->runAction(rotate1);
@@ -664,17 +675,7 @@ void GameShooterMode::ccTouchMoved(CCTouch *pTouch, CCEvent *pEvent)
 void GameShooterMode::ccTouchEnded(CCTouch *pTouch, CCEvent *pEvent)
 {
 	m_characterView->setScale(0.8f);
-}
-
-void GameShooterMode::oneRoundEnd()
-{
-	//check tools when one round end and delete "0 score" tool
-	GameController::getInstance()->checkSquares(true);
-
-	//reset doubleAttact buttom
-	GameController::getInstance()->resetAttactRate();
-	CCMenuItem *doubleAttactBtn = dynamic_cast<CCMenuItem*>(m_bottomLayout->getChildById(6));
-
+	m_bIsTouching = false;
 }
 
 void GameShooterMode::updateMarbles()
@@ -708,10 +709,8 @@ void GameShooterMode::useShotGunsEffect()
 
 void GameShooterMode::onMarbleChange(cocos2d::CCObject *pSender)
 {
-	bool isRoundOver = GameController::getInstance()->isRoundOver();
-	bool isGameOver = GameController::getInstance()->isGameOver();
-
-	if (!isRoundOver || isGameOver)
+	bool isGamePause = GameController::getInstance()->isGamePause();
+	if (m_bIsGameOver || isGamePause)
 	{
 		return;
 	}
@@ -753,9 +752,7 @@ void GameShooterMode::defenseCrash(SquareNode *node)
 		col = 2;
 	}
 	CrystalView *crystal = dynamic_cast<CrystalView*>(m_mainLayout->getChildById(10 + col));
-	CCLog("col === %d", col);
-	crystal->addBloodCount(-1);
-	if (crystal->getBloodCount() < 0)
+	if (crystal->getBloodCount() <= 0)
 	{
 		if (!m_bIsGameOver)
 		{
@@ -769,6 +766,7 @@ void GameShooterMode::defenseCrash(SquareNode *node)
 	{
 		node->setScore(0);
 	}
+	crystal->addBloodCount(-1);
 }
 
 void GameShooterMode::updateScore()
@@ -818,7 +816,8 @@ void GameShooterMode::updateProgress()
 	float gotoPos;
 	if (curLevel == bossLevel)
 	{
-		GameController::getInstance()->setBossBloodCount(targetLevel);
+		int bloodCount = targetLevel > 60 ? targetLevel : 60;
+		GameController::getInstance()->setBossBloodCount(bloodCount);
 		addBoss();
 	}
 	if (targetLevel == lastLevel)
@@ -867,8 +866,6 @@ void GameShooterMode::updateMarbleType(int type)
 
 void GameShooterMode::bossAttactEffect(int type)
 {
-	CCLog("attact type = %d", type);
-
 	auto remainSquares = SquareModel::theModel()->getRemainSqaure();
 	int remainCount = remainSquares.size();
 	CCPoint targetPos = m_characterView->getPosition();
@@ -971,4 +968,51 @@ void GameShooterMode::updateBoss()
 void GameShooterMode::saveGameData()
 {
 	DataHelper::getInstance()->saveShootGameInfo();
+}
+
+void GameShooterMode::didAccelerate(CCAcceleration* pAccelerationValue)
+{
+	bool isGamePause = GameController::getInstance()->isGamePause();
+	if (m_bIsGameOver || isGamePause || m_bIsTouching)
+	{
+		return;
+	}
+
+	float offsetX = pAccelerationValue->x * 10;
+	if (offsetX < 0)
+	{
+		offsetX = -offsetX * offsetX;
+	}
+	else
+	{
+		offsetX = offsetX * offsetX;
+	}
+	auto winSize = CCDirector::sharedDirector()->getWinSize();
+	auto characterPos = m_characterView->getPosition();
+	characterPos.x += offsetX;
+	auto size = m_characterView->getContentSize();
+	if (characterPos.x < 32)
+	{
+		characterPos.x = 32;
+	}
+	else if (characterPos.x > winSize.width - 32)
+	{
+		characterPos.x = winSize.width - 32;
+	}
+	m_characterView->setPosition(characterPos);
+	GameController::getInstance()->setShooterPos(characterPos);
+
+	for (int i = 0; i < 2; i++)
+	{
+		auto wheelBig = dynamic_cast<CCSprite *>(m_characterView->getBodyById(7 + i));
+		auto wheelSmall = dynamic_cast<CCSprite *>(m_characterView->getBodyById(10 + i));
+		auto rotate1 = CCRotateBy::create(0.6f, (offsetX)* 60);
+		auto rotate2 = CCRotateBy::create(0.6f, (offsetX)* 60);
+
+		wheelBig->stopAllActions();
+		wheelBig->runAction(rotate1);
+
+		wheelSmall->stopAllActions();
+		wheelSmall->runAction(rotate2);
+	}
 }

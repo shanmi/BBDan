@@ -88,6 +88,7 @@ enum ViewTag
 {
 	kTag_Streak = 100,
 	kTag_Wall = 200,
+	kTag_Wall_Top = 201,
 	kTag_Boss = 210,
 	kTag_Marble = 300,
 	kTag_Pause,

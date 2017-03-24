@@ -225,12 +225,25 @@ void MarbleNode::updateStreak(float delta)
 
 void MarbleNode::runRemoveAction()
 {
-	/*unschedule(schedule_selector(MarbleNode::updateStreak));
+	unschedule(schedule_selector(MarbleNode::updateStreak));
 	if (m_streak)
 	{
 		m_streak->removeFromParent();
-	}*/
-	removeAllChildren();
+	}
 	removeBody();
 	removeFromParent();
+}
+
+bool MarbleNode::inScreen()
+{
+	auto winSize = CCDirector::sharedDirector()->getWinSize();
+	if (getPositionX() > winSize.width || getPositionX() < 0)
+	{
+		return false;
+	}
+	if (getPositionY() > winSize.height || getPositionY() < 0)
+	{
+		return false;
+	}
+	return true;
 }

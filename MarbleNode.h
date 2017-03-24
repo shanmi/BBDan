@@ -38,6 +38,7 @@ public:
 	void addMotionStreak();
 
 	void runRemoveAction();
+	bool inScreen();
 
 private:
 	MarbleNode(MarbleAttr attr);

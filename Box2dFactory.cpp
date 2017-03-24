@@ -3,6 +3,7 @@
 #include "VisibleRect.h"
 #include "SquareNode.h"
 #include "CommonMacros.h"
+#include "GameController.h"
 
 Box2dFactory::Box2dFactory()
 {
@@ -123,10 +124,14 @@ void Box2dFactory::initBorders(float topLine, float bottomLine)
 	//	b2Vec2(VisibleRect::rightBottom().x / PTM_RATIO, bottomLine / PTM_RATIO));
 	//groundBody->CreateFixture(&groundBox, 0);
 
-	// top
-	groundBox.Set(b2Vec2(VisibleRect::leftTop().x / PTM_RATIO, topLine / PTM_RATIO),
-		b2Vec2(VisibleRect::rightTop().x / PTM_RATIO, topLine / PTM_RATIO));
-	groundBody->CreateFixture(&groundBox, 0);
+	int gameType = GameController::getInstance()->getGameType();
+	if (gameType == kGame_Normal)
+	{
+		// top
+		groundBox.Set(b2Vec2(VisibleRect::leftTop().x / PTM_RATIO, topLine / PTM_RATIO),
+			b2Vec2(VisibleRect::rightTop().x / PTM_RATIO, topLine / PTM_RATIO));
+		groundBody->CreateFixture(&groundBox, 0);
+	}
 
 	// left
 	groundBox.Set(b2Vec2(VisibleRect::leftTop().x / PTM_RATIO, VisibleRect::leftTop().y / PTM_RATIO),

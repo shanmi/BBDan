@@ -143,14 +143,8 @@ void HelpLayer::initLayout2()
 	sprintf(temp, str, cost);
 	hammerLabel->setString(temp);
 
-	CCLabelTTF *showFireLabel = dynamic_cast<CCLabelTTF*>(m_mainLayout->getChildById(29));
-	int level = GameConfig::getInstance()->m_showFireLevel;
-	str = showFireLabel->getString();
-	sprintf(temp, str, level);
-	showFireLabel->setString(temp);
-
 	CCLabelTTF *addIronLabel = dynamic_cast<CCLabelTTF*>(m_mainLayout->getChildById(34));
-	level = GameConfig::getInstance()->m_showIronLevel;
+	int level = GameConfig::getInstance()->m_showIronLevel;
 	str = addIronLabel->getString();
 	sprintf(temp, str, level);
 	addIronLabel->setString(temp);

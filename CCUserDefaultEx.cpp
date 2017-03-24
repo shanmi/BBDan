@@ -11,23 +11,20 @@ using namespace std;
  * implements of CCUserDefault
  */
 
-CCUserDefaultEx* CCUserDefaultEx::m_spUserDefault = 0;
-
 /**
  * If the user invoke delete CCUserDefault::sharedUserDefault(), should set m_spUserDefault
  * to null to avoid error when he invoke CCUserDefault::sharedUserDefault() later.
  */
 CCUserDefaultEx::~CCUserDefaultEx(){
-    m_spUserDefault = NULL;
+
 }
 
 CCUserDefaultEx::CCUserDefaultEx(){
-	m_spUserDefault = NULL;
+
 }
 
 void CCUserDefaultEx::purgeSharedUserDefault(){
-	CC_SAFE_DELETE(m_spUserDefault);
-    m_spUserDefault = NULL;
+
 }
 
 bool CCUserDefaultEx::getBoolForKey(const char* pKey){
@@ -179,10 +176,8 @@ void CCUserDefaultEx::setStringForKey(const char* pKey, const std::string & valu
 }
 
 CCUserDefaultEx* CCUserDefaultEx::sharedUserDefault(){
-    if (!m_spUserDefault){
-        m_spUserDefault = new CCUserDefaultEx();
-    }
-    return m_spUserDefault;
+	static CCUserDefaultEx instance;
+	return &instance;
 }
 
 void CCUserDefaultEx::flush(){

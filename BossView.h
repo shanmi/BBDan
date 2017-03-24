@@ -27,6 +27,7 @@ private:
 	cocos2d::extension::CCArmature *m_armature;
 	cocos2d::CCProgressTimer *m_bloodProgress;
 	b2Body *m_body;
+	std::string m_animPath;
 	int m_type;
 	int k_bloodRecord;
 	int m_bloodCount;

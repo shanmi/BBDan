@@ -39,8 +39,7 @@ void MarbleModel::removeMarble(MarbleNode *node)
 	{
 		auto marble = *iter;
 		m_marbles.erase(iter);
-		Box2dFactory::getInstance()->removeBody(marble->getBody());
-		marble->removeFromParent();
+		marble->runRemoveAction();
 	}
 }
 
@@ -174,17 +173,22 @@ void MarbleModel::updateMarbles()
 	{
 		auto &marble = (*iter);
 		auto body = marble->getBody();
-		MarbleNode *ball = (MarbleNode*)(body->GetUserData());
-		float distance = body->GetLinearVelocity().x*body->GetLinearVelocity().x + body->GetLinearVelocity().y*body->GetLinearVelocity().y;
-		if (distance > 0 && distance < 400)
+		//MarbleNode *ball = (MarbleNode*)(body->GetUserData());
+		if (marble->isMoving())
 		{
-			float angle = GameUtil::getDegreeTwoPoints(ccp(0, 0), ccp(body->GetLinearVelocity().x, body->GetLinearVelocity().y));
-			marble->shooterShoot(angle);
-		}
-		if (ball->isMoving())
-		{
+			float distance = body->GetLinearVelocity().x*body->GetLinearVelocity().x + body->GetLinearVelocity().y*body->GetLinearVelocity().y;
+			if (distance > 0 && distance < 400)
+			{
+				float angle = GameUtil::getDegreeTwoPoints(ccp(0, 0), ccp(body->GetLinearVelocity().x, body->GetLinearVelocity().y));
+				marble->shooterShoot(angle);
+			}
+
 			b2Vec2 ballPosition = body->GetPosition();
-			ball->setPosition(ccp(ballPosition.x * PTM_RATIO, ballPosition.y * PTM_RATIO));
+			marble->setPosition(ccp(ballPosition.x * PTM_RATIO, ballPosition.y * PTM_RATIO));
+			if (!marble->inScreen())
+			{
+				MarbleModel::theModel()->removeMarble(marble);
+			}
 		}
 		else
 		{

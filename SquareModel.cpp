@@ -91,7 +91,6 @@ void SquareModel::removeSquareNode(SquareNode *node)
 	{
 		m_squares.erase(iter);
 	}
-	Box2dFactory::getInstance()->removeBody(node->getBody());
 	node->runRemoveAction();
 }
 

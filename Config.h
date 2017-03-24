@@ -18,8 +18,8 @@
 //shoot mode
 #define BLOCK_DISTANCE 150
 #define BLOCK_SPEED 0.5f
-#define DOUBLE_ATTACT_TIME 5
-#define FREEZING_TIME 5
+#define DOUBLE_ATTACT_TIME 10
+#define FREEZING_TIME 10
 #define SHOTGUNS_TIME 10
 #define BALL_SPEED	  0.1f
 

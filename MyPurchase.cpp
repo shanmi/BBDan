@@ -8,7 +8,6 @@
 #include "GameController.h"
 using namespace cocos2d;
 
-MyPurchase* MyPurchase::s_pPurchase = NULL;
 
 MyPurchase::MyPurchase()
 :s_pRetListener(NULL)
@@ -24,10 +23,8 @@ MyPurchase::~MyPurchase(){
 }
 
 MyPurchase* MyPurchase::sharedPurchase(){
-	if (s_pPurchase == NULL) {
-		s_pPurchase = new MyPurchase();
-	}
-	return s_pPurchase;
+	static MyPurchase instance;
+	return &instance;
 }
 
 void MyPurchase::loadIAPPlugin(){

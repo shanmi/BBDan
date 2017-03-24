@@ -29,6 +29,7 @@ private:
 private:
 	UiLayout *m_mainLayout;
 	int m_type;
+	bool m_bIsGamePause;
 };
 
 #endif

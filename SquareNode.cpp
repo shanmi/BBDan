@@ -39,7 +39,12 @@ bool SquareNode::init()
 	case kGame_Normal:
 		break;
 	case kGame_Shoot:
+		if (m_score > 100)
+		{
+			m_score = 100;
+		}
 		m_score = rand() % m_score + 1;
+		m_speed = m_speed + m_score / 1000;
 		break;
 	}
 
@@ -276,7 +281,7 @@ void SquareNode::removeBody()
 {
 	if (m_body)
 	{
-		//Box2dFactory::getInstance()->removeBody(m_body);
+		Box2dFactory::getInstance()->removeBody(m_body);
 	}
 }
 
@@ -339,6 +344,21 @@ TriangleNode *TriangleNode::create(int shap /* = -1 */)
 bool TriangleNode::init(int shap /* = -1 */)
 {
 	m_score = SquareModel::theModel()->getCurrentScore();
+	int gameType = GameController::getInstance()->getGameType();
+	switch (gameType)
+	{
+	case kGame_Normal:
+		break;
+	case kGame_Shoot:
+		if (m_score > 100)
+		{
+			m_score = 100;
+		}
+		m_score = rand() % m_score + 1;
+		m_speed = m_speed + m_score / 1000;
+		break;
+	}
+
 	if (m_score % 10 == 0)
 	{
 		int random = rand() % 100;

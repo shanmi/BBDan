@@ -102,8 +102,6 @@ public:
 	static std::string G2U(const char* gb2312);
 private:
     CCUserDefaultEx();
-    
-    static CCUserDefaultEx* m_spUserDefault;
 };
 
 #endif // __SUPPORT_CCUSERDEFAULT_H__

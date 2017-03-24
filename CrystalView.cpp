@@ -74,6 +74,7 @@ void CrystalView::addBloodCount(int count)
 	m_count->setString(GameUtil::intToString(m_bloodCount).c_str());
 	if (m_bloodCount <= 0)
 	{
+		m_bloodCount = 0;
 		m_count->setVisible(false);
 	}
 	else
@@ -94,6 +95,17 @@ void CrystalView::addBloodCount(int count)
 	}
 	sprintf(temp, "game/sejimosi_kuangshi%d_%d.png", m_type + 1, index);
 	m_image->initWithFile(temp);
+	if (count > 0)
+	{
+		auto effect = GameUtil::getCryStalEffect();
+		addChild(effect);
+	}
+	else if (count < 0)
+	{
+		auto effect = GameUtil::getExplodeEffect("particle/crystal_particle.png");
+		effect->setPosition(getPosition());
+		getParent()->addChild(effect);
+	}
 }
 
 void CrystalView::runDieEffect()

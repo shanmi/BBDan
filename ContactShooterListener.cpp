@@ -33,7 +33,7 @@ void ContactShooterListener::BeginContact(b2Contact* contact)
 			node = dynamic_cast<CCNode*>(spriteA);
 		}
 
-		if (node->getTag() == kTag_Wall)
+		if (node->getTag() == kTag_Wall || node->getTag() == kTag_Wall_Top)
 		{
 			marble->setVisible(false);
 			marble->stop();

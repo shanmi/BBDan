@@ -63,8 +63,7 @@ public:
 	std::string getUserId();
 private:
 	MyPurchase();
-	virtual ~MyPurchase();
-	static MyPurchase* s_pPurchase;
+	~MyPurchase();
 };
 
 #endif

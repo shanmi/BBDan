@@ -38,28 +38,28 @@ bool BossView::init()
 	k_bloodRecord = targetLevel;
 	m_bloodCount = bloodCount;
 
-	std::string path = "animation/boss/diren001_bossyouling.ExportJson";
+	m_animPath = "animation/boss/diren001_bossyouling.ExportJson";
 	CCPoint anchor = ccp(0.5f, 0.5f);
 	switch (m_type)
 	{
 	case kBoss_Ghost:
-		path = "animation/boss/diren001_bossyouling.ExportJson";
+		m_animPath = "animation/boss/diren001_bossyouling.ExportJson";
 		anchor = ccp(0.5f, 0.7f);
 		break;
 	case kBoss_Spider:
-		path = "animation/boss/diren002_bosszhizhu.ExportJson";
+		m_animPath = "animation/boss/diren002_bosszhizhu.ExportJson";
 		anchor = ccp(0.5f, 0.5f);
 		break;
 	case kBoss_Moth:
-		path = "animation/boss/diren003_bossfeier.ExportJson";
+		m_animPath = "animation/boss/diren003_bossfeier.ExportJson";
 		anchor = ccp(0.5f, 0.5f);
 		break;
 
 	}
-	CCArmatureDataManager::sharedArmatureDataManager()->addArmatureFileInfo(path.c_str());
-	int pos1 = path.rfind("/");
-	int pos2 = path.rfind(".");
-	std::string armatureName = path.substr(pos1 + 1, pos2 - pos1 - 1);
+	CCArmatureDataManager::sharedArmatureDataManager()->addArmatureFileInfo(m_animPath.c_str());
+	int pos1 = m_animPath.rfind("/");
+	int pos2 = m_animPath.rfind(".");
+	std::string armatureName = m_animPath.substr(pos1 + 1, pos2 - pos1 - 1);
 	m_armature = CCArmature::create(armatureName.c_str());
 	m_armature->getAnimation()->playByIndex(0);
 	m_armature->setAnchorPoint(anchor);
@@ -197,6 +197,7 @@ void BossView::runDieEffect()
 	auto blink = CCBlink::create(1.0f, 10);
 	actions->addAction(blink);
 	CCFunctionAction *callback = CCFunctionAction::create([=](){
+		CCArmatureDataManager::sharedArmatureDataManager()->removeArmatureFileInfo(m_animPath.c_str());
 		Box2dFactory::getInstance()->removeBody(m_body);
 		removeFromParent();
 	});

@@ -30,8 +30,9 @@ public:
 	virtual void ccTouchMoved(cocos2d::CCTouch *pTouch, cocos2d::CCEvent *pEvent);
 	virtual void ccTouchEnded(cocos2d::CCTouch *pTouch, cocos2d::CCEvent *pEvent);
 
+	virtual void didAccelerate(cocos2d::CCAcceleration* pAccelerationValue);
+
 public:
-	void oneRoundEnd();
 	void updateMarbles();
 	void updateCoins();
 	void addMarble(float dt);
@@ -85,5 +86,6 @@ private:
 	float m_addMarbleTime;
 	bool m_bIsGamePause;
 	bool m_bIsGameOver;
+	bool m_bIsTouching;
 };
 #endif

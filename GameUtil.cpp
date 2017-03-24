@@ -161,8 +161,15 @@ cocos2d::CCParticleSystemQuad *GameUtil::getBombEffect()
 {
 	auto emitter = CCParticleSystemQuad::create("particle/explore.plist");
 	emitter->setAutoRemoveOnFinish(true);
-	std::string filename = "particle/explore.plist";
-	//emitter->initWithFile(filename.c_str());
+	//emitter->autorelease();
+	return emitter;
+}
+
+cocos2d::CCParticleSystemQuad *GameUtil::getCryStalEffect()
+{
+	auto emitter = CCParticleSystemQuad::create("particle/crystal_effect.plist");
+	emitter->setAutoRemoveOnFinish(true);
+	//emitter->autorelease();
 	return emitter;
 }
 

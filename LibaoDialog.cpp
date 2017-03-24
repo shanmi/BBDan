@@ -31,6 +31,7 @@ void LibaoDialog::onEnter()
 	}
 	else
 	{
+		m_bIsGamePause = GameController::getInstance()->isGamePause();
 		GameController::getInstance()->setGamePause(true);
 	}
 }
@@ -40,7 +41,7 @@ void LibaoDialog::onExit()
 	CCLayer::onExit();
 	CCDirector::sharedDirector()->getTouchDispatcher()->removeDelegate(this);
 	GameController::getInstance()->removeView(this);
-	GameController::getInstance()->setGamePause(false);
+	GameController::getInstance()->setGamePause(m_bIsGamePause);
 }
 
 bool LibaoDialog::ccTouchBegan(cocos2d::CCTouch *pTouch, cocos2d::CCEvent *pEvent)
@@ -50,6 +51,7 @@ bool LibaoDialog::ccTouchBegan(cocos2d::CCTouch *pTouch, cocos2d::CCEvent *pEven
 
 LibaoDialog::LibaoDialog(int type)
 :m_type(type)
+, m_bIsGamePause(false)
 {
 
 }
@@ -67,7 +69,7 @@ bool LibaoDialog::init()
 	if (!CCLayer::init()){
 		return false;
 	}
-	
+
 	auto winSize = CCDirector::sharedDirector()->getWinSize();
 	auto colorLayer = CCLayerColor::create(ccc4(0, 0, 0, 80));
 	addChild(colorLayer);
@@ -84,7 +86,7 @@ bool LibaoDialog::init()
 		m_mainLayout = UiLayout::create("layout/libao_dialog.xml");
 		break;
 	}
-	
+
 	m_mainLayout->setMenuTouchPriority(kPriority_Libao - 1);
 	m_mainLayout->setAnchorPoint(ccp(0.5f, 0.5f));
 	m_mainLayout->setPosition(ccpMult(winSize, 0.5f));

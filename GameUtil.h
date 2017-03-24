@@ -22,6 +22,7 @@ namespace GameUtil
 	cocos2d::CCParticleSystemQuad *getBombEffect();
 	cocos2d::CCParticleSystemQuad *getBombEffect2();
 	cocos2d::CCMotionStreak *getMotionStreak();
+	cocos2d::CCParticleSystemQuad *getCryStalEffect();
 
 	std::string getBlockImage(int type, int score);
 
