@@ -375,13 +375,6 @@ void GameScene::onHelpPanel(CCObject *pSender)
 
 void GameScene::showLibaoDiaolg()
 {
-	bool isBusinessMode = MyPurchase::sharedPurchase()->isBusinessMode();
-	int isYijian = GameConfig::getInstance()->m_yijian;
-	if (isBusinessMode && isYijian)
-	{
-		MyPurchase::sharedPurchase()->payForProducts(PAY_TYPE_COIN_LIBAO);
-		return;
-	}
 	int random = rand() % 2;
 	int libaoType = PAY_TYPE_TIME_LIBAO;
 	if (random == 0)
@@ -751,6 +744,7 @@ void GameScene::updateMarbles()
 
 void GameScene::notifyViews()
 {
+	GameController::getInstance()->checkSquares(true);
 	updateCoins();
 	updatePropsCount();
 	initBottomLayout();

@@ -371,13 +371,6 @@ void GameShooterMode::onHelpPanel(CCObject *pSender)
 
 void GameShooterMode::showLibaoDiaolg()
 {
-	bool isBusinessMode = MyPurchase::sharedPurchase()->isBusinessMode() == 1;
-	int isYijian = GameConfig::getInstance()->m_yijian;
-	if (isBusinessMode && isYijian)
-	{
-		MyPurchase::sharedPurchase()->payForProducts(PAY_TYPE_COIN_LIBAO);
-		return;
-	}
 	int random = rand() % 2;
 	int libaoType = PAY_TYPE_TIME_LIBAO;
 	if (random == 0)

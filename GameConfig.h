@@ -57,7 +57,6 @@ public:
 	int m_showIronLevel;
 
 	bool m_bAdvertiseMode;
-	int m_yijian;
 private:
 	GameConfig();
 

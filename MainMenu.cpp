@@ -139,7 +139,7 @@ void MainMenu::initLayout()
 
 	CCMenuItem *startGameTwo = dynamic_cast<CCMenuItem*>(m_mainLayout->getChildById(3));
 	startGameTwo->setTarget(this, menu_selector(MainMenu::toStartGameTwo));
-	//startGameTwo->setVisible(false);
+	startGameTwo->setVisible(false);
 
 	CCMenuItem *toShop = dynamic_cast<CCMenuItem*>(m_mainLayout->getChildById(5));
 	toShop->setTarget(this, menu_selector(MainMenu::toShopLayer));
@@ -184,16 +184,6 @@ void MainMenu::initLayout()
 		userIdLabel->setString(temp);
 	}
 
-	bool isBusinessMode = MyPurchase::sharedPurchase()->isBusinessMode();
-	int isYijian = GameConfig::getInstance()->m_yijian;
-	CCLabelTTF *phoneTip = dynamic_cast<CCLabelTTF*>(m_mainLayout->getChildById(12));
-	if (isBusinessMode && isYijian)
-	{
-		if (phoneTip)
-		{
-			phoneTip->setVisible(false);
-		}
-	}
 }
 
 void MainMenu::toStartGameOne(CCObject* pSender)

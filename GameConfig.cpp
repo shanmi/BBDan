@@ -21,7 +21,6 @@ GameConfig::GameConfig()
 , m_gravityLevel(120)
 , m_showIronLevel(160)
 , m_bAdvertiseMode(false)
-, m_yijian(0)
 {
 	/*memset(m_nDiamond, 0, sizeof(int)* 10 * 5);
 	memset(m_nMarble, 0, sizeof(int)* 10 * 3);
@@ -209,12 +208,6 @@ void GameConfig::preloadData()
 			{
 				m_bAdvertiseMode = false;
 			}
-		}
-
-		key = "yijian";
-		if (!root[key].IsNull())
-		{
-			m_yijian = root[key].GetInt();
 		}
 
 	}

@@ -72,11 +72,6 @@ void FuhuoLibao::initLayout()
 	CCMenuItem *closeItem = dynamic_cast<CCMenuItem*>(m_mainLayout->getChildById(6));
 	closeItem->setTarget(this, menu_selector(FuhuoLibao::closePanel));
 	bool isBusinessMode = MyPurchase::sharedPurchase()->isBusinessMode();
-	int isYijian = GameConfig::getInstance()->m_yijian;
-	if (isBusinessMode && isYijian)
-	{
-		closeItem->setTarget(this, menu_selector(FuhuoLibao::buyLibao));
-	}
 
 	CCMenuItem *buyItem = dynamic_cast<CCMenuItem*>(m_mainLayout->getChildById(5));
 	buyItem->setTarget(this, menu_selector(FuhuoLibao::buyLibao));
@@ -88,12 +83,6 @@ void FuhuoLibao::initLayout()
 		buyTip->setPosition(ccp(buyTip->getPositionX(), buyTip->getPositionY() - size.height * 0.76f));
 		buyTip->setScale(0.5f);
 		buyTip->setOpacity(120);
-
-		int isYijian = GameConfig::getInstance()->m_yijian;
-		if (isYijian)
-		{
-			buyTip->setVisible(false);
-		}
 	}
 }
 
@@ -136,12 +125,6 @@ void FuhuoLibao::buyLibao(CCObject *pSender)
 	}
 #else
 	MyPurchase::sharedPurchase()->payForProducts(PAY_TYPE_FUHUO_LIBAO);
-	bool isBusinessMode = MyPurchase::sharedPurchase()->isBusinessMode();
-	int isYijian = GameConfig::getInstance()->m_yijian;
-	if (isBusinessMode && isYijian)
-	{
-		removeFromParent();
-	}
 #endif
 }
 
